@@ -42,10 +42,10 @@
 
 | 推理方式 | 实际操作 |
 | --- | --- |
-| \`normal\` | 与原始训练/评估一致，当前 batch 动态 padding |
-| \`pair_exact\` | 一对句子的左右两侧分别使用相同的长度，取该**句对两句有效长度的较大者** |
-| \`sentence_exact\` | 每句话独立使用自己的实际有效 token 长度 |
-| \`fixed_128\` | 两句均在 pooling 输入端右 padding 到 128 |
+| `normal` | 与原始训练/评估一致，当前 batch 动态 padding |
+| `pair_exact` | 一对句子的左右两侧分别使用相同的长度，取该**句对两句有效长度的较大者** |
+| `sentence_exact` | 每句话独立使用自己的实际有效 token 长度 |
+| `fixed_128` | 两句均在 pooling 输入端右 padding 到 128 |
 
 每种方式重新计算整套 test 预测，分别计算每 seed 的 test Spearman，再在三个 seeds 上求均值。**这是固定模型的 inference-time intervention，不是四套分别训练的模型。**
 
@@ -64,7 +64,7 @@
 
 **Q：** E2/E3 都采用半窗口 overlap。局部 STFT 的潜在效果是否必须依赖 frame 重叠？去掉 overlap 是否简化实现并保持结果？
 
-**M：** 在 STSB 上按原训练协议**重新训练**四种 rect、\`center=False\`、无额外 frame positional encoding 的 local 配置。两种窗长 \`win∈{8,16}\` 与两种 hop（半窗或整窗）交叉，非算子因素全部统一为 \`dropout=0,norm=True\`，每种用 **seeds 0–2**。其中 E2/E3 是已经执行过的配置，补充不重叠的 E11/E12。重叠位置按重建实现进行 window-envelope 归一化。
+**M：** 在 STSB 上按原训练协议**重新训练**四种 rect、`center=False`、无额外 frame positional encoding 的 local 配置。两种窗长 `win∈{8,16}` 与两种 hop（半窗或整窗）交叉，非算子因素全部统一为 `dropout=0,norm=True`，每种用 **seeds 0–2**。其中 E2/E3 是已经执行过的配置，补充不重叠的 E11/E12。重叠位置按重建实现进行 window-envelope 归一化。
 
 **R：** **STSB official test，3-seed Spearman（mean ± sample std）**：
 
@@ -73,13 +73,13 @@
 | 8 | **E3**：win=8, hop=4；**0.843000 ± 0.001047** | **E11**：win=8, hop=8；**0.842166 ± 0.001423** |
 | 16 | **E2**：win=16, hop=8；**0.842204 ± 0.001824** | **E12**：win=16, hop=16；**0.843419 ± 0.000531** |
 
-同窗长情况下，overlap 与不 overlap 的 Spearman 均值差：\`win=8\` 时 \`+0.000834\`，\`win=16\` 时 \`−0.001215\`。三个 seeds 的早期 E12 Pearson 为 \`0.839528±0.002141\`；E12 相对同 seed global FLaG 的 Spearman 差为 \`+0.001259,+0.000591,+0.005023\`。
+同窗长情况下，overlap 与不 overlap 的 Spearman 均值差：`win=8` 时 `+0.000834`，`win=16` 时 `−0.001215`。三个 seeds 的早期 E12 Pearson 为 `0.839528±0.002141`；E12 相对同 seed global FLaG 的 Spearman 差为 `+0.001259,+0.000591,+0.005023`。
 
 **C：** overlap 不呈现一致的有利方向。因此后续选择**结构更简单**的 E12（rect、16/16、无重叠、非居中、无帧位置编码）用于机制研究和 Sprint 迁移；这里的“选定”指在**早期 3-seed 候选中进行探索性选择**，并不构成独立数据验证或通用最优排名。
 
 ### E12 扩展到 10 seeds 后怎样？
 
-原来的 FLaG 和 E12 均保持 \`dropout=0,norm=True\`、相同训练预算，不改超参数，扩展到 **seeds 0–9**：
+原来的 FLaG 和 E12 均保持 `dropout=0,norm=True`、相同训练预算，不改超参数，扩展到 **seeds 0–9**：
 
 | 模型 | 10-seed **test Spearman** ↑ | 10-seed **test Pearson** ↑ |
 | --- | ---: | ---: |
@@ -87,23 +87,23 @@
 | E12（16/16） | 0.842739 ± 0.003214 | 0.839393 ± 0.003467 |
 | 配对 E12 − FLaG | **+0.001180 ± 0.002107** | **+0.000889 ± 0.003033** |
 
-Spearman 正向 seeds **7/10**，配对 t 95% CI 约 \`[−0.000327,+0.002687]\`，双侧 p≈0.110。区间跨 0；早期 3/3 的正向信号**没有形成稳定的 10-seed 性能证明**。此外，STSB Mean pooling 10-seed Spearman \`0.851201±0.002000\`，高于当前这两组 FLaG 系列。
+Spearman 正向 seeds **7/10**，配对 t 95% CI 约 `[−0.000327,+0.002687]`，双侧 p≈0.110。区间跨 0；早期 3/3 的正向信号**没有形成稳定的 10-seed 性能证明**。此外，STSB Mean pooling 10-seed Spearman `0.851201±0.002000`，高于当前这两组 FLaG 系列。
 
 ## E13：从训练开始固定 global FFT 长度
 
 **Q：** E10 只在**推理**时尝试 fixed_128，但 FLaG 在**训练**中仍受到动态 padding 影响。如果从训练开始固定 global FFT 长度，是否能重现 E12 早期观察到的性能变化？
 
-**M：** **重新训练** global FLaG，在训练、validation 和 test 阶段都使用 \`fixed_fft_length=128\`（global rFFT 和 irFFT 都按这个长度工作）；不引入局部 frame，保持 STSB 早期 \`dropout=0,norm=True\`、3 epochs、**seeds 0–2**。与这三个 seeds 的原始动态 global FLaG 配对比较。
+**M：** **重新训练** global FLaG，在训练、validation 和 test 阶段都使用 `fixed_fft_length=128`（global rFFT 和 irFFT 都按这个长度工作）；不引入局部 frame，保持 STSB 早期 `dropout=0,norm=True`、3 epochs、**seeds 0–2**。与这三个 seeds 的原始动态 global FLaG 配对比较。
 
-**R：** 3-seed **test** Spearman \`0.841856±0.001000\`；Pearson \`0.837795±0.001660\`。配对 Spearman E13 − 原 global 为 \`−0.000445,−0.001592,+0.004222\`，均值 \`+0.000728±0.003079\`，**1/3 正向**。
+**R：** 3-seed **test** Spearman `0.841856±0.001000`；Pearson `0.837795±0.001660`。配对 Spearman E13 − 原 global 为 `−0.000445,−0.001592,+0.004222`，均值 `+0.000728±0.003079`，**1/3 正向**。
 
 **C：** 固定 global FFT 长度消除了这一路径的 batch-dependent 变换长度变化，但**没有稳定提高 STSB 性能**，也没有在这三个 seeds 上稳定重现 E12 的观察值。不能把“padding 敏感性存在”直接升级为“padding 是性能差距主因”。
 
 ## E14：在原论文 text 配置下重新比较 FLaG 和 E12
 
-**Q：** 上面的 STSB 探索都用了 \`dropout=0,norm=True\`。后来查阅论文正文发现其 text 主配置为 **\`dropout=0.1, post-pool LayerNorm=True\`**；此前观察到的 E12 微小正向趋势，对 dropout 是否敏感？
+**Q：** 上面的 STSB 探索都用了 `dropout=0,norm=True`。后来查阅论文正文发现其 text 主配置为 **`dropout=0.1, post-pool LayerNorm=True`**；此前观察到的 E12 微小正向趋势，对 dropout 是否敏感？
 
-**M：** 不改 STSB 任务协议、backbone、训练预算、E12 16/16 结构等，仅把 FLaG 和 E12 都统一改为**\`dropout=0.1,norm=True\`**，**重新训练 seeds 0–9（10 seeds）**。validation Spearman 选 checkpoint；下表为 official **test** 指标，FLaG/E12 按 seed 配对比较。
+**M：** 不改 STSB 任务协议、backbone、训练预算、E12 16/16 结构等，仅把 FLaG 和 E12 都统一改为**`dropout=0.1,norm=True`**，**重新训练 seeds 0–9（10 seeds）**。validation Spearman 选 checkpoint；下表为 official **test** 指标，FLaG/E12 按 seed 配对比较。
 
 **R：**
 
@@ -113,9 +113,9 @@ Spearman 正向 seeds **7/10**，配对 t 95% CI 约 \`[−0.000327,+0.002687]\`
 | E12，0.1/True | **0.838944 ± 0.001882** | **0.834015 ± 0.002119** |
 | 配对 E12 − FLaG | **−0.000121 ± 0.004039** | **−0.000965 ± 0.003878** |
 
-Spearman 正向 **5/10 seeds**，均值差近 0。论文原文报告的 STSB FLaG Spearman 约 \`0.8368±0.004\`；本重建的 \`0.839065\` 在数值上接近，但训练重建细节并未被证明逐项与作者实现完全一致，不能宣称精确复现。
+Spearman 正向 **5/10 seeds**，均值差近 0。论文原文报告的 STSB FLaG Spearman 约 `0.8368±0.004`；本重建的 `0.839065` 在数值上接近，但训练重建细节并未被证明逐项与作者实现完全一致，不能宣称精确复现。
 
-**C：** \`0/True\` 时的 E12 10-seed 小幅正向均值，在论文文本配置 \`0.1/True\` 下基本消失。**两套匹配配置都不支持“局部 STFT 稳定优于 global FLaG”的强结论**；也不能反向声称 global 在所有配置上一定更强。
+**C：** `0/True` 时的 E12 10-seed 小幅正向均值，在论文文本配置 `0.1/True` 下基本消失。**两套匹配配置都不支持“局部 STFT 稳定优于 global FLaG”的强结论**；也不能反向声称 global 在所有配置上一定更强。
 
 ---
 
