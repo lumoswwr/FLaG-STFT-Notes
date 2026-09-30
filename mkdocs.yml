@@ -5,14 +5,14 @@ site_url: https://lumoswwr.github.io/FLaG-STFT-Notes/
 nav:
   - 首页: index.md
   - 实验协议与指标: methods.md
-  - 研究结果综述: findings.md
   - STSB:
-      - E1–E8：算子探索与机制探针: stsb/01-experiments.md
-      - E9–E14：Padding、窗口与配置: stsb/02-padding.md
-      - 循环反射、P1 与 P2: stsb/03-mechanism.md
+      - E1–E8: stsb/01-experiments.md
+      - E9–E14: stsb/02-padding.md
+      - 循环反射与 P1/P2: stsb/03-mechanism.md
   - Sprint:
-      - 数据、训练与指标: sprint/01-protocol.md
-      - S1–S5：跨任务实验与控制: sprint/02-experiments.md
+      - 数据与训练: sprint/01-protocol.md
+      - S1–S5: sprint/02-experiments.md
+  - 结果总结: findings.md
 
 theme:
   name: material
