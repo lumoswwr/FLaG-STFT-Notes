@@ -2,13 +2,13 @@
 
 ## 当前结构
 
-### STSB
+### STSB数据集(FLaG表现不如Mean的数据集，任务为预测句子相似度)
 
 - **E1–E8**：Hann window、STFT、多窗口、位置编码、frequency/token knockout、DC attention。
 - **E9–E14**：padding 敏感性、不重叠窗口、固定 padding、dropout / post-pool LayerNorm 配置补充。
 - **机制分析**：循环反射的时域推导，以及 P1 / P1 补充 / P2 交叉验证。
 
-### Sprint
+### Sprint数据集(FLaG表现高于Mean的数据集，任务为判断句子语义是否重复)
 
 - **迁移协议**：STSB 与 Sprint 任务设置差异。
 - **S1–S5**：Mean / FLaG / E12 对比、10-seed、global/local gate-reconstruction、配置对齐和 dropout × norm 控制实验。
