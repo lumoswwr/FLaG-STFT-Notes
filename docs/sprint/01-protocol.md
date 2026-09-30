@@ -26,7 +26,13 @@ $$
 \ell=\operatorname{softplus}(w)\operatorname{cosine}(z_1,z_2)+b.
 $$
 
-主要指标 **AP（Average Precision）** 衡量重复问题的排序质量，**不需要分类阈值**。Accuracy 是总体正确率，F1 综合 Precision（查准率）与 Recall（查全率）。
+主要指标 **AP（Average Precision）** 衡量重复问题的排序质量，**不需要分类阈值**。按预测分数由高到低排列，计算各召回率增加位置的 precision：
+
+$
+\mathrm{AP}=\sum_k(R_k-R_{k-1})P_k.
+$
+
+其中 $P_k$、$R_k$ 是对应位置的 precision、recall。Accuracy 是总体正确率，F1 综合 Precision（查准率）与 Recall（查全率）。
 
 在 **adaptation validation** 上分别选择 Accuracy 阈值、F1 阈值；最终 **test Accuracy 用前者**，**test F1/Precision/Recall 用后者**。两个指标使用的分类阈值不同。
 
