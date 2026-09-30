@@ -1,0 +1,1110 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="FLaG / STFT 实验记录与机制分析">
+      
+      
+      
+        <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/stsb/03-mechanism/">
+      
+      
+        <link rel="prev" href="../02-padding/">
+      
+      
+        <link rel="next" href="../../sprint/01-protocol/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>循环反射与 P1/P2 - FLaG / STFT Mechanism Experiments</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#p1p2" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="FLaG / STFT Mechanism Experiments" class="md-header__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FLaG / STFT Mechanism Experiments
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              循环反射与 P1/P2
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="FLaG / STFT Mechanism Experiments" class="md-nav__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    FLaG / STFT Mechanism Experiments
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    STSB
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    STSB
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../01-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E1–E8：早期实验
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-padding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E9–E14：Padding 与配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    循环反射与 P1/P2
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    循环反射与 P1/P2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        循环反射的时域推导
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="循环反射的时域推导">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 输入与实虚 gate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 将频谱改写为原频谱与其共轭
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 逆变换得到循环反射
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 公式含义与通道形式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-padding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Padding 如何改变反射来源
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 实现检查与结论
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1 补充
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sprint
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sprint/01-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    迁移协议
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sprint/02-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S1–S5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        循环反射的时域推导
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="循环反射的时域推导">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 输入与实虚 gate
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 将频谱改写为原频谱与其共轭
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 逆变换得到循环反射
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 公式含义与通道形式
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#5-padding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Padding 如何改变反射来源
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 实现检查与结论
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p1_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P1 补充
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        P2
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="p1p2">循环反射的时域推导与 P1/P2<a class="headerlink" href="#p1p2" title="Permanent link">&para;</a></h1>
+<h2 id="_1">循环反射的时域推导<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> E9/E10 已发现，仅改变 pooling 输入的右 padding 长度就会使 FLaG 预测变化。为理解这一现象，检查实部、虚部分别乘 gate 后，逆 FFT 在 token 位置轴上对应什么操作。</p>
+<h3 id="1-gate">1. 输入与实虚 gate<a class="headerlink" href="#1-gate" title="Permanent link">&para;</a></h3>
+<p>先考虑一个句子、一个 hidden 通道，省略 batch 和通道下标。令 <span class="arithmatex">\(x[t]\)</span> 为进入 FFT 的实值序列，<span class="arithmatex">\(N\)</span> 为变换长度，<span class="arithmatex">\(t=0,\ldots,N-1\)</span>；有效长度以外的位置补零。<span class="arithmatex">\(X[k]\)</span> 为其 <span class="arithmatex">\(N\)</span> 点 DFT。</p>
+<div class="arithmatex">\[
+X[k] = \sum_{t=0}^{N-1} x[t] e^{-i2\pi kt/N}
+\]</div>
+<p>当前实现生成一个通道 gate，并在所有频率位置共享。令实部、虚部的实际乘数分别为 <span class="arithmatex">\(a,b\)</span>；开启 residual gate 时，它们包含“<span class="arithmatex">\(1+\mathrm{sigmoid}\)</span> 输出”。</p>
+<div class="arithmatex">\[
+a = 1 + g_{Re}, \qquad b = 1 + g_{Im}
+\]</div>
+<div class="arithmatex">\[
+Y[k] = a\,\mathrm{Re}(X[k]) + i b\,\mathrm{Im}(X[k])
+\]</div>
+<p>这里 <span class="arithmatex">\(a,b\)</span> 可以随输入句子及 hidden 通道变化，但对频率 <span class="arithmatex">\(k\)</span> 不变。<span class="arithmatex">\(Y[k]\)</span> 表示施加 gate 后的频谱。</p>
+<h3 id="2">2. 将频谱改写为原频谱与其共轭<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
+<div class="arithmatex">\[
+\mathrm{Re}(X[k]) = \frac{X[k] + \overline{X[k]}}{2},
+\qquad
+i\,\mathrm{Im}(X[k]) = \frac{X[k] - \overline{X[k]}}{2}
+\]</div>
+<p>代入 gate 操作并合并同类项：</p>
+<div class="arithmatex">\[
+Y[k]
+= \frac{a+b}{2}X[k]
++ \frac{a-b}{2}\overline{X[k]}
+\]</div>
+<p>令</p>
+<div class="arithmatex">\[
+\alpha = \frac{a+b}{2},
+\qquad
+\beta = \frac{a-b}{2},
+\]</div>
+<p>则</p>
+<div class="arithmatex">\[
+Y[k] = \alpha X[k] + \beta \overline{X[k]}.
+\]</div>
+<h3 id="3">3. 逆变换得到循环反射<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
+<p>由于 <span class="arithmatex">\(x[t]\)</span> 为实值序列，频谱共轭的逆 DFT 等于原序列的循环反射：</p>
+<div class="arithmatex">\[
+\mathcal{F}_N^{-1}\{\overline{X[k]}\}[t]
+= x[(-t) \bmod N]
+\]</div>
+<p>利用逆变换的线性性，得到核心恒等式：</p>
+<div class="arithmatex">\[
+y[t]
+= \alpha x[t]
++ \beta x[(-t) \bmod N]
+\]</div>
+<h3 id="4">4. 公式含义与通道形式<a class="headerlink" href="#4" title="Permanent link">&para;</a></h3>
+<p>第一项是原位置 hidden 的缩放；第二项是循环反射位置 hidden 的混入。恢复通道下标 <span class="arithmatex">\(d\)</span> 后：</p>
+<div class="arithmatex">\[
+y[t,d]
+= \frac{a_d+b_d}{2}x[t,d]
++ \frac{a_d-b_d}{2}x[(-t) \bmod N,d]
+\]</div>
+<p><span class="arithmatex">\(y\)</span> 是逆 FFT 后、最终时间维聚合前的 token hidden，不是最终句向量。代码采用 rFFT/irFFT 保存和重建实值信号的半谱，与上面的完整 DFT 表达等价。</p>
+<p>循环反射不同于普通倒序。以 <span class="arithmatex">\(N=4\)</span> 为例，位置 0、1、2、3 分别映射到 0、3、2、1：</p>
+<div class="arithmatex">\[
+[x_0,x_1,x_2,x_3]
+\rightarrow
+[x_0,x_3,x_2,x_1]
+\]</div>
+<p>当 <span class="arithmatex">\(a=b\)</span> 时，<span class="arithmatex">\(\beta=0\)</span>，反射项消失，重建只剩通道缩放 <span class="arithmatex">\(y[t]=a x[t]\)</span>。</p>
+<h3 id="5-padding">5. Padding 如何改变反射来源<a class="headerlink" href="#5-padding" title="Permanent link">&para;</a></h3>
+<p>取固定 gate 的示例：<span class="arithmatex">\(x=[10,20,30,40]\)</span>，<span class="arithmatex">\(a=1.8\)</span>，<span class="arithmatex">\(b=1.2\)</span>，因此 <span class="arithmatex">\(\alpha=1.5,\beta=0.3\)</span>。未补零时 <span class="arithmatex">\(N=4\)</span>，位置 1 的反射来源是位置 3：</p>
+<div class="arithmatex">\[
+y[1] = 1.5\times20 + 0.3\times40 = 42
+\]</div>
+<p>在同一序列后补四个零，<span class="arithmatex">\(N=8\)</span>。此时位置 1 的反射来源变为位置 7，属于零 padding：</p>
+<div class="arithmatex">\[
+y[1] = 1.5\times20 + 0.3\times0 = 30
+\]</div>
+<p>有效 hidden 和 gate 均未变化，仅改变 <span class="arithmatex">\(N\)</span>，就改变了反射来源及重建结果。因此，padding 可通过“变换长度 → 反射索引 → 重建 hidden”这条路径影响模型输出。</p>
+<p>更一般地，若有效位置为 <span class="arithmatex">\(0,\ldots,L-1\)</span>，其余为零，且 <span class="arithmatex">\(N\ge 2L-1\)</span>，则所有有效 <span class="arithmatex">\(t&gt;0\)</span> 的反射位置都落入 padding：</p>
+<div class="arithmatex">\[
+y[0] = a x[0],
+\qquad
+y[t] = \alpha x[t] \quad (1\le t&lt;L)
+\]</div>
+<p>位置 0 自反，因此仍使用乘数 <span class="arithmatex">\(a\)</span>。在本实验中该位置对应 BOS。</p>
+<h3 id="6">6. 实现检查与结论<a class="headerlink" href="#6" title="Permanent link">&para;</a></h3>
+<p>独立 float64 数值检查比较“rFFT → 实虚乘 gate → irFFT”和上述时域公式。全局恒等式在 <span class="arithmatex">\(N=1,\ldots,129\)</span> 的检查中，最大绝对误差约为 <span class="arithmatex">\(3.55\times10^{-15}\)</span>，两种计算在数值精度范围内一致。</p>
+<p><strong>C：</strong> 跨频率共享的实虚 gate 在给定 gate 时，等价于通道缩放与循环反射的混合，为 padding 敏感性提供了结构解释。gate 本身仍由输入生成，不能据此称整个网络为固定线性模型，也不能认定模型未使用频域信息。长度变化还可能影响 gate 的生成；哪条路径主导实际预测漂移，需要后续 P1 交叉验证。</p>
+<hr />
+<h2 id="p1">P1<a class="headerlink" href="#p1" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 上述推导中，padding 改变可能通过两种方式改变最后结果：</p>
+<ol>
+<li>改变用于生成 gate 的频谱，进而改变实部、虚部乘数 <span class="arithmatex">\(a,b\)</span>；</li>
+<li>改变循环反射位置，即使 <span class="arithmatex">\(a,b\)</span> 不变，重建结果也可能改变。</li>
+</ol>
+<p><strong>M：</strong> 规定：</p>
+<ul>
+<li>
+<p><span class="arithmatex">\(N_g\)</span>：生成 gate 的 FFT 长度</p>
+</li>
+<li>
+<p><span class="arithmatex">\(N_r\)</span>：重建时 FFT 长度</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th style="text-align: right;"><span class="arithmatex">\(N_g\)</span></th>
+<th style="text-align: right;"><span class="arithmatex">\(N_r\)</span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TT</td>
+<td style="text-align: right;">T</td>
+<td style="text-align: right;">T</td>
+</tr>
+<tr>
+<td>128T</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">T</td>
+</tr>
+<tr>
+<td>T128</td>
+<td style="text-align: right;">T</td>
+<td style="text-align: right;">128</td>
+</tr>
+<tr>
+<td>128128</td>
+<td style="text-align: right;">128</td>
+<td style="text-align: right;">128</td>
+</tr>
+</tbody>
+</table>
+<p><strong>R：</strong></p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th style="text-align: right;">相对TT的绝对预测漂移,三seed均值±标准差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TT</td>
+<td style="text-align: right;">0</td>
+</tr>
+<tr>
+<td>128T</td>
+<td style="text-align: right;"><span class="arithmatex">\((4.80 \pm 2.84) \times 10^{-7}\)</span></td>
+</tr>
+<tr>
+<td>T128</td>
+<td style="text-align: right;">0.005520±0.000805</td>
+</tr>
+<tr>
+<td>128128</td>
+<td style="text-align: right;">0.005520±0.000805</td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> 可以看出 FLaG 预测漂移主要来自 reconstruction 过程中 FFT 长度改变。Padding 对 <span class="arithmatex">\(a,b\)</span> 的影响十分小。</p>
+<h2 id="p1_1">P1 补充<a class="headerlink" href="#p1_1" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> P1 中将 reconstruction 时 padding 长度固定为 128，使反射项数值为 0。那么如果反射项系数为 0，结论是否保持一致？</p>
+<p><strong>M：</strong> 令 <span class="arithmatex">\(a=b\)</span>，使反射项系数变为 0，命名为 SYM（对称实验）。</p>
+<p><strong>R：</strong></p>
+<table>
+<thead>
+<tr>
+<th>比较</th>
+<th style="text-align: right;">平均绝对预测差异</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SYM与TT</td>
+<td style="text-align: right;">0.005576</td>
+</tr>
+<tr>
+<td>T128与TT</td>
+<td style="text-align: right;">0.005520</td>
+</tr>
+<tr>
+<td>SYM与T128</td>
+<td style="text-align: right;">0.000295</td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> SYM 与 T128 高度一致，结论保持不变：反射混合是当前预测漂移来源。</p>
+<h2 id="p2">P2<a class="headerlink" href="#p2" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 继续探究从 global 换到 local 时，预测变化来自 gate 还是重建。</p>
+<p><strong>M：</strong></p>
+<ul>
+<li>G:global,整句全局FFT</li>
+<li>L:local,E12的16/16局部STFT</li>
+<li>第一个字母:生成gate的频谱来源</li>
+<li>第二个字母:应用gate并重建hidden的方式</li>
+</ul>
+<p><strong>R：</strong></p>
+<table>
+<thead>
+<tr>
+<th>参数来源</th>
+<th>GG</th>
+<th>LG</th>
+<th>GL</th>
+<th>LL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLaG</td>
+<td>0.867756</td>
+<td>0.867756</td>
+<td>0.867590</td>
+<td>0.867590</td>
+</tr>
+<tr>
+<td>E12</td>
+<td>0.867938</td>
+<td>0.867938</td>
+<td>0.868096</td>
+<td>0.868096</td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> 结果清晰展示：只换 gate 频谱来源，gate 不变；只换 reconstruction，会产生与完整切换到 local 几乎相同的预测漂移。但是改变 reconstruction 不意味着成绩提高。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

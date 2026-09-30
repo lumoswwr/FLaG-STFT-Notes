@@ -1,0 +1,956 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="FLaG / STFT 实验记录与机制分析">
+      
+      
+      
+        <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/stsb/01-experiments/">
+      
+      
+        <link rel="prev" href="../..">
+      
+      
+        <link rel="next" href="../02-padding/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>E1–E8：早期实验 - FLaG / STFT Mechanism Experiments</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#stsbe1e8" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href="../.." title="FLaG / STFT Mechanism Experiments" class="md-header__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FLaG / STFT Mechanism Experiments
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              E1–E8：早期实验
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="FLaG / STFT Mechanism Experiments" class="md-nav__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    FLaG / STFT Mechanism Experiments
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    STSB
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    STSB
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E1–E8：早期实验
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E1–E8：早期实验
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#e1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E5
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E6
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../02-padding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E9–E14：Padding 与配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../03-mechanism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    循环反射与 P1/P2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sprint
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sprint/01-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    迁移协议
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../sprint/02-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S1–S5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#e1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E1
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E2
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E3
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E4
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E5
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E6
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E7
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E8
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="stsbe1e8">STSB：E1–E8 早期实验<a class="headerlink" href="#stsbe1e8" title="Permanent link">&para;</a></h1>
+<h2 id="e1">E1<a class="headerlink" href="#e1" title="Permanent link">&para;</a></h2>
+<p><strong>Q (Question)：</strong> 整句 FFT 的边界处理会有效果吗？</p>
+<p><strong>M (Method)：</strong> 在 global FLaG 进行 FFT 前，按句子长度加 Hann window。</p>
+<p><strong>R (Result)：</strong> 0.837019 ± 0.002763；相对同 seed FLaG 平均 −0.004109。</p>
+<p><strong>C (Conclusion)：</strong> 未改善，但不等于已排除频谱泄漏。</p>
+<h2 id="e2">E2<a class="headerlink" href="#e2" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 使用 STFT 是否会有改善？</p>
+<p><strong>M：</strong> 使用 rectangular window，<code>win=16, hop=8</code>，生成一个句级 gate，并非每个窗口一个 gate。</p>
+<p><strong>R：</strong> 0.842204 ± 0.001824；相对 FLaG +0.001076，3 seed 上 2/3 正向。</p>
+<h2 id="e3">E3<a class="headerlink" href="#e3" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 检查数据集 sentence length 后发现大部分句子 <code>length &lt; 16</code>，也就是 STFT 并没有起到多窗口作用，因此修改 <code>window</code> 与 <code>hop</code>。</p>
+<p><strong>M：</strong> <code>win=8, hop=4</code>。</p>
+<p><strong>R：</strong> 0.843000 ± 0.001047；相对 FLaG +0.001873，3/3 正向；相对 E2 平均 +0.000796。</p>
+<h2 id="e4">E4<a class="headerlink" href="#e4" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 上述局部频谱送入 attention 时没有加入帧位置编码，探究帧顺序信息是否有用。</p>
+<p><strong>M：</strong> 在 E3 基础上加入 learned frame position。</p>
+<p><strong>R：</strong> 0.842282 ± 0.001834；相对 E3 平均 −0.000718。</p>
+<p><strong>C：</strong> 放弃帧顺序信息。</p>
+<h2 id="e5">E5<a class="headerlink" href="#e5" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 继续探究 STFT 是否造成频谱泄漏影响。</p>
+<p><strong>M：</strong> 在 E3 基础上使用 periodic Hann，<code>center=True</code>。</p>
+<p><strong>R：</strong> 0.843027 ± 0.000593；相对 E3 平均 +0.000027，基本持平。</p>
+<p><strong>C：</strong> 后续放弃 Hann 使用。</p>
+<h2 id="e6">E6<a class="headerlink" href="#e6" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 尝试解释 E3 带来的提升，使用频带 knockout。</p>
+<p><strong>M：</strong> 沿用 FLaG 论文中的方法，DCT 后频带分组置 0。</p>
+<p><strong>R：</strong> B0 的平均 Spearman 降幅最大；FLaG 0.146694，E3 0.198943。</p>
+<p><strong>C：</strong> 除 B0 影响最大外，在不同 seed 中 E3 和 FLaG 的相对敏感性不稳定。使用 STFT 后与 FLaG 结论几乎持平。</p>
+<h2 id="e7">E7<a class="headerlink" href="#e7" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> Token hidden knockout。</p>
+<p><strong>M：</strong> 依旧沿用 FLaG。</p>
+<p><strong>R：</strong></p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">汇总指标</th>
+<th style="text-align: right;">FLaG</th>
+<th style="text-align: right;">E3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">句内平均相应的平均值</td>
+<td style="text-align: right;">0.003248</td>
+<td style="text-align: right;">0.003155</td>
+</tr>
+<tr>
+<td style="text-align: left;">句内最大相应的平均值</td>
+<td style="text-align: right;">0.007714</td>
+<td style="text-align: right;">0.007616</td>
+</tr>
+<tr>
+<td style="text-align: left;">句内位置相应标准差的平均值</td>
+<td style="text-align: right;">0.00195551</td>
+<td style="text-align: right;">0.00195521</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th>相对位置区域</th>
+<th style="text-align: right;">FLaG</th>
+<th style="text-align: right;">E3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开头段</td>
+<td style="text-align: right;">0.003000</td>
+<td style="text-align: right;">0.002850</td>
+</tr>
+<tr>
+<td>前部</td>
+<td style="text-align: right;">0.002771</td>
+<td style="text-align: right;">0.002790</td>
+</tr>
+<tr>
+<td>中部</td>
+<td style="text-align: right;">0.002786</td>
+<td style="text-align: right;">0.002719</td>
+</tr>
+<tr>
+<td>后部</td>
+<td style="text-align: right;">0.002843</td>
+<td style="text-align: right;">0.002780</td>
+</tr>
+<tr>
+<td>末尾段</td>
+<td style="text-align: right;">0.002256</td>
+<td style="text-align: right;">0.002146</td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> 和 FLaG 模型表现无明显差异。</p>
+<h2 id="e8">E8<a class="headerlink" href="#e8" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> STFT 是否相较于 FLaG 更关注 DC？</p>
+<p><strong>M：</strong> 直接读取 global（FLaG）/ local（STFT）的 attention。STFT 虽然有很多帧，但计算类似。</p>
+<p><strong>R：</strong></p>
+<table>
+<thead>
+<tr>
+<th>Seed</th>
+<th style="text-align: right;">FLaG的DC偏好比</th>
+<th style="text-align: right;">E3的DC偏好比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align: right;">2.602</td>
+<td style="text-align: right;">1.305</td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align: right;">1.586</td>
+<td style="text-align: right;">1.213</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">2.553</td>
+<td style="text-align: right;">1.625</td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> 与 E6 结论相匹配，但是大体上看 STFT 对 DC 偏好较弱。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
