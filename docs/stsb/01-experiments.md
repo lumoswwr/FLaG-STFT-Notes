@@ -1,149 +1,194 @@
-# STSB：E1–E8 早期实验
+# STSB：E1–E8，频域变换探索及早期机制探针
 
-## 统一实验设置
+这部分研究从“global FFT 是否受到序列边界影响”出发，逐步尝试 local STFT、局部帧位置编码和窗函数，随后使用 frequency/token knockout 与 DC-attention 诊断解释模型行为。**E1–E5 是重新训练的候选模型；E6–E8 是已训练模型的推理诊断，不能与前者混作一张性能排行榜。**
 
-本页的 E1–E5 属于 **STSB 上的 pooling 算子探索实验**；E6–E8 不重新训练模型，而是在已经训练好的 FLaG 和 E3 checkpoint 上做机制探针。除表中注明的改变外，早期 STSB 实验保持同一训练协议。**本页结果来自探索性实验，不能仅凭少量 seed 的差异认定 STFT 具有稳定性能优势。**
+完整数据集、指标定义及训练配置见[统一实验协议与指标说明](../methods.md)。以下将学姐要求的**配置表放在所有单项实验之前**，各实验只进一步解释自己的变化。
 
-| 项目 | 配置 |
+## A. STSB 统一协议
+
+| 项目 | 设置 |
 | --- | --- |
-| 数据集及任务 | **STSBenchmark（STSB）**；输入一对英文句子，预测其语义相似程度 |
-| 数据划分 | STSB 官方 train / validation（development）/ test；训练使用 train，以 validation Spearman 选择 checkpoint，在 test 上报告结果 |
-| 标签与预测 | 原始相似度标签范围 **0–5**，训练时除以 5；两句分别经过 RoBERTa + pooling，预测值为两个句向量的 **cosine similarity** |
-| Backbone | RoBERTa-base，**端到端参与微调** |
-| 训练目标 | cosine similarity 与归一化金标准分数之间的 **MSE loss** |
-| 训练预算 | **3 epochs**；batch size = 4 对句子、gradient accumulation = 4，等效 batch = 16 对句子；最大 token 长度 = 128 |
-| 优化配置 | AdamW；backbone learning rate = `1e-5`；pooling learning rate = `1e-3`；weight decay = 0.01；10% warmup，linear learning-rate schedule；gradient clipping = 1.0 |
-| FLaG/STFT 共有设置 | 8 个 latent queries、4 个 attention heads、residual gate（`1 + sigmoid`）、最后 masked max pooling |
-| **本页早期实验设置** | **pooling dropout = 0，post-pool LayerNorm = True**。这是本轮探索的统一控制条件，**不是**论文中 `dropout=0.1` 的 text 主配置 |
-| 早期实验随机种子 | E1–E5 各 **3 seeds（0、1、2）**；E6–E8 读取相同 seed 的 FLaG/E3 checkpoint，不重新训练 |
-| 主性能指标 | **test Spearman**：预测相似度与金标准的等级相关系数；**test Pearson**：两者的线性相关系数；均为越大越好 |
-| 数值报告方式 | 若写作 `均值 ± 标准差`，则指上述 **3 个 seed 的 test 指标**的均值与样本标准差；配置之间优先报告相同 seed 的配对差值 |
+| 数据集 | STSBenchmark（STSB），英文句对语义相似度，原始标签 0–5 |
+| 划分与用途 | 官方 train 训练；官方 development/validation 按 Spearman 选 epoch；官方 test 报最终性能 |
+| Backbone | RoBERTa-base，端到端微调；两句各产生一个句向量 |
+| 主性能指标 | **test Spearman**（预测/标签的秩相关）和 **test Pearson**（线性相关），均越高越好 |
+| 训练目标 | \`MSE(cosine(z1,z2), label/5)\` |
+| Epoch / Batch | 3 epochs；batch=4 句对；梯度累积 4（等效 batch=16）；max length=128 |
+| 优化 | AdamW；backbone LR=\`1e-5\`，pool LR=\`1e-3\`，weight decay=\`0.01\`，warmup ratio=\`0.1\`，线性 LR schedule，clip grad=1 |
+| FLaG/STFT 共享设置 | 8 个 latent queries；4 attention heads；residual gate；masked max time pooling；输出 projection |
+| **E1–E5 统一非算子设置** | **pooling dropout=0；post-pool LayerNorm=True**；窗口/位置编码差异见下表 |
+| Seeds | **E1–E5：3 seeds（0、1、2）**。E6–E8：读取相同三个 seed 的 FLaG/E3 checkpoint，不重新训练 |
+| 统计 | 逐 seed 计算 test 指标，再报 **3-seed 均值 ± 样本标准差**；对比优先使用同 seed 配对差 |
 
-**注意：** 此处 E1–E5 的对照应使用相同 seeds 0–2 的 FLaG 基线（test Spearman `0.841128 ± 0.002177`），不能直接拿后续 **10-seed** FLaG 均值或另一种 dropout/norm 配置当作配对基线。E6 的 Spearman 降幅属于 knockout 后的性能变化，E7 的响应量属于单 token 扰动，E8 的偏好比属于 attention 统计，三者都不是模型原始 test Spearman。
+!!! note "配置与论文的区别"
+    本页使用 **0 / True** 是原 STSB 探索线的统一控制条件。原论文文本主配置为 **0.1 / True**，后续补充实验 E14 专门检查这一配置，不应把两条线混作同一实验。
 
-## E1–E8 配置对照
+## B. E1–E8 配置对照表
 
-| 编号 | 类型 / 所用模型 | 关键方法及与基线的差别 | Seeds | 主要观察量 |
+| 编号 | 训练/分析对象 | 频域与关键配置（相对基线的变化） | Seeds | 结果属于什么指标 |
 | --- | --- | --- | --- | --- |
-| 基线 | Global FLaG | **整句 rFFT / irFFT**；不加 Hann；共享设置见上表 | 0、1、2 | test Spearman / Pearson |
-| E1 | Global FLaG + Hann | global FFT 前按有效句长施加 **Hann window**，其余保持不变 | 0、1、2 | test Spearman / Pearson |
-| E2 | STFT-FLaG | **rectangular**；`win=16, hop=8`；overlap = 8；`center=False`；仅生成一个句级 gate | 0、1、2 | test Spearman / Pearson |
-| E3 | STFT-FLaG | **rectangular**；`win=8, hop=4`；overlap = 4；`center=False`；仅生成一个句级 gate | 0、1、2 | test Spearman / Pearson |
-| E4 | E3 + frame position | 在 E3 上，为送入 latent attention 的局部频谱加入 **learned frame positional encoding** | 0、1、2 | test Spearman / Pearson |
-| E5 | E3 + window/centering | 从 E3 改为 **periodic Hann + `center=True`**，仍为 `win=8, hop=4`；**同时改变了窗函数与居中方式** | 0、1、2 | test Spearman / Pearson |
-| E6 | FLaG vs E3 探针 | 读取已训练 checkpoint；对最后一层 **content-token hidden** 做 DCT，分 8 个频带，每次置零一个频带、逆变换后重新预测；特殊 token 不动 | 0、1、2 | 各频带 knockout 前后 **Spearman 降幅** |
-| E7 | FLaG vs E3 探针 | 读取已训练 checkpoint；逐个把 **content token 的 hidden 向量置零**，保持其他 token 和有效 mask 不变，观察句对预测扰动 | 0、1、2 | 预测及平方误差响应、句内位置响应分布 |
-| E8 | FLaG vs E3 探针 | 读取已训练 checkpoint；取频谱 latent-attention 权重，对有效频率 token 统计 **每 token 的 DC / 非 DC 平均注意力之比** | 0、1、2 | 各 seed 的 **DC attention 偏好比** |
+| Baseline | Global FLaG | 整句 \`rFFT/irFFT\`；无窗口；\`FFT length=batch T\` | 0、1、2 | test Spearman / Pearson |
+| **E1** | 新训练：Global Hann | 在 global rFFT 前给各样本**有效 token**加 symmetric Hann；FFT 仍为 global | 0、1、2 | test Spearman / Pearson |
+| **E2** | 新训练：STFT | rect；\`win=16,hop=8,center=False\`，8-token overlap | 0、1、2 | test Spearman / Pearson |
+| **E3** | 新训练：STFT | rect；\`win=8,hop=4,center=False\`，4-token overlap | 0、1、2 | test Spearman / Pearson |
+| **E4** | 新训练：E3 + 帧位置编码 | E3 上为 attention 的局部频谱 token 加 learned frame position | 0、1、2 | test Spearman / Pearson |
+| **E5** | 新训练：E3 + Hann/center | E3 改为 \`periodic Hann,center=True\`，仍 \`win=8,hop=4\` | 0、1、2 | test Spearman / Pearson |
+| **E6** | **探针**：FLaG vs E3 | 对最终层 content-token hidden 做 DCT，划为 8 频带，每次置零一个后逆变换 | 0、1、2 | eligible test 子集的 Spearman 降幅及预测扰动 |
+| **E7** | **探针**：FLaG vs E3 | 逐个将 content-token hidden 置零，不重新运行/训练 backbone | 0、1、2 | 平方误差响应、预测响应、位置异质性 |
+| **E8** | **探针**：FLaG vs E3 | 读取频谱 latent-attention，分别统计 DC 与非 DC 的**每 token 平均权重** | 0、1、2 | test 句子的 DC attention 偏好比 |
 
-**E6 的样本范围：** 使用 test split，但八频带划分只对句对两侧各自至少有 **8 个 content tokens** 的样本实施；因此 E6 的 knockout Spearman 是在符合条件的子集上计算的，不等于完整 test 集的原始 Spearman。**E7 / E8** 则属于已训练模型的推理期诊断，不是额外训练出的新模型。
+E2–E5 的 local STFT 都将所有**有效帧的频率 token**送给同一组 latent queries，汇总生成一个**句级**通道 gate；门控所有频率 token，之后才逐帧逆变换，并非每个 frame 生成独立 gate。
+
+## C. E1–E5 性能汇总
+
+下表均为 **STSB official test，seeds=0/1/2**；E3/E12 后续的 10-seed 数据另有表述。
+
+| 模型 | 主要修改 | test Spearman ↑ | test Pearson ↑ | 与同 seed FLaG 的平均 Spearman 差 |
+| --- | --- | ---: | ---: | ---: |
+| FLaG baseline | 整句 global FFT | 0.841128 ± 0.002177 | 0.836765 ± 0.001782 | 0 |
+| E1 | global Hann | 0.837019 ± 0.002763 | 0.836682 ± 0.000282 | −0.004109 |
+| E2 | STFT 16/8 rect | 0.842204 ± 0.001824 | 0.837783 ± 0.003514 | +0.001076，2/3 正向 |
+| E3 | STFT 8/4 rect | 0.843000 ± 0.001047 | 0.838685 ± 0.001421 | +0.001873，3/3 正向 |
+| E4 | E3 + learned frame pos | 0.842282 ± 0.001834 | 本阶段汇总未列出 | 参见 E4；相对 E3 −0.000718 |
+| E5 | E3 + periodic Hann + center | 0.843027 ± 0.000593 | 0.838083 ± 0.002720 | 相对 E3 +0.000027 |
+
+**读表方法：** 这是模型探索记录，不是对八种方案做严格的独立验证。特别是 E5 同时改变 Hann 和 centering，不能把结果单独归因于 Hann；E4 没有报告过可核实的 Pearson 汇总，本表不填造数值。
 
 ---
 
+## E1：global FFT 前加入 Hann
 
-## E1
+**Q（问题）：** global FFT 默认将有限长度序列周期性延拓，序列首尾不连续可能引起频谱泄漏；在输入前加 Hann 是否改善 STSB 表现？
 
-**Q (Question)：** 整句 FFT 的边界处理会有效果吗？
+**M（方法）：** 以相同 seed 的 FLaG 为对照，仅在 FFT 前加窗。根据每个样本的 attention mask 得到有效长度 \`L\`，在这些位置使用 symmetric Hann（\`periodic=False\`）；padding 仍为零。对于 \`L>2\`：
 
-**M (Method)：** 在 global FLaG 进行 FFT 前，按句子长度加 Hann window。
+$$
+w[n]=\frac{1}{2}\left(1-\cos\frac{2\pi n}{L-1}\right),\quad n=0,\ldots,L-1.
+$$
 
-**R (Result)：** 0.837019 ± 0.002763；相对同 seed FLaG 平均 −0.004109。
+窗函数逐位置乘在 RoBERTa hidden 上（**有效特殊 token 也参与加窗**），随后仍按 batch padded 长度做**整句** global rFFT。原实现对 \`L≤2\` 使用全 1 窗口。除加窗外，gate、逆变换、池化、训练和 seed 全部不变，**没有固定 FFT 长度**。
 
-**C (Conclusion)：** 未改善，但不等于已排除频谱泄漏。
+**R（结果）：** 3-seed test Spearman \`0.837019±0.002763\`，低于配对 FLaG 的 \`0.841128±0.002177\`（平均 −0.004109）；Pearson \`0.836682±0.000282\`，与 FLaG \`0.836765±0.001782\` 很接近。
 
-## E2
+**C（结论）：** 当前加 Hann 的实现没有提升 STSB 性能，但**不能推断频谱泄漏不存在**。加窗同时改变了靠近句子首尾的 token hidden，泄漏变化与输入信息减弱并未分离。
 
-**Q：** 使用 STFT 是否会有改善？
+## E2：第一次引入 local STFT（16/8）
 
-**M：** 使用 rectangular window，`win=16, hop=8`，生成一个句级 gate，并非每个窗口一个 gate。
+**Q：** 如果整句的频域表示不够适合语义信息，改为相互重叠的局部频谱是否带来变化？
 
-**R：** 0.842204 ± 0.001824；相对 FLaG +0.001076，3 seed 上 2/3 正向。
+**M：** 不加 Hann，采用 rectangular frame，\`win_length=16\`、\`hop_length=8\`、\`center=False\`，相邻局部帧重叠 8 token；有效句子尾部不足一帧时在局部完成零填充。每帧做 16 点 rFFT，展平有效帧的频率 token 供共享 latent attention 产生**一个**句级 gate；对各帧频谱施加 gate 后逐帧逆变换，并按实现的重叠处理恢复 token 序列。其余配置与 FLaG 一致（0/True，3 seeds）。
 
-## E3
+**R：** 3-seed **test** Spearman \`0.842204±0.001824\`、Pearson \`0.837783±0.003514\`。相对同 seed FLaG 的平均 Spearman 差为 \`+0.001076\`，2/3 seeds 正向。
 
-**Q：** 检查数据集 sentence length 后发现大部分句子 `length < 16`，也就是 STFT 并没有起到多窗口作用，因此修改 `window` 与 `hop`。
+**C：** 看到小幅探索性正向信号，但只有 3 seeds，尚不能确认多窗口/overlap 就是原因。
 
-**M：** `win=8, hop=4`。
+## E3：缩短局部窗口（8/4）
 
-**R：** 0.843000 ± 0.001047；相对 FLaG +0.001873，3/3 正向；相对 E2 平均 +0.000796。
+**Q：** \`win=16\` 时，部分短句只生成一个有效帧；缩小窗口能否让短句也有更细的局部频谱？
 
-## E4
+**M：** 在 E2 的 rect、非居中、单个句级 gate 基础上，改为 \`win=8,hop=4\`，相邻帧重叠 4 token。其余协议保持不变，仍为 **3 seeds（0–2）**。
 
-**Q：** 上述局部频谱送入 attention 时没有加入帧位置编码，探究帧顺序信息是否有用。
+**R：** 3-seed test Spearman \`0.843000±0.001047\`，Pearson \`0.838685±0.001421\`；配对 FLaG 的 Spearman 差为 \`+0.002003,+0.000591,+0.003024\`（均值 \`+0.001873\`，3/3 正向）。相对 E2 的平均 Spearman 为 \`+0.000796\`。
 
-**M：** 在 E3 基础上加入 learned frame position。
+**C：** 在这三个 seeds 上有小幅提高，因此后续暂用 E3 开展机制探针。该结果不是 10-seed 显著性结论，也不能仅凭分数认定模型一定利用了更多局部结构。
 
-**R：** 0.842282 ± 0.001834；相对 E3 平均 −0.000718。
+## E4：局部帧的位置编码
 
-**C：** 放弃帧顺序信息。
+**Q：** E3 将 frame 频率 token 展平后送入 attention，没有额外的帧位置信息；加入 learned frame position 是否有帮助？
 
-## E5
+**M：** 在 E3 上启用 \`use_frame_positional_encoding=True\`，按 frame id 将**可学习帧位置向量加在进入 attention 的频率 token 上**；局部窗、hop、重建和其他设置不变。与 E3 同样的 seeds 0–2 重新训练。位置编码改变了参数化，因此这是新的训练实验，不是给 E3 checkpoint 直接附加位置编码。
 
-**Q：** 继续探究 STFT 是否造成频谱泄漏影响。
+**R：** 3-seed test Spearman \`0.842282±0.001834\`，相对 E3 的均值为 \`−0.000718\`；本阶段可靠汇总未给出该模型 Pearson 的数值。
 
-**M：** 在 E3 基础上使用 periodic Hann，`center=True`。
+**C：** **这种**可学习帧位置编码未观察到收益，后续候选不使用它；不能据此断言帧顺序永远无用。
 
-**R：** 0.843027 ± 0.000593；相对 E3 平均 +0.000027，基本持平。
+## E5：周期 Hann + centered STFT
 
-**C：** 后续放弃 Hann 使用。
+**Q：** 即使局部 STFT 已引入局部边界，各帧的边界不连续仍可能发生；加入窗口是否进一步影响表现？
 
-## E6
+**M：** 在 E3 \`win=8,hop=4\` 的基础上，将 rect 改为 **periodic Hann**，同时将 \`center=False\` 改为 **\`center=True\`**（帧提取前在序列左右加入 \`win/2\` 零填充）。保持单句级 gate、0/True 和 seeds 0–2。**本实验一次改了两个因素，不能将效果单独归因于 Hann window。**
 
-**Q：** 尝试解释 E3 带来的提升，使用频带 knockout。
+**R：** 3-seed test Spearman \`0.843027±0.000593\`、Pearson \`0.838083±0.002720\`。与 E3 Spearman 均值相差 \`+0.000027\`，几乎持平。
 
-**M：** 沿用 FLaG 论文中的方法，DCT 后频带分组置 0。
+**C：** 没有看到这一组合带来有意义的性能提升。为了降低结构复杂度，后续优先采用 rectangular、非居中的局部实现；尚未独立鉴别 Hann 和 centered 的作用。
 
-**R：** B0 的平均 Spearman 降幅最大；FLaG 0.146694，E3 0.198943。
+---
 
-**C：** 除 B0 影响最大外，在不同 seed 中 E3 和 FLaG 的相对敏感性不稳定。使用 STFT 后与 FLaG 结论几乎持平。
+## E6：对最终层 hidden 做 DCT 频带 knockout
 
-## E7
+**Q：** E3 的早期分数变化是否伴随对不同输入频段的不同依赖？低频是否更重要？
 
-**Q：** Token hidden knockout。
+**M：** **不重新训练**。分别读取 seeds 0–2 的 FLaG 与 E3 checkpoint，并在相同 STSB official test 句对上运行 RoBERTa。对最后一层 hidden 中**内容 token**（排除首尾特殊 token）沿 token 位置做 **DCT-II**；用 8 个按几何方式分配宽度的频带 \`B0…B7\`（\`B0\` 含 DC/最低频，后续频带频率逐渐提高，每带至少一个系数），一次仅将其中一带的全部 hidden 通道 DCT 系数置零，逆 DCT 恢复内容 token hidden，特殊 token 不变，然后用**原模型的 pooling** 重新计算句对 cosine。
 
-**M：** 依旧沿用 FLaG。
+只有**句对双方各至少 8 个内容 token** 才进入本探针的八频带分析。按这一 **eligible test 子集** 的预测，逐 seed 计算：
 
-**R：**
+$$
+\Delta\rho_b=\rho_{\mathrm{baseline,eligible}}-\rho_{\mathrm{knockout}(b),eligible}.
+$$
 
-| 汇总指标                   |       FLaG |         E3 |
-| :------------------------- | ---------: | ---------: |
-| 句内平均相应的平均值       |   0.003248 |   0.003155 |
-| 句内最大相应的平均值       |   0.007714 |   0.007616 |
-| 句内位置相应标准差的平均值 | 0.00195551 | 0.00195521 |
+另外保存每个句对 knockout 前后的 **绝对预测变化**和**绝对平方误差变化**，它们与 Spearman 降幅是不同统计量。注意：DCT 是用于**分析输入 hidden**，并非把 FLaG 模型自身改为 DCT pooling。
 
-| 相对位置区域 |     FLaG |       E3 |
-| ------------ | -------: | -------: |
-| 开头段       | 0.003000 | 0.002850 |
-| 前部         | 0.002771 | 0.002790 |
-| 中部         | 0.002786 | 0.002719 |
-| 后部         | 0.002843 | 0.002780 |
-| 末尾段       | 0.002256 | 0.002146 |
+**R：** 已记录的 B0 平均 Spearman 降幅：FLaG \`0.146694\`，E3 \`0.198943\`，均明显；但 E3 相对 FLaG 的低频敏感性差异随 seed/子集而变化，其余频带差异没有构成稳健解释。这里的降幅**不是**完整 test Spearman 之间的差。
 
-**C：** 和 FLaG 模型表现无明显差异。
+**C：** B0 是两个模型的重要输入频带。这个实验不足以证明“E3 性能变化由更偏好 DC 造成”；频带扰动的重要性和 attention 分配要分开解释。
 
-## E8
+## E7：逐内容 token hidden knockout
 
-**Q：** STFT 是否相较于 FLaG 更关注 DC？
+**Q：** E3 是否比 global FLaG 更重视特定位置的 token，从而表现出不同的句内位置敏感性？
 
-**M：** 读取相同 seeds 0–2 的 FLaG 与 E3 已训练 checkpoint，在 **STSB test** 上提取 latent cross-attention 权重。先对各 latent query 的 attention 取平均（如存在逐 head 权重，也先取 head 均值），得到各有效频率 token 的权重。Global FLaG 仅有一个 DC token（`k=0`）；E3 将各有效局部 frame 的 `k=0` 都计为 DC，并忽略无效 frame。
+**M：** 使用同一组 **3 个 seeds（0–2）** 的已训练 FLaG/E3，在 STSB **test** 上做推理探针，不更新参数。对于每一个句子的每个 **content token**，单独将其**最后层 hidden 向量全部置零**，保留特殊 token 与原有效 attention mask、其他 token 不变；重新做 pooling，再与句对另一侧**未扰动**的 embedding 算 cosine。
 
-**“DC 偏好比”定义：** 对**每个句子**，分别计算 DC 组内和非 DC 组内的**每个 token 平均 attention**，再相除：
+设原预测 \`s\`、扰动后 \`s'\`、标签 \`y/5\`。每个位置记录 \`|s'-s|\` 与 \`|(s'-y/5)^2-(s-y/5)^2|\`。下表的**位置响应**为后者：先对同一句、同位置在各 seed 的响应对齐求平均，然后统计句内位置的均值、最大值与总体标准差，最后跨句求平均。将 content tokens 的**相对位置**划为前、中、后等五段，观察位置曲线。
 
-$
+**R：** 以下为报告中保留的 **seeds 0–2 聚合、STSB test** 结果，单位为**绝对平方误差变化**，不是 Spearman：
+
+| 位置响应统计 | FLaG | E3 |
+| --- | ---: | ---: |
+| 句内平均响应的跨句均值 | 0.003248 | 0.003155 |
+| 句内最大响应的跨句均值 | 0.007714 | 0.007616 |
+| 句内位置响应标准差的跨句均值 | 0.00195551 | 0.00195521 |
+
+| Content-token 相对位置区域 | FLaG | E3 |
+| --- | ---: | ---: |
+| 开头段 | 0.003000 | 0.002850 |
+| 前部 | 0.002771 | 0.002790 |
+| 中部 | 0.002786 | 0.002719 |
+| 后部 | 0.002843 | 0.002780 |
+| 末尾段 | 0.002256 | 0.002146 |
+
+**C：** E3 与 FLaG 在该扰动下的位置响应统计十分接近，没有证据支持 E3 因为更强的 token 位置选择性而取得早期小幅性能差异。这里是对**最后层 hidden** 做置零，不是删除原句 token 后重跑 RoBERTa。
+
+## E8：DC attention“偏好比”是什么，怎么算？
+
+**Q：** E6 发现两个模型对低频 B0 的 knockout 敏感，那么 E3 的**频域 latent attention** 是否也更偏向 DC token？
+
+**M：** 使用 FLaG/E3 同一 3 个 seeds 的已训练 checkpoint，在 STSB test 运行正常 forward，读取缓存的 spectral tokens 和 latent cross-attention weights。若权重保留 attention heads，先平均 heads；再在 8 个 latent queries 上平均，得到每个有效频率 token 的权重 \`A_k\`。Global FLaG 的 \`k=0\` 是唯一 DC token；E3 将**各有效 frame 的 \`k=0\`** 都作为 DC token，屏蔽无效 frame。
+
+**不能直接比较 DC 的总 attention 质量**：E3 可能有多个 DC tokens。代码先在两个集合内部求**每 token 平均注意力**，对每个句子计算偏好比：
+
+$$
 r_{\mathrm{DC}} =
-\frac{\left(\sum_{k \in \mathrm{DC}} A_k\right)/N_{\mathrm{DC}}}
-{\left(\sum_{k \in \mathrm{nonDC}} A_k\right)/N_{\mathrm{nonDC}}+10^{-12}}
-$
+\frac{
+    \displaystyle \frac{1}{N_{\mathrm{DC}}}
+    \sum_{k\in\mathrm{DC}}A_k
+}{
+    \displaystyle \frac{1}{N_{\mathrm{nonDC}}}
+    \sum_{k\in\mathrm{nonDC}}A_k + 10^{-12}
+}.
+$$
 
-其中 `A_k` 是平均后的 attention weight，`N_DC` / `N_nonDC` 分别为对应的有效频率 token 数。**这样除以各组 token 数，是为了避免 E3 的局部 frame 数量更多导致 DC token 更多，从而使单纯总注意力质量不可比。** `r_DC>1` 表示平均每个 DC token 获得的 attention 高于平均每个非 DC token，`r_DC≈1` 表示两组平均接近。表中每个 seed 的值为该 seed 在 test 句子上的偏好比平均值。
+其中 \`N_DC\` / \`N_nonDC\` 是该句**有效频率 token 的数量**。**r>1**：平均每个 DC token 的注意力超过平均每个非 DC token；**r≈1**：两组平均分配接近。对所有 test 句子先各算一个比值，再在各 seed 内对句子求平均。它既不是 DC 频谱**能量**，也不是 E6 的频带**性能重要性**。
 
-该值描述 **attention 分配**，不是频谱能量占比，也不等于 knockout 的性能重要性；不同 global/local 频谱 token 的语义和分辨率也不同，所以不能把比值差异直接当作因果解释。
+**R：** 下表为 **3 个 seeds（0–2）的句均 DC attention 偏好比**，不是相关系数：
 
-**R：**
+| Seed | Global FLaG | E3（8/4 STFT） |
+| ---: | ---: | ---: |
+| 0 | 2.602 | 1.305 |
+| 1 | 1.586 | 1.213 |
+| 2 | 2.553 | 1.625 |
 
-| Seed | FLaG的DC偏好比 | E3的DC偏好比 |
-| ---- | -------------: | -----------: |
-| 0    |          2.602 |        1.305 |
-| 1    |          1.586 |        1.213 |
-| 2    |          2.553 |        1.625 |
+**C：** 三个 seeds 上，E3 的 DC **相对 attention 比值**低于 FLaG。该结果与 E6 的“某些设置下 E3 的 B0 knockout 更敏感”**不是同一件事**：一个测 attention 分配，一个测删频带后预测性能；也不能直接对全局 DC 与局部 frame DC 赋予完全相同的频率语义。不能据此断言 E3 的 DC 更不重要，或据此解释 STFT 的性能变化。
 
-**C：** 在这三个 seed 的 attention 诊断中，E3 的**每 token DC 注意力偏好比**都低于 FLaG。不过，E6 的 B0 knockout 在汇总统计上曾表现出 E3 的较大性能降幅，两种观察**不能简单认为相互印证**：E6 衡量删除频带后的预测/性能敏感性，E8 衡量模型内部的 attention 分配，二者不是同一种指标。现有 E8 结果只支持“该诊断下 E3 的 DC 相对 attention 较低”，不能推出 DC 对 E3 不重要。
+---
+
+**代码索引：** E1–E5 训练见 [\`train_sts.py\`](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/train_sts.py) 和 [\`flag_pooling.py\`](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/factory/pooling/flag_pooling.py)；E6 [DCT knockout](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/probe_dct_frequency_knockout.py)，E7 [token knockout](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/probe_token_knockout.py)，E8 [local DC diagnostic](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/probe_local_dc_diagnostic.py)。
