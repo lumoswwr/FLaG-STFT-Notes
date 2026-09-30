@@ -6,7 +6,7 @@
 
 | 编号 | 研究对象 | 是否重新训练 | 数据与 seeds | 改变的因素 | 核心观测 |
 | --- | --- | :---: | --- | --- | --- |
-| E9 | 已训练 FLaG / E3 | 否 | STSB；原始探针短句，已记录补零对比 | 同样的有效句子 hidden，额外右 padding 到 16/24/32/64/128 | 句对 cosine 绝对变化 |
+| E9 | 已训练 FLaG / E3 | 否 | STSB；探针脚本默认 seed=0、最多 200 对短句；表中历史执行数量仍待日志复核 | 同样的有效句子 hidden，额外右 padding 到 16/24/32/64/128 | 句对 cosine 绝对变化 |
 | E10 | 已训练 FLaG / E3 | 否 | STSB test，3 seeds（0–2） | normal / pair_exact / sentence_exact / fixed_128 四种推理 padding 约定 | 全 test Spearman |
 | E11 | STFT 8/8 | **是** | STSB train→validation→test；3 seeds（0–2） | rect、win=8、hop=8、无 overlap | test Spearman / Pearson |
 | E12 | STFT 16/16 | **是** | 同上，先 3 seeds，后扩展到 **10 seeds（0–9）** | rect、win=16、hop=16、无 overlap | test Spearman / Pearson |
@@ -23,7 +23,7 @@
 
 **M：** 使用已训练 **FLaG 与 E3** checkpoint。选有效 token 长度不超过 16 的 STSB 短句，将**相同的有效 hidden** 按长度 16、24、32、64、128 补零，仅改变传给 pooling 的右 padding 总长度与 mask，不改变内容 token、encoder 输出或模型参数。使用按每句自身有效长度处理时的预测作为参照，比较句对预测 cosine 的**绝对漂移**。global FFT 的变换长度随外部 padding 变化；E3 则对同样有效 token 按固定 8/4 帧构造局部频谱，批内额外的无效帧被 mask。
 
-**R：** 在补到 128 的该短句诊断里：
+**R：** 在补到 128 的该短句诊断里（**代码的默认运行设置是 seed=0、最多 200 对短句；当前汇总文档没有保存足以独立核实这次表格对应的全部 CLI 参数的原始日志，正式定稿时须复核**）：
 
 | 同一输入相对自身有效长度 | Global FLaG | Local E3 |
 | --- | ---: | ---: |
