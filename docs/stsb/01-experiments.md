@@ -96,7 +96,7 @@ $$
 
 **Q：** E3 将 frame 频率 token 展平后送入 attention，没有额外的帧位置信息；加入 learned frame position 是否有帮助？
 
-**M：** 在 E3 上启用 `use_frame_positional_encoding=True`，按 frame id 将**可学习帧位置向量加在进入 attention 的频率 token 上**；局部窗、hop、重建和其他设置不变。与 E3 同样的 seeds 0–2 重新训练。位置编码改变了参数化，因此这是新的训练实验，不是给 E3 checkpoint 直接附加位置编码。
+**M：** 在 E3 上启用 `use_frame_positional_encoding=True`（实现中 `max_frame_positions=32`），按 frame id 将**可学习帧位置向量加在进入 attention 的频率 token 上**；局部窗、hop、重建和其他设置不变。与 E3 同样的 seeds 0–2 重新训练。位置编码改变了参数化，因此这是新的训练实验，不是给 E3 checkpoint 直接附加位置编码。
 
 **R：** 3-seed test Spearman `0.842282±0.001834`，相对 E3 的均值为 `−0.000718`；本阶段可靠汇总未给出该模型 Pearson 的数值。
 
@@ -118,7 +118,7 @@ $$
 
 **Q：** E3 的早期分数变化是否伴随对不同输入频段的不同依赖？低频是否更重要？
 
-**M：** **不重新训练**。分别读取 seeds 0–2 的 FLaG 与 E3 checkpoint，并在相同 STSB official test 句对上运行 RoBERTa。对最后一层 hidden 中**内容 token**（排除首尾特殊 token）沿 token 位置做 **DCT-II**；用 8 个按几何方式分配宽度的频带 `B0…B7`（`B0` 含 DC/最低频，后续频带频率逐渐提高，每带至少一个系数），一次仅将其中一带的全部 hidden 通道 DCT 系数置零，逆 DCT 恢复内容 token hidden，特殊 token 不变，然后用**原模型的 pooling** 重新计算句对 cosine。
+**M：** **不重新训练**。分别读取 seeds 0–2 的 FLaG 与 E3 checkpoint，并在相同 STSB official test 句对上运行 RoBERTa。对最后一层 hidden 中**内容 token**（排除首尾特殊 token）沿 token 位置做 **DCT-II**；用 8 个按几何方式分配宽度的频带 `B0…B7`（代码设 `num_bands=8,base=4.0`，先给每带至少一个系数，再按 `4^b` 的权重分配其余系数并用最大余数法保证数量总和；`B0` 含 DC/最低频，后续频带频率逐渐提高），一次仅将其中一带的全部 hidden 通道 DCT 系数置零，逆 DCT 恢复内容 token hidden，特殊 token 不变，然后用**原模型的 pooling** 重新计算句对 cosine。
 
 只有**句对双方各至少 8 个内容 token** 才进入本探针的八频带分析。按这一 **eligible test 子集** 的预测，逐 seed 计算：
 
