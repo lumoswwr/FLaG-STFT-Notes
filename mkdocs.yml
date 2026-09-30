@@ -1,5 +1,6 @@
 site_name: FLaG / STFT Mechanism Experiments
 site_description: FLaG / STFT 实验记录与机制分析
+site_url: https://lumoswwr.github.io/FLaG-STFT-Notes/
 
 nav:
   - 首页: index.md
