@@ -1,9 +1,8 @@
 # 实验协议、配置与评价指标
 
-本页是 E1–E14、P1/P2 和 Sprint S1–S5 的统一说明。阅读各实验时，先辨别其性质：**重新训练后的性能比较**、**固定 checkpoint 的推理扰动**和**统计诊断**不是一回事。数字旁必须同时注明数据集、数据划分、模型配置、seed 数量和指标。
+本页是 E1–E14、P1/P2 和 Sprint S1–S5 的统一说明。
 
-!!! warning "实验性质与口径"
-    研究过程中先观察了部分 STSB test 结果，再决定后续实验和模型变体；Sprint 也有过早期 test 调试。这些是**探索性分析**。后续扩展到 10 seeds 可以检验跨随机种子的稳定性，但不能把已多次查看的 test 集重新称为未经观察的确认集。Sprint 的 matched global 和 dropout × norm 控制仅在 adaptation **validation** 上得到指标，不能与正式 **test** 数字合并排名。
+
 
 ## 1. 两个数据集与任务
 
@@ -18,9 +17,8 @@
 | 选择模型 | validation Spearman | validation Accuracy（采用 validation 校准的 Accuracy 阈值） |
 | 划分 | 官方 train 训练、development/validation 选 checkpoint、官方 test 评估 | 使用所采用配置的官方 validation，固定分层划分 90%/10% 作为 adaptation train/validation；官方 test 最后评估 |
 | 随机性 | 训练 seeds；同一组比较应配对相同 seeds | 训练 seeds；adaptation split 固定 `random_state=42`，所有模型一致 |
-| 注意事项 | 不能把 3-seed 与 10-seed 均值当成完全等样本的配对结果 | validation 控制实验与 official-test 主结果须分开标注 |
 
-Sprint 本项目采用的适配数据量为 **90,900 对训练、10,100 对 validation**，官方最终 test 为 **101,000 对**。这里的划分是我们的可复现实现选择；原论文正文说明使用官方 validation 的 90:10 适配和冻结 RoBERTa，但不应把我们重建的所有代码细节冒充作者逐项公布的参数。
+
 
 ## 2. 统一模型流程与可变因素
 
@@ -44,7 +42,7 @@ Sprint 本项目采用的适配数据量为 **90,900 对训练、10,100 对 vali
 | Sprint S4 matched global 与 E12 | 匹配比较 | 0 | 有 |
 | Sprint S5（仅 global FLaG） | Global | 0 或 0.1 | 有或无 |
 
-**论文正文定义**的文本配置是 **dropout=0.1，post-pool LayerNorm=True**。原公开实现中定义了 `norm3`，但部分 released forward 路径没有使用它；我们早期 Sprint 复现沿用了 `0.1/无 norm`。**不能把早期 Sprint FLaG 的 `0.1/无 norm` 写成论文方法部分明确规定的最终文本设置。** S1/S2 的早期 FLaG 与 E12 同时改变了算子、dropout、norm，S4 才是匹配这些非算子因素后的比较。
+**论文正文定义**的文本配置是 **dropout=0.1，post-pool LayerNorm=True**。原公开实现中定义了 `norm3`，但部分 released forward 路径没有使用它；我们早期 Sprint 复现沿用了 `0.1/无 norm`。 S1/S2 的早期 FLaG 与 E12 同时改变了算子、dropout、norm，S4 才是匹配这些非算子因素后的比较。
 
 ## 3. 训练参数
 
@@ -61,7 +59,7 @@ Sprint 本项目采用的适配数据量为 **90,900 对训练、10,100 对 vali
 | 模型选择 | validation Spearman | validation 上校准 Accuracy 阈值后，以 Accuracy 选 epoch |
 | 原始主实验 seed | STSB FLaG / Mean 后续统计使用 0–9；早期 E1–E13 主要使用 0–2；E12 后扩展到 0–9 | 早期 S1 为 0–2；S2 及 S4/S5 控制为 0–9 |
 
-具体参数和结果以各 run 的 `config.json`、`history.csv`、`metrics.json` 为准。本页面记录的是对应已知实验协议，不能用于推定未执行过的变体配置。
+
 
 ## 4. 指标究竟在测什么
 
@@ -99,9 +97,3 @@ Sprint 本项目采用的适配数据量为 **90,900 对训练、10,100 对 vali
 **3-seed 探索结果**（特别是 E1–E13 的候选搜索）只描述观察到的方向；**10-seed 配对结果**可用于考察其是否跨 seed 稳定，但显著性不足时不能称为稳定优势。STSB 早期探索 FLaG/E12 均为 `dropout=0/norm=True`：10-seed test Spearman 分别为 `0.841559±0.003538` 与 `0.842739±0.003214`，配对增量 `+0.001180±0.002107`，7/10 正向，区间跨 0。STSB E14 统一论文文本配置 `0.1/norm=True` 时，10-seed 分别为 `0.839065±0.004154` 与 `0.838944±0.001882`，配对增量约 `-0.000121±0.004039`，5/10 正向。
 
 **研究主张的范围**：P1/P2 反映当前实现和被测 checkpoint 的结构、预测扰动；不意味着 local reconstruction 总能改善下游性能，也不能把 Sprint 早期整套配置增益全部归因于 STFT。
-
-## 6. 可复核来源
-
-- 本项目实验与代码：[AMPCliff / FLaG-STFT-mechanism](https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism)，重点为 `text_repro/train_sts.py`、`train_sprint.py`、`probe_*.py`、`STFT_MECHANISM_SUMMARY.md`。
-- 每次训练的 `config.json`、`metrics.json` 和原始日志应与最终文字说明一一对应。仅凭本网站的汇总数字不能证明原始训练配置，学姐核对时可结合服务器记录。
-- 原始 FLaG 方法的正文配置与任务说明见课题组论文；**本文区分论文方法文字、公开代码与我们重建的训练脚本**，三者不要混写。

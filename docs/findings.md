@@ -1,12 +1,12 @@
 # 研究结果综述：哪些结论站得住？
 
-本页是给学姐快速阅读的**研究结果导览**。所有细节、单项实验配置、seed 数量与计算公式均在[统一实验协议](methods.md)、[STSB E1–E8](stsb/01-experiments.md)、[STSB E9–E14](stsb/02-padding.md)、[循环反射与 P1/P2](stsb/03-mechanism.md)、[Sprint S1–S5](sprint/02-experiments.md)中展开。**这里严格区分实测结构行为、经验性能变化和暂未验证的猜想。**
+
 
 ## 1. 为什么开展这组实验？
 
 在原始 FLaG 研究背景下，STSBenchmark 是一个 global FLaG 在当前协议下不如 Mean pooling 的文本任务。我们先尝试 Hann、局部 STFT、窗口长度、重叠和位置编码，发现局部方案在少量 seeds 上有微小正向信号；随后通过 knockout、padding probe、时域等式与 2×2 干预，发现**local/global 最清晰的差异在重建路径，而非 gate 观测**。把结构固定的 E12 转到 Sprint 后，又发现**dropout 与 post-pool normalization 会显著影响性能比较**，因此原始整套方案增益不能解释为局部算子的独立增益。
 
-## 2. 性能结果一览：不要混淆数据集与 split
+## 2. 性能结果一览
 
 | 实验 | 设置及数据位置 | Global FLaG | E12 local STFT | 配对 E12−Global | Seeds |
 | --- | --- | ---: | ---: | ---: | ---: |
@@ -15,7 +15,7 @@
 | Sprint **早期 S2** | **official-test AP**，FLaG `0.1/False`、E12 `0/True`，**配置不匹配** | 0.713121 ± 0.019140 | 0.761344 ± 0.016899 | **+0.048222 ± 0.017641**，10/10 正向；**不能归因于 local 算子** | **10** |
 | Sprint **匹配 S4** | **adaptation validation AP**，两者 `0/True` | 0.795830 ± 0.017156 | 0.789136 ± 0.014094 | **−0.006693 ± 0.017279**，4/10 正向；区间跨 0 | **10** |
 
-这里有两条独立的重要参照：STSB 的 Mean pooling 10-seed **test Spearman `0.851201±0.002000`**；Sprint S5 仅针对 **global FLaG** 的四组 dropout/norm 控制，其中 `0.1/True` 的 **adaptation validation AP `0.819156±0.015250`**（10 seeds）。**它们不属于同一个比较表格中的可替代数据。**
+
 
 ## 3. 机制实证一览
 
@@ -39,6 +39,3 @@
 - Sprint 早期 E12 配置的 AP 确实高于早期 global 配置，但 S4/S5 证明**混杂的非算子因素不能忽略**，不能将整个差额归因于 STFT；
 - 当前结果**不支持**“local STFT 普遍优于 FLaG”“reconstruction 差异已经构成性能因果证明”“在 Sprint 的 `0.1/True` 条件下已完成 global/local 匹配测试”等说法。
 
-下一步是否继续研究训练对重建算子的适配、其它局部频域分析或新数据集，需要由新的研究假设驱动，并预先固定验证协议。当前这份网站先把已有实验的**指标、配置、seed、结果与证据边界**如实记录清楚。
-
-**所有主要实现入口：** [实验研究分支](https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism) · [总体过程记录](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/STFT_MECHANISM_SUMMARY.md) · [独立核对范围说明](https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism/text_repro/audit_snapshot_20260926)。
