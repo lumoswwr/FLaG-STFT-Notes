@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="FLaG / STFT 实验记录与机制分析">
+        <meta name="description" content="FLaG / STFT 实验配置、指标与机制分析">
       
       
       
@@ -27,7 +27,7 @@
     
     
       
-        <title>循环反射与 P1/P2 - FLaG / STFT Mechanism Experiments</title>
+        <title>循环反射、P1 与 P2 - FLaG / STFT Mechanism Experiments</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#p1p2" class="md-skip">
+        <a href="#stsbp1-p2" class="md-skip">
           跳转至
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              循环反射与 P1/P2
+              循环反射、P1 与 P2
             
           </span>
         </div>
@@ -224,6 +224,60 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实验协议与指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../findings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    研究结果综述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -250,10 +304,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -271,8 +325,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -296,7 +350,7 @@
   <span class="md-ellipsis">
     
   
-    E1–E8：早期实验
+    E1–E8：算子探索与机制探针
   
 
     
@@ -324,7 +378,7 @@
   <span class="md-ellipsis">
     
   
-    E9–E14：Padding 与配置
+    E9–E14：Padding、窗口与配置
   
 
     
@@ -361,7 +415,7 @@
   <span class="md-ellipsis">
     
   
-    循环反射与 P1/P2
+    循环反射、P1 与 P2
   
 
     
@@ -379,7 +433,7 @@
   <span class="md-ellipsis">
     
   
-    循环反射与 P1/P2
+    循环反射、P1 与 P2
   
 
     
@@ -413,77 +467,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="循环反射的时域推导">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-gate" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p1padding-gate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 输入与实虚 gate
+        P1：Padding 的影响来自 gate 还是重建？
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. 将频谱改写为原频谱与其共轭
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. 逆变换得到循环反射
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. 公式含义与通道形式
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-padding" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Padding 如何改变反射来源
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. 实现检查与结论
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -491,7 +484,7 @@
   <a href="#p1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P1
+        P1 补充：去掉循环反射
       
     </span>
   </a>
@@ -499,21 +492,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#p1_1" class="md-nav__link">
+  <a href="#p2global-local" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P1 补充
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P2
+        P2：Global 与 Local 的差异来自哪里？
       
     </span>
   </a>
@@ -562,10 +544,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -583,8 +565,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -608,7 +590,7 @@
   <span class="md-ellipsis">
     
   
-    迁移协议
+    数据、训练与指标
   
 
     
@@ -636,7 +618,7 @@
   <span class="md-ellipsis">
     
   
-    S1–S5
+    S1–S5：跨任务实验与控制
   
 
     
@@ -692,77 +674,16 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="循环反射的时域推导">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#1-gate" class="md-nav__link">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#p1padding-gate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 输入与实虚 gate
+        P1：Padding 的影响来自 gate 还是重建？
       
     </span>
   </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        2. 将频谱改写为原频谱与其共轭
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        3. 逆变换得到循环反射
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#4" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        4. 公式含义与通道形式
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#5-padding" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        5. Padding 如何改变反射来源
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        6. 实现检查与结论
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
   
 </li>
       
@@ -770,7 +691,7 @@
   <a href="#p1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P1
+        P1 补充：去掉循环反射
       
     </span>
   </a>
@@ -778,21 +699,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#p1_1" class="md-nav__link">
+  <a href="#p2global-local" class="md-nav__link">
     <span class="md-ellipsis">
       
-        P1 补充
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#p2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        P2
+        P2：Global 与 Local 的差异来自哪里？
       
     </span>
   </a>
@@ -816,144 +726,84 @@
 
 
 
-<h1 id="p1p2">循环反射的时域推导与 P1/P2<a class="headerlink" href="#p1p2" title="Permanent link">&para;</a></h1>
+<h1 id="stsbp1-p2">STSB：循环反射、P1 与 P2<a class="headerlink" href="#stsbp1-p2" title="Permanent link">&para;</a></h1>
+<p>本页使用 STSB 早期训练的 checkpoint（<code>dropout=0</code>、<code>post-pool norm=True</code>），<strong>固定模型参数，仅改变推理计算</strong>。P1/P2 均使用 <strong>3 seeds（0、1、2）</strong>，结果来自 <strong>validation</strong>。这里的“预测漂移”指同一句对两种处理下 cosine 预测的平均绝对差，不是 Spearman 的变化。</p>
 <h2 id="_1">循环反射的时域推导<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> E9/E10 已发现，仅改变 pooling 输入的右 padding 长度就会使 FLaG 预测变化。为理解这一现象，检查实部、虚部分别乘 gate 后，逆 FFT 在 token 位置轴上对应什么操作。</p>
-<h3 id="1-gate">1. 输入与实虚 gate<a class="headerlink" href="#1-gate" title="Permanent link">&para;</a></h3>
-<p>先考虑一个句子、一个 hidden 通道，省略 batch 和通道下标。令 <span class="arithmatex">\(x[t]\)</span> 为进入 FFT 的实值序列，<span class="arithmatex">\(N\)</span> 为变换长度，<span class="arithmatex">\(t=0,\ldots,N-1\)</span>；有效长度以外的位置补零。<span class="arithmatex">\(X[k]\)</span> 为其 <span class="arithmatex">\(N\)</span> 点 DFT。</p>
+<p><strong>Q：</strong> 为什么给 global FLaG 增加右侧零 padding，也会改变有效 token 的输出？</p>
+<p><strong>M：</strong> 当前 FLaG 在不同频率位置共享同一通道 gate，但对 FFT 的实部、虚部分别使用乘数 <code>a</code>、<code>b</code>。固定某个样本及 hidden 通道，令输入为 <code>x[t]</code>，FFT 长度为 <code>N</code>：</p>
 <div class="arithmatex">\[
-X[k] = \sum_{t=0}^{N-1} x[t] e^{-i2\pi kt/N}
+Y[k]=a\,\mathrm{Re}(X[k])+ib\,\mathrm{Im}(X[k])
+=\frac{a+b}{2}X[k]+\frac{a-b}{2}\overline{X[k]}.
 \]</div>
-<p>当前实现生成一个通道 gate，并在所有频率位置共享。令实部、虚部的实际乘数分别为 <span class="arithmatex">\(a,b\)</span>；开启 residual gate 时，它们包含“<span class="arithmatex">\(1+\mathrm{sigmoid}\)</span> 输出”。</p>
+<p>逆 FFT 后得到：</p>
 <div class="arithmatex">\[
-a = 1 + g_{Re}, \qquad b = 1 + g_{Im}
+\boxed{y[t]=\frac{a+b}{2}x[t]+\frac{a-b}{2}x[(-t)\bmod N]}
 \]</div>
-<div class="arithmatex">\[
-Y[k] = a\,\mathrm{Re}(X[k]) + i b\,\mathrm{Im}(X[k])
-\]</div>
-<p>这里 <span class="arithmatex">\(a,b\)</span> 可以随输入句子及 hidden 通道变化，但对频率 <span class="arithmatex">\(k\)</span> 不变。<span class="arithmatex">\(Y[k]\)</span> 表示施加 gate 后的频谱。</p>
-<h3 id="2">2. 将频谱改写为原频谱与其共轭<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
-<div class="arithmatex">\[
-\mathrm{Re}(X[k]) = \frac{X[k] + \overline{X[k]}}{2},
-\qquad
-i\,\mathrm{Im}(X[k]) = \frac{X[k] - \overline{X[k]}}{2}
-\]</div>
-<p>代入 gate 操作并合并同类项：</p>
-<div class="arithmatex">\[
-Y[k]
-= \frac{a+b}{2}X[k]
-+ \frac{a-b}{2}\overline{X[k]}
-\]</div>
-<p>令</p>
-<div class="arithmatex">\[
-\alpha = \frac{a+b}{2},
-\qquad
-\beta = \frac{a-b}{2},
-\]</div>
-<p>则</p>
-<div class="arithmatex">\[
-Y[k] = \alpha X[k] + \beta \overline{X[k]}.
-\]</div>
-<h3 id="3">3. 逆变换得到循环反射<a class="headerlink" href="#3" title="Permanent link">&para;</a></h3>
-<p>由于 <span class="arithmatex">\(x[t]\)</span> 为实值序列，频谱共轭的逆 DFT 等于原序列的循环反射：</p>
-<div class="arithmatex">\[
-\mathcal{F}_N^{-1}\{\overline{X[k]}\}[t]
-= x[(-t) \bmod N]
-\]</div>
-<p>利用逆变换的线性性，得到核心恒等式：</p>
-<div class="arithmatex">\[
-y[t]
-= \alpha x[t]
-+ \beta x[(-t) \bmod N]
-\]</div>
-<h3 id="4">4. 公式含义与通道形式<a class="headerlink" href="#4" title="Permanent link">&para;</a></h3>
-<p>第一项是原位置 hidden 的缩放；第二项是循环反射位置 hidden 的混入。恢复通道下标 <span class="arithmatex">\(d\)</span> 后：</p>
-<div class="arithmatex">\[
-y[t,d]
-= \frac{a_d+b_d}{2}x[t,d]
-+ \frac{a_d-b_d}{2}x[(-t) \bmod N,d]
-\]</div>
-<p><span class="arithmatex">\(y\)</span> 是逆 FFT 后、最终时间维聚合前的 token hidden，不是最终句向量。代码采用 rFFT/irFFT 保存和重建实值信号的半谱，与上面的完整 DFT 表达等价。</p>
-<p>循环反射不同于普通倒序。以 <span class="arithmatex">\(N=4\)</span> 为例，位置 0、1、2、3 分别映射到 0、3、2、1：</p>
-<div class="arithmatex">\[
-[x_0,x_1,x_2,x_3]
-\rightarrow
-[x_0,x_3,x_2,x_1]
-\]</div>
-<p>当 <span class="arithmatex">\(a=b\)</span> 时，<span class="arithmatex">\(\beta=0\)</span>，反射项消失，重建只剩通道缩放 <span class="arithmatex">\(y[t]=a x[t]\)</span>。</p>
-<h3 id="5-padding">5. Padding 如何改变反射来源<a class="headerlink" href="#5-padding" title="Permanent link">&para;</a></h3>
-<p>取固定 gate 的示例：<span class="arithmatex">\(x=[10,20,30,40]\)</span>，<span class="arithmatex">\(a=1.8\)</span>，<span class="arithmatex">\(b=1.2\)</span>，因此 <span class="arithmatex">\(\alpha=1.5,\beta=0.3\)</span>。未补零时 <span class="arithmatex">\(N=4\)</span>，位置 1 的反射来源是位置 3：</p>
-<div class="arithmatex">\[
-y[1] = 1.5\times20 + 0.3\times40 = 42
-\]</div>
-<p>在同一序列后补四个零，<span class="arithmatex">\(N=8\)</span>。此时位置 1 的反射来源变为位置 7，属于零 padding：</p>
-<div class="arithmatex">\[
-y[1] = 1.5\times20 + 0.3\times0 = 30
-\]</div>
-<p>有效 hidden 和 gate 均未变化，仅改变 <span class="arithmatex">\(N\)</span>，就改变了反射来源及重建结果。因此，padding 可通过“变换长度 → 反射索引 → 重建 hidden”这条路径影响模型输出。</p>
-<p>更一般地，若有效位置为 <span class="arithmatex">\(0,\ldots,L-1\)</span>，其余为零，且 <span class="arithmatex">\(N\ge 2L-1\)</span>，则所有有效 <span class="arithmatex">\(t&gt;0\)</span> 的反射位置都落入 padding：</p>
-<div class="arithmatex">\[
-y[0] = a x[0],
-\qquad
-y[t] = \alpha x[t] \quad (1\le t&lt;L)
-\]</div>
-<p>位置 0 自反，因此仍使用乘数 <span class="arithmatex">\(a\)</span>。在本实验中该位置对应 BOS。</p>
-<h3 id="6">6. 实现检查与结论<a class="headerlink" href="#6" title="Permanent link">&para;</a></h3>
-<p>独立 float64 数值检查比较“rFFT → 实虚乘 gate → irFFT”和上述时域公式。全局恒等式在 <span class="arithmatex">\(N=1,\ldots,129\)</span> 的检查中，最大绝对误差约为 <span class="arithmatex">\(3.55\times10^{-15}\)</span>，两种计算在数值精度范围内一致。</p>
-<p><strong>C：</strong> 跨频率共享的实虚 gate 在给定 gate 时，等价于通道缩放与循环反射的混合，为 padding 敏感性提供了结构解释。gate 本身仍由输入生成，不能据此称整个网络为固定线性模型，也不能认定模型未使用频域信息。长度变化还可能影响 gate 的生成；哪条路径主导实际预测漂移，需要后续 P1 交叉验证。</p>
-<hr />
-<h2 id="p1">P1<a class="headerlink" href="#p1" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> 上述推导中，padding 改变可能通过两种方式改变最后结果：</p>
-<ol>
-<li>改变用于生成 gate 的频谱，进而改变实部、虚部乘数 <span class="arithmatex">\(a,b\)</span>；</li>
-<li>改变循环反射位置，即使 <span class="arithmatex">\(a,b\)</span> 不变，重建结果也可能改变。</li>
-</ol>
-<p><strong>M：</strong> 规定：</p>
-<ul>
-<li>
-<p><span class="arithmatex">\(N_g\)</span>：生成 gate 的 FFT 长度</p>
-</li>
-<li>
-<p><span class="arithmatex">\(N_r\)</span>：重建时 FFT 长度</p>
-</li>
-</ul>
+<p>第一项是原位置缩放，第二项是<strong>循环反射位置</strong>的信息混入。反射位置取决于 FFT 长度 <code>N</code>，并非普通倒序。</p>
+<p><strong>R：</strong> 固定 <code>x=[10,20,30,40]</code>、<code>a=1.8</code>、<code>b=1.2</code>，则：</p>
 <table>
 <thead>
 <tr>
-<th>配置</th>
-<th style="text-align: right;"><span class="arithmatex">\(N_g\)</span></th>
-<th style="text-align: right;"><span class="arithmatex">\(N_r\)</span></th>
+<th>处理</th>
+<th>位置 1 的反射来源</th>
+<th style="text-align: right;">重建结果 <code>y[1]</code></th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>TT</td>
+<td><code>N=4</code></td>
+<td>原位置 3，数值 40</td>
+<td style="text-align: right;"><code>1.5×20+0.3×40=42</code></td>
+</tr>
+<tr>
+<td>右侧补零至 <code>N=8</code></td>
+<td>位置 7，数值 0</td>
+<td style="text-align: right;"><code>1.5×20+0.3×0=30</code></td>
+</tr>
+</tbody>
+</table>
+<p>即使 gate 完全相同，改变 <code>N</code> 也能改变输出。独立 float64 检查 <code>N=1–129</code>，时域等式与 rFFT/irFFT 实现的最大误差约 <code>3.55×10^{-15}</code>。</p>
+<p><strong>C：</strong> 实、虚门控不一致时，会出现与 FFT 长度有关的循环反射。若 <code>a=b</code>，反射项消失。公式只描述<strong>给定 gate 时</strong>的重建，实际模型的 gate 还可能因输入频谱改变，因此继续做 P1。</p>
+<h2 id="p1padding-gate">P1：Padding 的影响来自 gate 还是重建？<a class="headerlink" href="#p1padding-gate" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 改变 global FFT 长度后，预测漂移主要来自 gate 变化，还是重建长度变化？</p>
+<p><strong>M：</strong> 在同一 FLaG checkpoint 上，分别控制<strong>生成 gate 的 FFT 长度</strong> <code>N_g</code> 和<strong>应用 gate、逆 FFT 的长度</strong> <code>N_r</code>。设 <code>T</code> 是正常 batch padding 长度，固定长度为 128。</p>
+<table>
+<thead>
+<tr>
+<th>配置</th>
+<th style="text-align: right;"><code>N_g</code></th>
+<th style="text-align: right;"><code>N_r</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TT（原始）</td>
 <td style="text-align: right;">T</td>
 <td style="text-align: right;">T</td>
 </tr>
 <tr>
-<td>128T</td>
+<td>128T（只换 gate 输入）</td>
 <td style="text-align: right;">128</td>
 <td style="text-align: right;">T</td>
 </tr>
 <tr>
-<td>T128</td>
+<td>T128（只换重建长度）</td>
 <td style="text-align: right;">T</td>
 <td style="text-align: right;">128</td>
 </tr>
 <tr>
-<td>128128</td>
+<td>128128（两个都换）</td>
 <td style="text-align: right;">128</td>
 <td style="text-align: right;">128</td>
 </tr>
 </tbody>
 </table>
-<p><strong>R：</strong></p>
+<p><strong>R：</strong> STSB validation，3-seed <strong>相对 TT 的平均绝对 cosine 漂移</strong>：</p>
 <table>
 <thead>
 <tr>
 <th>配置</th>
-<th style="text-align: right;">相对TT的绝对预测漂移,三seed均值±标准差</th>
+<th style="text-align: right;">mean ± std</th>
 </tr>
 </thead>
 <tbody>
@@ -963,84 +813,134 @@ y[t] = \alpha x[t] \quad (1\le t&lt;L)
 </tr>
 <tr>
 <td>128T</td>
-<td style="text-align: right;"><span class="arithmatex">\((4.80 \pm 2.84) \times 10^{-7}\)</span></td>
+<td style="text-align: right;"><span class="arithmatex">\((4.80\pm2.84)\times10^{-7}\)</span></td>
 </tr>
 <tr>
 <td>T128</td>
-<td style="text-align: right;">0.005520±0.000805</td>
+<td style="text-align: right;">0.005520 ± 0.000805</td>
 </tr>
 <tr>
 <td>128128</td>
-<td style="text-align: right;">0.005520±0.000805</td>
+<td style="text-align: right;">0.005520 ± 0.000805</td>
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 可以看出 FLaG 预测漂移主要来自 reconstruction 过程中 FFT 长度改变。Padding 对 <span class="arithmatex">\(a,b\)</span> 的影响十分小。</p>
-<h2 id="p1_1">P1 补充<a class="headerlink" href="#p1_1" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> P1 中将 reconstruction 时 padding 长度固定为 128，使反射项数值为 0。那么如果反射项系数为 0，结论是否保持一致？</p>
-<p><strong>M：</strong> 令 <span class="arithmatex">\(a=b\)</span>，使反射项系数变为 0，命名为 SYM（对称实验）。</p>
-<p><strong>R：</strong></p>
+<p><strong>C：</strong> 改变 gate 输入频谱长度几乎不影响预测；改变重建长度产生明显漂移。当前模型的 padding 敏感性主要来自重建路径。</p>
+<h2 id="p1">P1 补充：去掉循环反射<a class="headerlink" href="#p1" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 去掉循环反射项，能否重现固定重建长度带来的预测变化？</p>
+<p><strong>M：</strong> 在相同 checkpoint 上，将实部、虚部乘数都设为 <code>(a+b)/2</code>，令反射项系数为零，记作 <strong>SYM</strong>。比较 SYM、原始 TT 与 P1 的 T128。</p>
+<p><strong>R：</strong> STSB validation，3-seed 平均绝对 cosine 差：</p>
 <table>
 <thead>
 <tr>
 <th>比较</th>
-<th style="text-align: right;">平均绝对预测差异</th>
+<th style="text-align: right;">mean ± std</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>SYM与TT</td>
-<td style="text-align: right;">0.005576</td>
+<td>SYM − TT</td>
+<td style="text-align: right;">0.005576 ± 0.000761</td>
 </tr>
 <tr>
-<td>T128与TT</td>
-<td style="text-align: right;">0.005520</td>
+<td>T128 − TT</td>
+<td style="text-align: right;">0.005520 ± 0.000805</td>
 </tr>
 <tr>
-<td>SYM与T128</td>
-<td style="text-align: right;">0.000295</td>
+<td>SYM − T128</td>
+<td style="text-align: right;">0.000295 ± 0.000003</td>
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> SYM 与 T128 高度一致，结论保持不变：反射混合是当前预测漂移来源。</p>
-<h2 id="p2">P2<a class="headerlink" href="#p2" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> 继续探究从 global 换到 local 时，预测变化来自 gate 还是重建。</p>
-<p><strong>M：</strong></p>
-<ul>
-<li>G:global,整句全局FFT</li>
-<li>L:local,E12的16/16局部STFT</li>
-<li>第一个字母:生成gate的频谱来源</li>
-<li>第二个字母:应用gate并重建hidden的方式</li>
-</ul>
-<p><strong>R：</strong></p>
+<p>两种干预引起的句对预测变化相关系数为 <code>0.99853±0.00046</code>。</p>
+<p><strong>C：</strong> SYM 与 T128 引起的变化高度接近，支持<strong>循环反射是 padding 漂移的主要来源</strong>。注意固定长度 128 不代表所有 token 的反射项都严格为零，位置 0 始终自反。该结果也不意味着去掉反射会提高 Spearman。</p>
+<h2 id="p2global-local">P2：Global 与 Local 的差异来自哪里？<a class="headerlink" href="#p2global-local" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 从 global FLaG 换成 E12（STFT 16/16），改变预测的主要是 <strong>gate 生成</strong>还是<strong>重建路线</strong>？</p>
+<p><strong>M：</strong> 分别使用 3 个 FLaG-trained 和 3 个 E12-trained checkpoint。对<strong>同一个 checkpoint</strong>，交叉改变 gate 的频谱来源与实际重建路线：</p>
 <table>
 <thead>
 <tr>
-<th>参数来源</th>
-<th>GG</th>
-<th>LG</th>
-<th>GL</th>
-<th>LL</th>
+<th>配置</th>
+<th>Gate 来源</th>
+<th>施加 gate 的频谱及重建</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>FLaG</td>
-<td>0.867756</td>
-<td>0.867756</td>
-<td>0.867590</td>
-<td>0.867590</td>
+<td>GG</td>
+<td>Global</td>
+<td>Global FFT → global iFFT</td>
 </tr>
 <tr>
-<td>E12</td>
-<td>0.867938</td>
-<td>0.867938</td>
-<td>0.868096</td>
-<td>0.868096</td>
+<td>LG</td>
+<td>Local</td>
+<td>Global FFT → global iFFT</td>
+</tr>
+<tr>
+<td>GL</td>
+<td>Global</td>
+<td>Local STFT → 局部 iFFT + 帧拼接</td>
+</tr>
+<tr>
+<td>LL</td>
+<td>Local</td>
+<td>Local STFT → 局部 iFFT + 帧拼接</td>
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 结果清晰展示：只换 gate 频谱来源，gate 不变；只换 reconstruction，会产生与完整切换到 local 几乎相同的预测漂移。但是改变 reconstruction 不意味着成绩提高。</p>
+<p>其中，<strong>GL 只使用 global 频谱计算 gate，实际被重建的仍是 local 频谱</strong>。每一组对照共享同一 checkpoint 权重，不重新训练。这里的“重建”包括频谱组织、逆变换及局部帧拼接，不只是替换 iFFT 函数。</p>
+<p><strong>R1：</strong> STSB validation，3-seed <strong>相对 GG 的平均绝对 cosine 漂移</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>训练来源</th>
+<th style="text-align: right;">只换 gate（LG−GG）</th>
+<th style="text-align: right;">只换重建路线（GL−GG）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLaG-trained</td>
+<td style="text-align: right;"><span class="arithmatex">\(2.86\times10^{-7}\)</span></td>
+<td style="text-align: right;">0.005770</td>
+</tr>
+<tr>
+<td>E12-trained</td>
+<td style="text-align: right;"><span class="arithmatex">\(2.14\times10^{-7}\)</span></td>
+<td style="text-align: right;">0.005970</td>
+</tr>
+</tbody>
+</table>
+<p><strong>R2：</strong> 同一组 validation 上的 <strong>3-seed Spearman 均值</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>训练来源</th>
+<th style="text-align: right;">GG</th>
+<th style="text-align: right;">LG</th>
+<th style="text-align: right;">GL</th>
+<th style="text-align: right;">LL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLaG-trained</td>
+<td style="text-align: right;">0.867756</td>
+<td style="text-align: right;">0.867756</td>
+<td style="text-align: right;">0.867590</td>
+<td style="text-align: right;">0.867590</td>
+</tr>
+<tr>
+<td>E12-trained</td>
+<td style="text-align: right;">0.867938</td>
+<td style="text-align: right;">0.867938</td>
+<td style="text-align: right;">0.868096</td>
+<td style="text-align: right;">0.868096</td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> 两种频谱生成的 gate 在当前 checkpoint 中几乎相同，global/local 预测差异主要来自<strong>重建路线</strong>。但切换路线并未一致提高 Spearman。</p>
+<p><strong>P1 与 P2 的区别：</strong> P1 在 <strong>global 内部</strong>改变 FFT 长度；P2 在<strong>同一模型权重下</strong>切换 global/local 路线。二者都定位了预测差异，但都没有证明 local STFT 会稳定提高性能。</p>
 
 
 

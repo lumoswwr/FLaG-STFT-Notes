@@ -1,0 +1,1165 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="FLaG / STFT 实验配置、指标与机制分析">
+      
+      
+      
+        <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/methods/">
+      
+      
+        <link rel="prev" href="..">
+      
+      
+        <link rel="next" href="../findings/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>实验协议与指标 - FLaG / STFT Mechanism Experiments</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#_1" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href=".." title="FLaG / STFT Mechanism Experiments" class="md-header__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FLaG / STFT Mechanism Experiments
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              实验协议与指标
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="FLaG / STFT Mechanism Experiments" class="md-nav__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    FLaG / STFT Mechanism Experiments
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实验协议与指标
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实验协议与指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 两个数据集与任务
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 统一模型流程与可变因素
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 统一模型流程与可变因素">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dropout-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        必须区分的 dropout / normalization 配置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 训练参数
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 指标究竟在测什么
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 指标究竟在测什么">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-stsbspearmanpearson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 STSB：Spearman、Pearson
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-sprintapaccuracyf1precisionrecall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Sprint：AP、Accuracy、F1、Precision、Recall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 机制探针的统计量，不能与性能指标混用
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 实验结果使用规则
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../findings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    研究结果综述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    STSB
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    STSB
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stsb/01-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E1–E8：算子探索与机制探针
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stsb/02-padding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E9–E14：Padding、窗口与配置
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stsb/03-mechanism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    循环反射、P1 与 P2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sprint
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint/01-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据、训练与指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint/02-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S1–S5：跨任务实验与控制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 两个数据集与任务
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 统一模型流程与可变因素
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. 统一模型流程与可变因素">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#dropout-normalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        必须区分的 dropout / normalization 配置
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. 训练参数
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. 指标究竟在测什么
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. 指标究竟在测什么">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-stsbspearmanpearson" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 STSB：Spearman、Pearson
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#42-sprintapaccuracyf1precisionrecall" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.2 Sprint：AP、Accuracy、F1、Precision、Recall
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#43" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.3 机制探针的统计量，不能与性能指标混用
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. 实验结果使用规则
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="_1">实验协议、配置与评价指标<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
+<p>本页是 E1–E14、P1/P2 和 Sprint S1–S5 的统一说明。</p>
+<h2 id="1">1. 两个数据集与任务<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>STSBenchmark（STSB）</th>
+<th>SprintDuplicateQuestions（Sprint）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入</td>
+<td>两个英文句子</td>
+<td>两个英文问题</td>
+</tr>
+<tr>
+<td>任务</td>
+<td>预测连续语义相似度</td>
+<td>二分类：是否为重复问题</td>
+</tr>
+<tr>
+<td>标签</td>
+<td>原始分数 0–5，训练时归一化到 0–1</td>
+<td>0 / 1</td>
+</tr>
+<tr>
+<td>Backbone</td>
+<td>RoBERTa-base，<strong>端到端微调</strong></td>
+<td>RoBERTa-base，<strong>冻结</strong></td>
+</tr>
+<tr>
+<td>训练目标</td>
+<td>两句余弦相似度与归一化标签的 MSE</td>
+<td>正尺度余弦仿射 logit 的 BCEWithLogitsLoss</td>
+</tr>
+<tr>
+<td>主比较指标</td>
+<td>test <strong>Spearman</strong>、test <strong>Pearson</strong></td>
+<td><strong>Average Precision（AP）</strong>，并报告 Accuracy、F1 等</td>
+</tr>
+<tr>
+<td>选择模型</td>
+<td>validation Spearman</td>
+<td>validation Accuracy（采用 validation 校准的 Accuracy 阈值）</td>
+</tr>
+<tr>
+<td>划分</td>
+<td>官方 train 训练、development/validation 选 checkpoint、官方 test 评估</td>
+<td>使用所采用配置的官方 validation，固定分层划分 90%/10% 作为 adaptation train/validation；官方 test 最后评估</td>
+</tr>
+<tr>
+<td>随机性</td>
+<td>训练 seeds；同一组比较应配对相同 seeds</td>
+<td>训练 seeds；adaptation split 固定 <code>random_state=42</code>，所有模型一致</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2">2. 统一模型流程与可变因素<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<p><code>RoBERTa hidden states [B,T,D] → 频域分析 → latent attention → 共享的通道 gate → gated spectrum → 时域重建 → masked max pooling → 可选 post-pool LayerNorm → 输出 projection</code></p>
+<ul>
+<li><strong>Global FLaG</strong>：对 attention mask 处理后的整条 batch-padded 序列做 global <code>rFFT</code>，之后用相同长度 <code>irFFT</code>。默认 FFT 长度跟当前 batch 的 padded 长度 <code>T</code> 变化。</li>
+<li><strong>Local STFT-FLaG</strong>：按固定 <code>win_length</code> / <code>hop_length</code> 切分有效序列，每帧做局部 FFT，将有效帧频率 token 汇总用于生成<strong>一个句级 gate</strong>，再对各帧分别做逆变换并拼回 token 序列。<strong>不是每帧生成一个 gate</strong>。</li>
+<li><strong>E3</strong>：局部 <code>win=8, hop=4, rect, center=False</code>，相邻帧重叠 4 个位置。</li>
+<li><strong>E12</strong>：局部 <code>win=16, hop=16, rect, center=False</code>，无重叠，无额外 frame position encoding。选作后续研究的<strong>固定 local 候选</strong>，而非已证实的通用最优模型。</li>
+</ul>
+<p>共同核心结构：<strong>8 latent queries、4 attention heads、residual channel gate（<code>1+sigmoid</code>）、masked max pooling</strong>。gate 是一个长为 <code>2D</code> 的样本级向量，分别作用于实部和虚部<strong>通道</strong>，在当前实现中各频率 bin 共享同一 gate；不要将其描述成“为各频段分别学习一套 gate”。</p>
+<h3 id="dropout-normalization">必须区分的 dropout / normalization 配置<a class="headerlink" href="#dropout-normalization" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>使用场景</th>
+<th>FFT 算子</th>
+<th style="text-align: right;">pooling dropout</th>
+<th style="text-align: center;">post-pool LayerNorm</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STSB 最初 FLaG、E1–E13 机制探索及原 E12</td>
+<td>按实验分别为 global / local</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: center;">有</td>
+</tr>
+<tr>
+<td>STSB E14 论文文本配置补充（FLaG / E12）</td>
+<td>匹配比较</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: center;">有</td>
+</tr>
+<tr>
+<td>Sprint 早期 S1/S2 FLaG</td>
+<td>Global</td>
+<td style="text-align: right;">0.1</td>
+<td style="text-align: center;"><strong>无</strong></td>
+</tr>
+<tr>
+<td>Sprint 早期 S1/S2 E12</td>
+<td>Local 16/16</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: center;"><strong>有</strong></td>
+</tr>
+<tr>
+<td>Sprint S4 matched global 与 E12</td>
+<td>匹配比较</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: center;">有</td>
+</tr>
+<tr>
+<td>Sprint S5（仅 global FLaG）</td>
+<td>Global</td>
+<td style="text-align: right;">0 或 0.1</td>
+<td style="text-align: center;">有或无</td>
+</tr>
+</tbody>
+</table>
+<p><strong>论文正文定义</strong>的文本配置是 <strong>dropout=0.1，post-pool LayerNorm=True</strong>。原公开实现中定义了 <code>norm3</code>，但部分 released forward 路径没有使用它；我们早期 Sprint 复现沿用了 <code>0.1/无 norm</code>。 S1/S2 的早期 FLaG 与 E12 同时改变了算子、dropout、norm，S4 才是匹配这些非算子因素后的比较。</p>
+<h2 id="3">3. 训练参数<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>STSB</th>
+<th>Sprint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Backbone</td>
+<td>RoBERTa-base 可训练</td>
+<td>RoBERTa-base 冻结并保持 eval</td>
+</tr>
+<tr>
+<td>Max sequence length</td>
+<td>128</td>
+<td>128</td>
+</tr>
+<tr>
+<td>Optimizer</td>
+<td>AdamW</td>
+<td>AdamW</td>
+</tr>
+<tr>
+<td>Backbone LR</td>
+<td><code>1e-5</code></td>
+<td>冻结、不更新</td>
+</tr>
+<tr>
+<td>Pooling / head LR</td>
+<td><code>1e-3</code>（STSB 的 head 为余弦计算，无单独可学习分类 head）</td>
+<td><code>1e-3</code></td>
+</tr>
+<tr>
+<td>Epoch</td>
+<td>3</td>
+<td>10</td>
+</tr>
+<tr>
+<td>Batch</td>
+<td>4 个句对，累积 4 次（等效 16）</td>
+<td>32 个句对</td>
+</tr>
+<tr>
+<td>目标</td>
+<td>MSE</td>
+<td>BCEWithLogitsLoss</td>
+</tr>
+<tr>
+<td>模型选择</td>
+<td>validation Spearman</td>
+<td>validation 上校准 Accuracy 阈值后，以 Accuracy 选 epoch</td>
+</tr>
+<tr>
+<td>原始主实验 seed</td>
+<td>STSB FLaG / Mean 后续统计使用 0–9；早期 E1–E13 主要使用 0–2；E12 后扩展到 0–9</td>
+<td>早期 S1 为 0–2；S2 及 S4/S5 控制为 0–9</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4">4. 指标究竟在测什么<a class="headerlink" href="#4" title="Permanent link">&para;</a></h2>
+<h3 id="41-stsbspearmanpearson">4.1 STSB：Spearman、Pearson<a class="headerlink" href="#41-stsbspearmanpearson" title="Permanent link">&para;</a></h3>
+<p>设共有 <code>n</code> 个句对，模型预测的两句余弦相似度为 <code>s_i</code>，归一化后的真实标签（STSB 原始分数除以 5）为 <code>y_i</code>：</p>
+<ul>
+<li><strong>Spearman</strong>：对 <code>s_i</code> 和 <code>y_i</code> 分别排序，计算两组秩之间的相关系数。衡量句对相似程度的<strong>排序</strong>是否一致；越接近 1 越好。</li>
+<li><strong>Pearson</strong>：衡量预测与标签之间的<strong>线性相关性</strong>，也越接近 1 越好。</li>
+<li><strong>test 指标</strong>：使用 validation Spearman 选出 checkpoint 后，在官方 test 上计算，不能当成 validation 分数。</li>
+<li>表中的 <code>mean ± std</code>：先逐 seed 得到完整指标，再对 seeds 的指标算均值及<strong>样本标准差</strong>（<code>ddof=1</code>）。比较 FLaG 和 E12 时，应对<strong>同 seed</strong>做差后再汇总，不能用两种模型的边际标准差推出配对差的标准差。</li>
+</ul>
+<h3 id="42-sprintapaccuracyf1precisionrecall">4.2 Sprint：AP、Accuracy、F1、Precision、Recall<a class="headerlink" href="#42-sprintapaccuracyf1precisionrecall" title="Permanent link">&para;</a></h3>
+<p>分类模型生成 <code>logit = softplus(raw_scale) × cosine(z_1,z_2) + bias</code>，正尺度保证 logit 与 cosine 在数学上保持相同排序（浮点精度下可能有极小同分误差）。</p>
+<ul>
+<li><strong>AP（Average Precision）</strong>：沿预测分数从高到低排序，汇总各召回率提升位置的 precision。用于评价<strong>不固定阈值时</strong>检索重复问题的质量；这里不是 Accuracy，也不等于 ROC-AUC。</li>
+<li><strong>Accuracy</strong>：<code>(TP+TN)/(TP+TN+FP+FN)</code>；在重复问题正类稀少的数据上，Accuracy 容易受负类占比主导。</li>
+<li><strong>Precision</strong>：<code>TP/(TP+FP)</code>；<strong>Recall</strong>：<code>TP/(TP+FN)</code>；<strong>F1</strong>：<code>2PR/(P+R)</code>。</li>
+<li>本项目在 <strong>adaptation validation</strong> 上分别选择 <strong>Accuracy 阈值</strong>与 <strong>F1 阈值</strong>；在最终 test 上冻结阈值：test Accuracy 使用前者，test F1/Precision/Recall 使用后者。因此这些指标<strong>不对应同一套分类阈值或同一张混淆矩阵</strong>。AP 为 threshold-free。</li>
+<li><strong>validation AP</strong> 是从适配 validation 上得到的排序指标，<strong>test AP</strong> 来自官方 test；即使数值接近也不能互换。Sprint S4/S5 的 matched/2×2 控制是 validation-only。</li>
+</ul>
+<h3 id="43">4.3 机制探针的统计量，不能与性能指标混用<a class="headerlink" href="#43" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>指标</th>
+<th>用途</th>
+<th>定义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>频带 knockout 的 Spearman 降幅</td>
+<td>E6</td>
+<td>在符合 8 频带条件的测试子集上，<code>Spearman_before - Spearman_after_band_removed</code></td>
+</tr>
+<tr>
+<td>单 token 预测响应</td>
+<td>E7</td>
+<td>删掉一个内容 token 的 hidden 后，两句 cosine 的绝对变化</td>
+</tr>
+<tr>
+<td>单 token 平方误差响应</td>
+<td>E7</td>
+<td><code>|(s_after-y)^2 - (s_before-y)^2|</code>；先对相同位置跨 seed 对齐，再统计句内位置响应差异</td>
+</tr>
+<tr>
+<td>DC attention 偏好比</td>
+<td>E8</td>
+<td><strong>平均每个 DC 频率 token 的 attention / 平均每个非 DC 频率 token 的 attention</strong>；它不是 DC 能量占比，也不是 knockout 重要性</td>
+</tr>
+<tr>
+<td>平均绝对预测漂移</td>
+<td>E9/P1/P2/S3</td>
+<td>相同输入/同 checkpoint，在两个推理处理方式下的 <code>mean(|prediction_A - prediction_B|)</code>；不是 Spearman/AP 提升</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5">5. 实验结果使用规则<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
+<p><strong>3-seed 探索结果</strong>（特别是 E1–E13 的候选搜索）只描述观察到的方向；<strong>10-seed 配对结果</strong>可用于考察其是否跨 seed 稳定，但显著性不足时不能称为稳定优势。STSB 早期探索 FLaG/E12 均为 <code>dropout=0/norm=True</code>：10-seed test Spearman 分别为 <code>0.841559±0.003538</code> 与 <code>0.842739±0.003214</code>，配对增量 <code>+0.001180±0.002107</code>，7/10 正向，区间跨 0。STSB E14 统一论文文本配置 <code>0.1/norm=True</code> 时，10-seed 分别为 <code>0.839065±0.004154</code> 与 <code>0.838944±0.001882</code>，配对增量约 <code>-0.000121±0.004039</code>，5/10 正向。</p>
+<p><strong>研究主张的范围</strong>：P1/P2 反映当前实现和被测 checkpoint 的结构、预测扰动；不意味着 local reconstruction 总能改善下游性能，也不能把 Sprint 早期整套配置增益全部归因于 STFT。</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

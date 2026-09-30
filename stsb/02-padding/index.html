@@ -6,7 +6,7 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="FLaG / STFT 实验记录与机制分析">
+        <meta name="description" content="FLaG / STFT 实验配置、指标与机制分析">
       
       
       
@@ -27,7 +27,7 @@
     
     
       
-        <title>E9–E14：Padding 与配置 - FLaG / STFT Mechanism Experiments</title>
+        <title>E9–E14：Padding、窗口与配置 - FLaG / STFT Mechanism Experiments</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#stsbe9e14-padding" class="md-skip">
+        <a href="#stsbe9e14padding" class="md-skip">
           跳转至
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              E9–E14：Padding 与配置
+              E9–E14：Padding、窗口与配置
             
           </span>
         </div>
@@ -224,6 +224,60 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../methods/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实验协议与指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../findings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    研究结果综述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -250,10 +304,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -271,8 +325,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_2">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -296,7 +350,7 @@
   <span class="md-ellipsis">
     
   
-    E1–E8：早期实验
+    E1–E8：算子探索与机制探针
   
 
     
@@ -333,7 +387,7 @@
   <span class="md-ellipsis">
     
   
-    E9–E14：Padding 与配置
+    E9–E14：Padding、窗口与配置
   
 
     
@@ -351,7 +405,7 @@
   <span class="md-ellipsis">
     
   
-    E9–E14：Padding 与配置
+    E9–E14：Padding、窗口与配置
   
 
     
@@ -377,10 +431,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#e9" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E9
+        实验配置总览
       
     </span>
   </a>
@@ -388,10 +442,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e10" class="md-nav__link">
+  <a href="#e9-padding" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E10
+        E9：增加外部右 padding 会怎样？
       
     </span>
   </a>
@@ -399,10 +453,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e12" class="md-nav__link">
+  <a href="#e10padding-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E12
+        E10：Padding 敏感性能解释整体 test 性能差异吗？
       
     </span>
   </a>
@@ -410,10 +464,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e13" class="md-nav__link">
+  <a href="#e11e12-overlap-22" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E13
+        E11/E12：局部窗口大小 × overlap 2×2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="E11/E12：局部窗口大小 × overlap 2×2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#e12-10-seeds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E12 扩展到 10 seeds 后怎样？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e13-global-fft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E13：从训练开始固定 global FFT 长度
       
     </span>
   </a>
@@ -421,10 +503,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e14" class="md-nav__link">
+  <a href="#e14-text-flag-e12" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E14
+        E14：在原论文 text 配置下重新比较 FLaG 和 E12
       
     </span>
   </a>
@@ -454,7 +536,7 @@
   <span class="md-ellipsis">
     
   
-    循环反射与 P1/P2
+    循环反射、P1 与 P2
   
 
     
@@ -501,10 +583,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -522,8 +604,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -547,7 +629,7 @@
   <span class="md-ellipsis">
     
   
-    迁移协议
+    数据、训练与指标
   
 
     
@@ -575,7 +657,7 @@
   <span class="md-ellipsis">
     
   
-    S1–S5
+    S1–S5：跨任务实验与控制
   
 
     
@@ -623,10 +705,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#e9" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E9
+        实验配置总览
       
     </span>
   </a>
@@ -634,10 +716,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e10" class="md-nav__link">
+  <a href="#e9-padding" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E10
+        E9：增加外部右 padding 会怎样？
       
     </span>
   </a>
@@ -645,10 +727,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e12" class="md-nav__link">
+  <a href="#e10padding-test" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E12
+        E10：Padding 敏感性能解释整体 test 性能差异吗？
       
     </span>
   </a>
@@ -656,10 +738,38 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e13" class="md-nav__link">
+  <a href="#e11e12-overlap-22" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E13
+        E11/E12：局部窗口大小 × overlap 2×2
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="E11/E12：局部窗口大小 × overlap 2×2">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#e12-10-seeds" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E12 扩展到 10 seeds 后怎样？
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#e13-global-fft" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        E13：从训练开始固定 global FFT 长度
       
     </span>
   </a>
@@ -667,10 +777,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e14" class="md-nav__link">
+  <a href="#e14-text-flag-e12" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E14
+        E14：在原论文 text 配置下重新比较 FLaG 和 E12
       
     </span>
   </a>
@@ -694,69 +804,136 @@
 
 
 
-<h1 id="stsbe9e14-padding">STSB：E9–E14 Padding 与配置<a class="headerlink" href="#stsbe9e14-padding" title="Permanent link">&para;</a></h1>
-<h2 id="e9">E9<a class="headerlink" href="#e9" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> 频率 token DC 分析没有得到较为关键信息，因此进一步考虑 STFT 的提升是否来自对外部 padding 更稳定。</p>
-<p><strong>M：</strong> 取长度不超过 16 的句子，分别 padding 到 16、24、32、64、128。</p>
-<p><strong>R：</strong> 补到 128 时：</p>
+<h1 id="stsbe9e14padding">STSB：E9–E14，Padding、局部窗口与配置复核<a class="headerlink" href="#stsbe9e14padding" title="Permanent link">&para;</a></h1>
+<p>本页承接 <a href="../01-experiments/">E1–E8</a>。E9/E10 检查<strong>固定 checkpoint 在推理时</strong>对外部补零的敏感性；E11/E12/E13 是训练新模型；E14 是后续查阅原论文后补做的<strong>匹配配置与 10-seed</strong> 实验。它们回答的问题和指标不同，见<a href="../../methods/">统一实验协议</a>。</p>
+<h2 id="_1">实验配置总览<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
-<th>相对各句精确长度的预测漂移</th>
-<th style="text-align: right;">FLaG</th>
-<th style="text-align: right;">E3</th>
+<th>编号</th>
+<th>研究对象</th>
+<th style="text-align: center;">是否重新训练</th>
+<th>数据与 seeds</th>
+<th>改变的因素</th>
+<th>核心观测</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>平均绝对相似度变化</td>
+<td>E9</td>
+<td>已训练 FLaG / E3</td>
+<td style="text-align: center;">否</td>
+<td>STSB；探针脚本默认 seed=0、最多 200 对短句；表中历史执行数量仍待日志复核</td>
+<td>同样的有效句子 hidden，额外右 padding 到 16/24/32/64/128</td>
+<td>句对 cosine 绝对变化</td>
+</tr>
+<tr>
+<td>E10</td>
+<td>已训练 FLaG / E3</td>
+<td style="text-align: center;">否</td>
+<td>STSB test，3 seeds（0–2）</td>
+<td>normal / pair_exact / sentence_exact / fixed_128 四种推理 padding 约定</td>
+<td>全 test Spearman</td>
+</tr>
+<tr>
+<td>E11</td>
+<td>STFT 8/8</td>
+<td style="text-align: center;"><strong>是</strong></td>
+<td>STSB train→validation→test；3 seeds（0–2）</td>
+<td>rect、win=8、hop=8、无 overlap</td>
+<td>test Spearman / Pearson</td>
+</tr>
+<tr>
+<td>E12</td>
+<td>STFT 16/16</td>
+<td style="text-align: center;"><strong>是</strong></td>
+<td>同上，先 3 seeds，后扩展到 <strong>10 seeds（0–9）</strong></td>
+<td>rect、win=16、hop=16、无 overlap</td>
+<td>test Spearman / Pearson</td>
+</tr>
+<tr>
+<td>E13</td>
+<td>Global FLaG fixed FFT 128</td>
+<td style="text-align: center;"><strong>是</strong></td>
+<td>STSB，3 seeds（0–2）</td>
+<td><strong>训练与推理</strong>均固定 global FFT/iFFT 长度 128</td>
+<td>test Spearman / Pearson</td>
+</tr>
+<tr>
+<td>E14</td>
+<td>Global FLaG 与 E12</td>
+<td style="text-align: center;"><strong>是</strong></td>
+<td>STSB，<strong>10 seeds（0–9）</strong></td>
+<td>在同一 <strong>论文 text 非算子配置</strong>下比较：dropout=0.1，post-pool norm=True</td>
+<td><strong>test</strong> Spearman / Pearson 及配对差</td>
+</tr>
+</tbody>
+</table>
+<p>除 E14 外，重训练候选遵循早期 STSB 统一非算子设置：<strong>pooling dropout=0，post-pool LayerNorm=True</strong>，8 latent、4 heads、masked max pooling、3 epochs、RoBERTa-base 端到端微调。E9/E10 只改变<strong>已算出的 encoder hidden 进入 pooling 时的补零</strong>，不重训 backbone；因此不等同于重新 tokenization、重新编码或完整系统对任意 batch 的位级不变性测试。</p>
+<hr />
+<h2 id="e9-padding">E9：增加外部右 padding 会怎样？<a class="headerlink" href="#e9-padding" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> E8 没有提供稳定的性能原因；local STFT 的固定帧长度是否使其比 global FFT 对额外的 batch 右 padding 更稳定？</p>
+<p><strong>M：</strong> 使用已训练 <strong>FLaG 与 E3</strong> checkpoint。选有效 token 长度不超过 16 的 STSB 短句，将<strong>相同的有效 hidden</strong> 按长度 16、24、32、64、128 补零，仅改变传给 pooling 的右 padding 总长度与 mask，不改变内容 token、encoder 输出或模型参数。使用按每句自身有效长度处理时的预测作为参照，比较句对预测 cosine 的<strong>绝对漂移</strong>。global FFT 的变换长度随外部 padding 变化；E3 则对同样有效 token 按固定 8/4 帧构造局部频谱，批内额外的无效帧被 mask。</p>
+<p><strong>R：</strong> 在补到 128 的该短句诊断里（<strong>代码的默认运行设置是 seed=0、最多 200 对短句</strong>）：</p>
+<table>
+<thead>
+<tr>
+<th>同一输入相对自身有效长度</th>
+<th style="text-align: right;">Global FLaG</th>
+<th style="text-align: right;">Local E3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>平均绝对 cosine 漂移</td>
 <td style="text-align: right;">0.006003</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">数值精度范围内约 0</td>
 </tr>
 <tr>
-<td>最大绝对相似度变化</td>
+<td>最大绝对 cosine 漂移</td>
 <td style="text-align: right;">0.035915</td>
-<td style="text-align: right;">0</td>
+<td style="text-align: right;">数值精度范围内约 0</td>
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> FLaG 对 padding 敏感。</p>
-<h2 id="e10">E10<a class="headerlink" href="#e10" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> 承接 E9，探索数据集上的 padding 是否会影响最终预测。</p>
-<p><strong>M：</strong> 加载 FLaG 以及 E3（<code>win=8, hop=4</code>）checkpoint，采用四种处理方式。</p>
+<p><strong>C：</strong> 当前 global FLaG 输出对额外右 padding 长度敏感；当前 E3 实现对这类<strong>encoder hidden 不变时的额外外部零 padding</strong>近似不变。</p>
+<h2 id="e10padding-test">E10：Padding 敏感性能解释整体 test 性能差异吗？<a class="headerlink" href="#e10padding-test" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> E9 只挑短句并测预测漂移；把 padding 约定改到整个 STSB test，最终 Spearman 是否有系统性变化？是否足以解释 E3 和 global FLaG 的差异？</p>
+<p><strong>M：</strong> 读取 <strong>3 seeds（0–2）</strong> 的 FLaG 和 E3 已训练 checkpoint，在<strong>完整 STSB test</strong> 上每个句子只计算一次 RoBERTa hidden；然后保持有效 hidden 不变，用四种方式组织<strong>送入 pooling 的长度</strong>：</p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th></th>
+<th>推理方式</th>
+<th>实际操作</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>normal</td>
-<td>保持原来的batch padding</td>
+<td><code>normal</code></td>
+<td>与原始训练/评估一致，当前 batch 动态 padding</td>
 </tr>
 <tr>
-<td>pair_exact</td>
-<td>句对两侧都适用</td>
+<td><code>pair_exact</code></td>
+<td>一对句子的左右两侧分别使用相同的长度，取该<strong>句对两句有效长度的较大者</strong></td>
 </tr>
 <tr>
-<td>sentence_exact</td>
-<td>每句话分别使用自身有效长度</td>
+<td><code>sentence_exact</code></td>
+<td>每句话独立使用自己的实际有效 token 长度</td>
 </tr>
 <tr>
-<td>fixed_128</td>
-<td>所有句子统一补到128</td>
+<td><code>fixed_128</code></td>
+<td>两句均在 pooling 输入端右 padding 到 128</td>
 </tr>
 </tbody>
 </table>
+<p>每种方式重新计算整套 test 预测，分别计算每 seed 的 test Spearman，再在三个 seeds 上求均值。<strong>这是固定模型的 inference-time intervention，不是四套分别训练的模型。</strong></p>
 <p><strong>R：</strong></p>
 <table>
 <thead>
 <tr>
-<th>推理约定</th>
-<th style="text-align: right;">FLaG三seed平均Spearman</th>
-<th style="text-align: right;">E3</th>
+<th>推理方式</th>
+<th style="text-align: right;">Global FLaG：3-seed mean test Spearman ↑</th>
+<th style="text-align: right;">E3：3-seed mean test Spearman ↑</th>
 </tr>
 </thead>
 <tbody>
@@ -782,50 +959,102 @@
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 有影响，但不是主要导致 FLaG 与 STFT 差距的原因；同时进一步确认 STFT 对 padding 不敏感，FLaG 反之。</p>
-<h2 id="e12">E12<a class="headerlink" href="#e12" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> 尝试窗口不重叠。</p>
-<p><strong>M：</strong> 设置窗口大小为 16 或 8，重叠设置为半个窗口或不重叠。</p>
-<p><strong>R：</strong></p>
+<p><strong>C：</strong> global FLaG 的 test Spearman 会随 padding 约定小幅变化，E3 在这组固定 hidden 的探针中几乎不变；但切换 padding 约定<strong>没有稳定抹平</strong>两种模型的性能差。<strong>结构上的 padding 不变性与下游性能收益是两个不同命题</strong>。</p>
+<h2 id="e11e12-overlap-22">E11/E12：局部窗口大小 × overlap 2×2<a class="headerlink" href="#e11e12-overlap-22" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> E2/E3 都采用半窗口 overlap。局部 STFT 的潜在效果是否必须依赖 frame 重叠？去掉 overlap 是否简化实现并保持结果？</p>
+<p><strong>M：</strong> 在 STSB 上按原训练协议<strong>重新训练</strong>四种 rect、<code>center=False</code>、无额外 frame positional encoding 的 local 配置。两种窗长 <code>win∈{8,16}</code> 与两种 hop（半窗或整窗）交叉，非算子因素全部统一为 <code>dropout=0,norm=True</code>，每种用 <strong>seeds 0–2</strong>。其中 E2/E3 是已经执行过的配置，补充不重叠的 E11/E12。重叠位置按重建实现进行 window-envelope 归一化。</p>
+<p><strong>R：</strong> <strong>STSB official test，3-seed Spearman（mean ± sample std）</strong>：</p>
 <table>
 <thead>
 <tr>
-<th>窗口大小</th>
-<th style="text-align: right;">有重叠:每次移动半个窗口</th>
-<th style="text-align: right;">无重叠:每次移动整个窗口</th>
+<th style="text-align: right;">窗长</th>
+<th style="text-align: right;">半窗 overlap</th>
+<th style="text-align: right;">不 overlap</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>8</td>
-<td style="text-align: right;">E3:<code>win=8</code>,<code>hop=4</code><br />0.843000±0.001047</td>
-<td style="text-align: right;">E11:<code>win=8</code>,<code>hop=8</code><br />0.842116±0.001423</td>
+<td style="text-align: right;">8</td>
+<td style="text-align: right;"><strong>E3</strong>：win=8, hop=4；<strong>0.843000 ± 0.001047</strong></td>
+<td style="text-align: right;"><strong>E11</strong>：win=8, hop=8；<strong>0.842166 ± 0.001423</strong></td>
 </tr>
 <tr>
-<td>16</td>
-<td style="text-align: right;">E2:<code>win=16</code>,<code>hop=8</code><br />0.842204±0.001824</td>
-<td style="text-align: right;">E12:<code>win=16</code>,<code>hop=16</code><br />0.843419±0.000531</td>
+<td style="text-align: right;">16</td>
+<td style="text-align: right;"><strong>E2</strong>：win=16, hop=8；<strong>0.842204 ± 0.001824</strong></td>
+<td style="text-align: right;"><strong>E12</strong>：win=16, hop=16；<strong>0.843419 ± 0.000531</strong></td>
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 后续模型全部使用 <code>win=16 / hop=16</code>。</p>
-<h2 id="e13">E13<a class="headerlink" href="#e13" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> E10 只在推理采用固定 padding，训练时仍动态。探究从训练开始固定 padding 长度。</p>
-<p><strong>M：</strong> 采用 <code>fixed_128</code> padding 训练 FLaG，3 seed。</p>
-<p><strong>R：</strong> 0.841856 ± 0.001000；相对 FLaG +0.000728 ± 0.003079，仅 1/3 正向。</p>
-<p><strong>C：</strong> FLaG 对 padding 敏感，但固定 padding 不代表模型表现更好。</p>
-<h2 id="e14">E14<a class="headerlink" href="#e14" title="Permanent link">&para;</a></h2>
-<blockquote>
-<p>此处E14是在Sprint数据集上发现dropout norm设置对模型有影响的补充</p>
-</blockquote>
-<p><strong>Q：</strong> 在 STSB 数据集补充 <code>dropout=0.1, norm=True</code>，也就是对齐原论文配置。</p>
+<p>同窗长情况下，overlap 与不 overlap 的 Spearman 均值差：<code>win=8</code> 时 <code>+0.000834</code>，<code>win=16</code> 时 <code>−0.001215</code>。三个 seeds 的早期 E12 Pearson 为 <code>0.839528±0.002141</code>；E12 相对同 seed global FLaG 的 Spearman 差为 <code>+0.001259,+0.000591,+0.005023</code>。</p>
+<p><strong>C：</strong> overlap 不呈现一致的有利方向。因此后续选择<strong>结构更简单</strong>的 E12（rect、16/16、无重叠、非居中、无帧位置编码）用于机制研究和 Sprint 迁移。</p>
+<h3 id="e12-10-seeds">E12 扩展到 10 seeds 后怎样？<a class="headerlink" href="#e12-10-seeds" title="Permanent link">&para;</a></h3>
+<p>原来的 FLaG 和 E12 均保持 <code>dropout=0,norm=True</code>、相同训练预算，不改超参数，扩展到 <strong>seeds 0–9</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th style="text-align: right;">10-seed <strong>test Spearman</strong> ↑</th>
+<th style="text-align: right;">10-seed <strong>test Pearson</strong> ↑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Global FLaG</td>
+<td style="text-align: right;">0.841559 ± 0.003538</td>
+<td style="text-align: right;">0.838504 ± 0.003444</td>
+</tr>
+<tr>
+<td>E12（16/16）</td>
+<td style="text-align: right;">0.842739 ± 0.003214</td>
+<td style="text-align: right;">0.839393 ± 0.003467</td>
+</tr>
+<tr>
+<td>配对 E12 − FLaG</td>
+<td style="text-align: right;"><strong>+0.001180 ± 0.002107</strong></td>
+<td style="text-align: right;"><strong>+0.000889 ± 0.003033</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Spearman 正向 seeds <strong>7/10</strong>，配对 t 95% CI 约 <code>[−0.000327,+0.002687]</code>，双侧 p≈0.110。区间跨 0；早期 3/3 的正向信号<strong>没有形成稳定的 10-seed 性能证明</strong>。此外，STSB Mean pooling 10-seed Spearman <code>0.851201±0.002000</code>，高于当前这两组 FLaG 系列。</p>
+<h2 id="e13-global-fft">E13：从训练开始固定 global FFT 长度<a class="headerlink" href="#e13-global-fft" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> E10 只在<strong>推理</strong>时尝试 fixed_128，但 FLaG 在<strong>训练</strong>中仍受到动态 padding 影响。如果从训练开始固定 global FFT 长度，是否能重现 E12 早期观察到的性能变化？</p>
+<p><strong>M：</strong> <strong>重新训练</strong> global FLaG，在训练、validation 和 test 阶段都使用 <code>fixed_fft_length=128</code>（global rFFT 和 irFFT 都按这个长度工作）；不引入局部 frame，保持 STSB 早期 <code>dropout=0,norm=True</code>、3 epochs、<strong>seeds 0–2</strong>。与这三个 seeds 的原始动态 global FLaG 配对比较。</p>
+<p><strong>R：</strong> 3-seed <strong>test</strong> Spearman <code>0.841856±0.001000</code>；Pearson <code>0.837795±0.001660</code>。配对 Spearman E13 − 原 global 为 <code>−0.000445,−0.001592,+0.004222</code>，均值 <code>+0.000728±0.003079</code>，<strong>1/3 正向</strong>。</p>
+<p><strong>C：</strong> 固定 global FFT 长度消除了这一路径的 batch-dependent 变换长度变化，但<strong>没有稳定提高 STSB 性能</strong>，也没有在这三个 seeds 上稳定重现 E12 的观察值。不能把“padding 敏感性存在”直接升级为“padding 是性能差距主因”。</p>
+<h2 id="e14-text-flag-e12">E14：在原论文 text 配置下重新比较 FLaG 和 E12<a class="headerlink" href="#e14-text-flag-e12" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 上面的 STSB 探索都用了 <code>dropout=0,norm=True</code>。后来查阅论文正文发现其 text 主配置为 <strong><code>dropout=0.1, post-pool LayerNorm=True</code></strong>；此前观察到的 E12 微小正向趋势，对 dropout 是否敏感？</p>
+<p><strong>M：</strong> 不改 STSB 任务协议、backbone、训练预算、E12 16/16 结构等，仅把 FLaG 和 E12 都统一改为<strong><code>dropout=0.1,norm=True</code></strong>，<strong>重新训练 seeds 0–9（10 seeds）</strong>。validation Spearman 选 checkpoint；下表为 official <strong>test</strong> 指标，FLaG/E12 按 seed 配对比较。</p>
 <p><strong>R：</strong></p>
-<ul>
-<li>FLaG：0.839065 ± 0.004154</li>
-<li>E12：0.838944 ± 0.001882</li>
-<li>E12 − FLaG：−0.000121 ± 0.004039，5/10 seed 为正</li>
-</ul>
-<p><strong>C：</strong> 在统一 <code>dropout=0 + Norm</code> 时 STSB 曾观察到 E12 的轻微正向趋势，但在论文 text 配置 <code>0.1 + Norm</code> 下该趋势消失。</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th style="text-align: right;">10-seed <strong>test Spearman</strong> ↑</th>
+<th style="text-align: right;">10-seed <strong>test Pearson</strong> ↑</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Global FLaG，0.1/True</td>
+<td style="text-align: right;"><strong>0.839065 ± 0.004154</strong></td>
+<td style="text-align: right;"><strong>0.834980 ± 0.003942</strong></td>
+</tr>
+<tr>
+<td>E12，0.1/True</td>
+<td style="text-align: right;"><strong>0.838944 ± 0.001882</strong></td>
+<td style="text-align: right;"><strong>0.834015 ± 0.002119</strong></td>
+</tr>
+<tr>
+<td>配对 E12 − FLaG</td>
+<td style="text-align: right;"><strong>−0.000121 ± 0.004039</strong></td>
+<td style="text-align: right;"><strong>−0.000965 ± 0.003878</strong></td>
+</tr>
+</tbody>
+</table>
+<p>Spearman 正向 <strong>5/10 seeds</strong>，均值差近 0。论文原文报告的 STSB FLaG Spearman 约 <code>0.8368±0.004</code>；本重建的 <code>0.839065</code> 在数值上接近。</p>
+<p><strong>C：</strong> <code>0/True</code> 时的 E12 10-seed 小幅正向均值，在论文文本配置 <code>0.1/True</code> 下基本消失。<strong>两套匹配配置都不支持“局部 STFT 稳定优于 global FLaG”的强结论</strong>；也不能反向声称 global 在所有配置上一定更强。</p>
+<hr />
+<p><strong>接下来的机制问题：</strong> E9/E10 显示 global 对外部 padding 敏感，但 E13 没有建立性能原因。为了理解这一点，下一页推导<strong>实虚门控产生的循环反射</strong>，再用 P1 检查变化来自 gate 还是 reconstruction；P2 则在另一维度上拆分 global/local。</p>
 
 
 
