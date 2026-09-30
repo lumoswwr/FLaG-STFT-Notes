@@ -8,7 +8,7 @@
 | **STSB test Spearman**，0.1 dropout / 有 norm，10 seeds | 0.839065 ± 0.004154 | 0.838944 ± 0.001882 | −0.000121 ± 0.004039（5/10 正向） |
 | **Sprint validation AP**，两者均 0 dropout / 有 norm，10 seeds | 0.795830 ± 0.017156 | 0.789136 ± 0.014094 | −0.006693 ± 0.017279（4/10 正向） |
 
-STSB 上 E12 的小幅正向趋势未在不同配置下稳定出现。Sprint 早期 E12 的 **official-test AP** 高于早期 FLaG，但当时 dropout/norm 不匹配，不能据此认定算子带来增益。
+作为参照，STSB Mean pooling 在相同早期协议下的 10-seed test Spearman 为 **0.851201 ± 0.002000**。STSB 上 E12 的小幅正向趋势未在不同配置下稳定出现。Sprint 早期 E12 的 **official-test AP** 高于早期 FLaG，但当时 dropout/norm 不匹配，不能据此认定算子带来增益。
 
 ## 机制
 
