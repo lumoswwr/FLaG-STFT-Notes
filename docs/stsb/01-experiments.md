@@ -78,7 +78,7 @@ E2/E3 使用 `center=False`，均只生成**一个句级 gate**；E5 **同时改
 频带的重要性用 **Spearman 降幅**衡量：
 
 $$
-\Delta\rho_b=\rho_{\text{原预测}}-\rho_{\text{删除频带 }b}.
+\Delta\rho_b=\rho_{\mathrm{before}}-\rho_{\mathrm{after},b}.
 $$
 
 **R：** B0 引起的平均 Spearman 降幅最大：FLaG **0.146694**，E3 **0.198943**。
