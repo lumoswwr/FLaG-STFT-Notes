@@ -21,10 +21,10 @@
 
 **第一，实验报告不是“每组谁的数字高就一定是哪项结构起作用”。** STSB E1–E5 / E11–E14 有部分重新训练的候选；E6–E10 及 P1/P2 大多在固定 checkpoint 下改变推理条件。两种证据层次不能互相代替。
 
-**第二，S1/S2 和 S4 的数值不属于同一控制条件。** Sprint 早期 FLaG \`dropout=0.1,post_pool_norm=False\`，E12 \`0/True\`；S4 才把两者匹配为 \`0/True\`。S5 的 \`0.1/True\` 是**仅 global FLaG**在 adaptation validation 上的控制，不能与 STSB E14 的 **test Spearman** 直接并列比较。
+**第二，S1/S2 和 S4 的数值不属于同一控制条件。** Sprint 早期 FLaG `dropout=0.1,post_pool_norm=False`，E12 `0/True`；S4 才把两者匹配为 `0/True`。S5 的 `0.1/True` 是**仅 global FLaG**在 adaptation validation 上的控制，不能与 STSB E14 的 **test Spearman** 直接并列比较。
 
 **第三，所有均值都必须带限定词。** 比如“STSB 3-seed test Spearman”“Sprint 10-seed adaptation validation AP”“P2 3-seed validation cosine 绝对漂移”；本文不会只给一个无数据集/seed/split 说明的数字。
 
 ## 文件与证据
 
-正文由 MkDocs + Material 组织，可点击左侧章节与右侧页内目录。本网站是可读性整理版；**运行脚本、模型源码和研究原始摘要位于 [AMPCliff 实验分支](https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism)**。具体每次实验仍以训练日志和 \`config.json\` 为准。新增结果应同时记录运行 commit、任务 split、seed 清单和训练/推理设置，避免后续追溯歧义。
+正文由 MkDocs + Material 组织，可点击左侧章节与右侧页内目录。本网站是可读性整理版；**运行脚本、模型源码和研究原始摘要位于 [AMPCliff 实验分支](https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism)**。具体每次实验仍以训练日志和 `config.json` 为准。新增结果应同时记录运行 commit、任务 split、seed 清单和训练/推理设置，避免后续追溯歧义。
