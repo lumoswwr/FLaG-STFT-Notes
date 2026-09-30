@@ -10,9 +10,9 @@
 | S2 | S1 的早期整套方案扩至 10 seeds 后表现怎样？ | Sprint **official test** | **0–9（10）** | 扩展重新训练 | **延续 S1，仍不匹配** |
 | S3 | 在 Sprint 也能观察到 P2 的 gate/reconstruction 分工吗？ | Sprint adaptation **validation** | **0–2（3）** | **固定 S1 所训练 checkpoint** 做 GG/LG/GL/LL | 对每个源 checkpoint 内拷贝同一套非算子设置；两种训练来源本身仍不同 |
 | S4 | 控制 dropout/norm 后，local E12 是否稳定优于 global？ | Sprint adaptation **validation** | **0–9（10）** | 匹配的 global **重新训练**；比较 E12 | 两者均 **0/True**；算子不同 |
-| S5 | Sprint 的结果是否对 dropout 与 post-pool norm 有交互敏感性？ | Sprint adaptation **validation** | **0–9（10）** | **重新训练**四种 **global FLaG** | dropout \`{0,0.1}\` × norm \`{False,True}\` |
+| S5 | Sprint 的结果是否对 dropout 与 post-pool norm 有交互敏感性？ | Sprint adaptation **validation** | **0–9（10）** | **重新训练**四种 **global FLaG** | dropout `{0,0.1}` × norm `{False,True}` |
 
-**记号：** \`0/True\` 表示 pooling dropout=0、post-pool LayerNorm=开启；\`0.1/False\` 表示 dropout=0.1、无 post-pool LayerNorm。论文方法正文写明**文本**为 \`0.1/True\`。S1 的 \`0.1/False\` 是本项目早期公开代码风格的复现实现，**不是**论文方法段所描述的文本归一化设置。
+**记号：** `0/True` 表示 pooling dropout=0、post-pool LayerNorm=开启；`0.1/False` 表示 dropout=0.1、无 post-pool LayerNorm。论文方法正文写明**文本**为 `0.1/True`。S1 的 `0.1/False` 是本项目早期公开代码风格的复现实现，**不是**论文方法段所描述的文本归一化设置。
 
 ## B. 共同 Sprint 任务设置
 
@@ -20,11 +20,11 @@
 | --- | --- |
 | 数据 | SprintDuplicateQuestions，输入英文句对，二分类标签 0/1 |
 | 样本划分 | 官方 validation → 固定分层 90:10：adaptation train **90,900** 对、validation **10,100** 对；official test **101,000** 对 |
-| Split 随机性 | \`random_state=42\`；训练随机 seeds 按各实验单独列出；各模型共享同一划分 |
+| Split 随机性 | `random_state=42`；训练随机 seeds 按各实验单独列出；各模型共享同一划分 |
 | Encoder | **冻结** RoBERTa-base；max length=128 |
-| Head | 单调正尺度 cosine-logit（\`softplus(raw_scale)×cosine+bias\`） |
+| Head | 单调正尺度 cosine-logit（`softplus(raw_scale)×cosine+bias`） |
 | Loss | BCEWithLogitsLoss |
-| 训练预算 | 10 epochs；batch=32；pool/head LR=\`1e-3\` |
+| 训练预算 | 10 epochs；batch=32；pool/head LR=`1e-3` |
 | 选择 | **validation 校准 Accuracy 阈值后，以 validation Accuracy 选 checkpoint** |
 | 最终指标 | AP 不依赖阈值；test Accuracy 用 validation 的 Accuracy 阈值；test F1/Precision/Recall **另用** validation 的 F1 阈值 |
 | 模型核心 | Global/E12 都是 8 latents、4 heads、residual gate、masked max pooling；E12 固定 rect、win16/hop16、无 overlap、无新帧位置编码 |
@@ -59,7 +59,7 @@
 
 **Q：** S1 的 3-seed 差异扩展到 10 seeds 后是否仍能观察到？它是否能证明 local operator 的作用？
 
-**M：** **保留 S1 的实际配置不变**，global FLaG 为 \`0.1/False\`，E12 为 \`0/True\`，用 **seeds 0–9** 各重新进行 Sprint 训练/适配；仍在 validation 选 checkpoint/阈值后只对 official test 报指标。这个扩 seed 不会自动使两种配置匹配。
+**M：** **保留 S1 的实际配置不变**，global FLaG 为 `0.1/False`，E12 为 `0/True`，用 **seeds 0–9** 各重新进行 Sprint 训练/适配；仍在 validation 选 checkpoint/阈值后只对 official test 报指标。这个扩 seed 不会自动使两种配置匹配。
 
 **R：** **10-seed official-test（均值±样本标准差）**：
 
@@ -71,7 +71,7 @@
 | Precision（val F1 阈值） | 0.745202 ± 0.033959 | 0.814274 ± 0.032556 | +0.069072，9/10 正向 |
 | Recall（val F1 阈值） | 0.579800 ± 0.037446 | 0.594100 ± 0.041906 | +0.014300，6/10 正向 |
 
-AP 配对差的 95% t 区间约 \`[+0.0356,+0.0608]\`。它表明**这两套实际训练配置**的 AP 差在本实验中跨 seed 一致；**不表示**局部 STFT operator 的因果收益也一致。
+AP 配对差的 95% t 区间约 `[+0.0356,+0.0608]`。它表明**这两套实际训练配置**的 AP 差在本实验中跨 seed 一致；**不表示**局部 STFT operator 的因果收益也一致。
 
 **C：** E12 的**整体配置**与早期 global 方案相比确实有较大的 official-test AP 差，但两个因素不匹配导致不能归因。下面 S3 从**推理路径**拆机制，S4 再从**重新训练的控制配置**隔离非算子因素。
 
@@ -124,7 +124,7 @@ AP 配对差的 95% t 区间约 \`[+0.0356,+0.0608]\`。它表明**这两套实�
 | E12，0/True | **0.789136 ± 0.014094** |
 | 同 seed 的 E12 − GlobalMatch | **−0.006693 ± 0.017279** |
 
-配对差 **4/10 seeds 正向**，95% t 区间约 \`[−0.0191,+0.0057]\`，双侧配对 t 检验约 \`p=0.252\`。区间跨 0；这是“**未观察到稳定 local 优势**”，不能说成“证明 global 永远比 local 更强”或已经证明两者等效。
+配对差 **4/10 seeds 正向**，95% t 区间约 `[−0.0191,+0.0057]`，双侧配对 t 检验约 `p=0.252`。区间跨 0；这是“**未观察到稳定 local 优势**”，不能说成“证明 global 永远比 local 更强”或已经证明两者等效。
 
 **C：** 匹配的 global 方案无需引入 local STFT，也能在这组 validation 控制中达到接近 E12 的 AP。**S1/S2 的整套配置差不能归因于局部算子单独造成**。这个结论与 S3 的“结构差异主要进入重建路线”不矛盾：**模型输出会变，并不代表该改变会稳定提高 AP**。
 
@@ -134,7 +134,7 @@ AP 配对差的 95% t 区间约 \`[+0.0356,+0.0608]\`。它表明**这两套实�
 
 **Q：** 重新核对原 FLaG 论文方法后确认：其文本主设置为 **dropout=0.1 且 post-pool LayerNorm=True**。Sprint early global FLaG 的 **0.1/False** 与这一方法文字不同。到底 dropout、post-pool norm 及两者**交互**对本项目 Sprint global 模型有多大影响？
 
-**M：** **固定 global FFT**，对**global FLaG 一种 operator**做两因素交叉训练：\`dropout ∈ {0,0.1}\` 与 \`post_pool_norm ∈ {False,True}\`，四组分别使用相同的冻结 RoBERTa、head、adaptation train/validation 划分、10 epochs 和 checkpoint 选择方式，**每组 seeds 0–9（10 seeds）**。此处**没有同时训练四种 local STFT**，所以不是 global/local × dropout × norm 的 2×2×2 证明。
+**M：** **固定 global FFT**，对**global FLaG 一种 operator**做两因素交叉训练：`dropout ∈ {0,0.1}` 与 `post_pool_norm ∈ {False,True}`，四组分别使用相同的冻结 RoBERTa、head、adaptation train/validation 划分、10 epochs 和 checkpoint 选择方式，**每组 seeds 0–9（10 seeds）**。此处**没有同时训练四种 local STFT**，所以不是 global/local × dropout × norm 的 2×2×2 证明。
 
 **R1：** **10-seed adaptation validation AP（mean ± std）**：
 
@@ -149,17 +149,17 @@ AP 配对差的 95% t 区间约 \`[+0.0356,+0.0608]\`。它表明**这两套实�
 
 | 配对操作 | mean ΔAP ± std | 正向 seeds |
 | --- | ---: | ---: |
-| 无 norm 时，dropout \`0.1 → 0\` | **+0.048038 ± 0.024758** | 10/10 |
-| 有 norm 时，dropout \`0.1 → 0\` | **−0.023326 ± 0.017170** | 0/10 |
-| dropout=0.1 时，norm \`False → True\` | **+0.068220 ± 0.029151** | 10/10 |
-| dropout=0 时，norm \`False → True\` | **−0.003145 ± 0.014885** | 5/10 |
+| 无 norm 时，dropout `0.1 → 0` | **+0.048038 ± 0.024758** | 10/10 |
+| 有 norm 时，dropout `0.1 → 0` | **−0.023326 ± 0.017170** | 0/10 |
+| dropout=0.1 时，norm `False → True` | **+0.068220 ± 0.029151** | 10/10 |
+| dropout=0 时，norm `False → True` | **−0.003145 ± 0.014885** | 5/10 |
 
-按上述差分定义计算的 dropout × norm **交互项**约为 \`−0.071364±0.021526\`，10/10 seeds 为负。这说明两个因素**不能分别用“去掉 dropout 总是更好”或“加 norm 总是更好”来概括**。
+按上述差分定义计算的 dropout × norm **交互项**约为 `−0.071364±0.021526`，10/10 seeds 为负。这说明两个因素**不能分别用“去掉 dropout 总是更好”或“加 norm 总是更好”来概括**。
 
-**C：** 在这四组**global FLaG adaptation validation** 控制中，\`dropout=0.1 + post-pool LayerNorm=True\` 的平均 AP 为 \`0.819156\`，是本次四种 global 配置中数值最高的一组，且与原早期 \`0.1/False\` 的配对提升 10/10 seeds 为正。它也吻合论文方法文字描述的**text 配置**；但同一 validation 用于模型选择及后续实验比较，不能将此增益冒称已由独立 official test 证实。
+**C：** 在这四组**global FLaG adaptation validation** 控制中，`dropout=0.1 + post-pool LayerNorm=True` 的平均 AP 为 `0.819156`，是本次四种 global 配置中数值最高的一组，且与原早期 `0.1/False` 的配对提升 10/10 seeds 为正。它也吻合论文方法文字描述的**text 配置**；但同一 validation 用于模型选择及后续实验比较，不能将此增益冒称已由独立 official test 证实。
 
 !!! important "尚未进行的比较"
-    Sprint **尚未**在相同 \`dropout=0.1,norm=True\` 下对**global FLaG 与 E12**重新训练完整的 10-seed matched 对照。因此这里不能写“论文配置下 Sprint global 一定优于 E12”；它需要单独的 matched 实验。已完成的这组论文 text 配置 global/local 10-seed 配对检验发生在 **STSB E14**，指标是 **test Spearman/Pearson**，与 Sprint 的 validation AP 不可横向比较。
+    Sprint **尚未**在相同 `dropout=0.1,norm=True` 下对**global FLaG 与 E12**重新训练完整的 10-seed matched 对照。因此这里不能写“论文配置下 Sprint global 一定优于 E12”；它需要单独的 matched 实验。已完成的这组论文 text 配置 global/local 10-seed 配对检验发生在 **STSB E14**，指标是 **test Spearman/Pearson**，与 Sprint 的 validation AP 不可横向比较。
 
 ---
 
@@ -167,8 +167,8 @@ AP 配对差的 95% t 区间约 \`[+0.0356,+0.0608]\`。它表明**这两套实�
 
 **已经观察到的结构事实**：Sprint S3 与 STSB P2 均显示，在所测 checkpoint 和输入上，global/local **gate 观测路径变化很小**，完整 reconstruction/temporal-support 路线的切换能明显改变句对 cosine。
 
-**性能层面的限制**：Sprint S1/S2 的大幅 AP 差是**两套原始配置**之间的结果；在 S4 的 \`0/True\` 匹配控制中，不存在稳定的 local 优势；S5 说明 dropout×norm 本身足以大幅改变 global 的 validation AP。**不能**把“reconstruction 是表示差异主要来源”换写成“local reconstruction 是性能提升的已证明原因”。
+**性能层面的限制**：Sprint S1/S2 的大幅 AP 差是**两套原始配置**之间的结果；在 S4 的 `0/True` 匹配控制中，不存在稳定的 local 优势；S5 说明 dropout×norm 本身足以大幅改变 global 的 validation AP。**不能**把“reconstruction 是表示差异主要来源”换写成“local reconstruction 是性能提升的已证明原因”。
 
-**下一步跨任务配置线索**：STSB 的 [E14](../stsb/02-padding.md#e14在原论文-text-配置下重新比较-flag-和-e12) 在论文文本配置 \`0.1/True\` 下，10-seed FLaG/E12 **test Spearman** 分别为 \`0.839065±0.004154\` 与 \`0.838944±0.001882\`（配对 E12−FLaG \`−0.000121±0.004039\`，5/10 正向）。这是另一数据集的独立配置敏感性观察，**不是** Sprint 的 S5 结果。
+**下一步跨任务配置线索**：STSB 的 [E14](../stsb/02-padding.md#e14在原论文-text-配置下重新比较-flag-和-e12) 在论文文本配置 `0.1/True` 下，10-seed FLaG/E12 **test Spearman** 分别为 `0.839065±0.004154` 与 `0.838944±0.001882`（配对 E12−FLaG `−0.000121±0.004039`，5/10 正向）。这是另一数据集的独立配置敏感性观察，**不是** Sprint 的 S5 结果。
 
 **源代码：** [Sprint train](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/train_sprint.py) · [Sprint P2 probe](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/probe_sprint_global_local_2x2.py) · [机制研究过程摘要](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/STFT_MECHANISM_SUMMARY.md)。
