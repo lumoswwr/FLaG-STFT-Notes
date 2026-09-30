@@ -4,7 +4,7 @@
 
 | 实验 | 问题 | 模型与数据 | Seeds | 主要指标 |
 | --- | --- | --- | --- | --- |
-| 循环反射推导 | 共享的实/虚门控在时域究竟对应什么？ | 数学恒等式；另用 float64 数值检查 | 数值检查 \`N=1…129\` | 数值最大误差 |
+| 循环反射推导 | 共享的实/虚门控在时域究竟对应什么？ | 数学恒等式；另用 float64 数值检查 | 数值检查 `N=1…129` | 数值最大误差 |
 | P1 | **同一个 global FLaG**：改变外部 padding/FFT length，预测漂移由 gate 还是 reconstruction 造成？ | STSB 原始动态 FLaG checkpoint；推理探针 | **0、1、2** | 预测 cosine 的平均绝对漂移 |
 | P1 补充 | 对称实虚门控、移除反射项，能否重现固定长度带来的变化？ | 同一 checkpoint 的对称门控推理干预 | **0、1、2** | 预测漂移、相似性与验证指标 |
 | P2 | **global vs local**：两种完整频域路线的输出差异来自 gate 的生成还是完整的 analysis/reconstruction 路径？ | FLaG-trained 和 E12-trained checkpoints，分别重放 global/local 组合 | 每组 **0、1、2** | cosine 漂移；辅助 validation Spearman |
@@ -17,11 +17,11 @@
 
 ### Q：为什么只是增加右侧零 padding，global FLaG 的有效 token 输出也可能改变？
 
-原 global FLaG 先按 attention mask 将 padding hidden 置零，再对整个 batch padded 长度 \`N\` 做 global rFFT。虽然新增加的数值全是零，但**变换长度 \`N\` 会变**。关键在于 FLaG 的 gate 对每个 hidden 通道的 Fourier **实部与虚部分别给出乘数**，且乘数在频率 bin 之间共享。
+原 global FLaG 先按 attention mask 将 padding hidden 置零，再对整个 batch padded 长度 `N` 做 global rFFT。虽然新增加的数值全是零，但**变换长度 `N` 会变**。关键在于 FLaG 的 gate 对每个 hidden 通道的 Fourier **实部与虚部分别给出乘数**，且乘数在频率 bin 之间共享。
 
 ### M：把一维、一个通道的操作写成时域形式
 
-考虑进入 global FFT 的一条实值序列 \`x[t]\`，长度为 \`N\`，无效位置已补零。它的 DFT 为：
+考虑进入 global FFT 的一条实值序列 `x[t]`，长度为 `N`，无效位置已补零。它的 DFT 为：
 
 $$
 X[k]=\sum_{t=0}^{N-1}x[t]e^{-i2\pi kt/N}.
@@ -33,7 +33,7 @@ $$
 a=1+g_{\mathrm{Re}},\qquad b=1+g_{\mathrm{Im}}.
 $$
 
-\`g_Re\` 与 \`g_Im\` 来自样本条件 latent gate；对于**同一条序列/同一通道**，\`a,b\` 在各个频率 bin 共享，**不是**在不同样本或不同通道上恒定。门控后频谱：
+`g_Re` 与 `g_Im` 来自样本条件 latent gate；对于**同一条序列/同一通道**，`a,b` 在各个频率 bin 共享，**不是**在不同样本或不同通道上恒定。门控后频谱：
 
 $$
 Y[k]=a\,\mathrm{Re}\,X[k]+ib\,\mathrm{Im}\,X[k].
@@ -53,22 +53,22 @@ $$
 
 它表示两条路径：原位置 token 缩放（\(\alpha x[t]\)）与来自**循环反射位置**的 token 混入（\(\beta x[(-t)\bmod N]\)）。这描述的是**逆 FFT 后、最终 masked max pooling 前**的 hidden，**不是**直接描述最终句向量的线性公式。完整实值 DFT 的证明与实现的 rFFT/irFFT 半谱重建在这一条件下等价。
 
-**循环反射不是普通倒序。** 例如 \`N=4\` 时，位置 \`[0,1,2,3]\` 反射到 \`[0,3,2,1]\`，其中位置 0 自反。当 \`a=b\` 时，\(\beta=0\)，反射混合消失，只剩逐通道缩放。
+**循环反射不是普通倒序。** 例如 `N=4` 时，位置 `[0,1,2,3]` 反射到 `[0,3,2,1]`，其中位置 0 自反。当 `a=b` 时，\(\beta=0\)，反射混合消失，只剩逐通道缩放。
 
 ### R：改变 N 就能改变反射来源
 
-构造固定 gate 的例子：\`x=[10,20,30,40]\`，令 \`a=1.8,b=1.2\`，即 \(\alpha=1.5,\beta=0.3\)。
+构造固定 gate 的例子：`x=[10,20,30,40]`，令 `a=1.8,b=1.2`，即 \(\alpha=1.5,\beta=0.3\)。
 
-- \`N=4\` 时，\`y[1]=1.5×20+0.3×40=42\`。
-- 相同有效序列后再补 4 个零，\`N=8\` 时，位置 1 的反射来源变成位置 7（零），故 \`y[1]=1.5×20+0.3×0=30\`。
+- `N=4` 时，`y[1]=1.5×20+0.3×40=42`。
+- 相同有效序列后再补 4 个零，`N=8` 时，位置 1 的反射来源变成位置 7（零），故 `y[1]=1.5×20+0.3×0=30`。
 
-即使**暂时固定 gate**，仅改变 \`N\`，重建后的有效位置 hidden 也可以改变。更一般地，若有效长度 \`L\` 且 \`N≥2L−1\`，则所有**有效位置 \`t>0\`** 的反射来源均位于零 padding 区；**\`t=0\` 仍然自反**，不能笼统地说“固定到 128 时每个位置的反射必然为零”。
+即使**暂时固定 gate**，仅改变 `N`，重建后的有效位置 hidden 也可以改变。更一般地，若有效长度 `L` 且 `N≥2L−1`，则所有**有效位置 `t>0`** 的反射来源均位于零 padding 区；**`t=0` 仍然自反**，不能笼统地说“固定到 128 时每个位置的反射必然为零”。
 
-实现校验：在 float64 下比较原 \`rFFT → 实虚乘 gate → irFFT\` 与上述等式，在 \`N=1…129\` 的数值检查中记录的最大绝对误差约 \`3.55×10^-15\`。
+实现校验：在 float64 下比较原 `rFFT → 实虚乘 gate → irFFT` 与上述等式，在 `N=1…129` 的数值检查中记录的最大绝对误差约 `3.55×10^-15`。
 
 ### C：这是结构解释，不是完整性能解释
 
-global FLaG 对 FFT length 的敏感性，在结构上可通过**实虚非对称 gate 引发的、与 \`N\` 有关的循环反射**理解。不过实际模型还会根据频谱**重新生成 gate**。因此下一步 P1 要把“gate 变了”和“同 gate 下 reconstruction 变了”分开检查。
+global FLaG 对 FFT length 的敏感性，在结构上可通过**实虚非对称 gate 引发的、与 `N` 有关的循环反射**理解。不过实际模型还会根据频谱**重新生成 gate**。因此下一步 P1 要把“gate 变了”和“同 gate 下 reconstruction 变了”分开检查。
 
 ---
 
@@ -76,17 +76,17 @@ global FLaG 对 FFT length 的敏感性，在结构上可通过**实虚非对称
 
 ### Q
 
-改变外部 padding 时，最终预测可能经两条路线改变：**①** 不同 FFT length 的频谱使 latent attention/gate \`a,b\` 改变；**②** gate 即使近似不变，reconstruction length 变化也会改变循环反射位置。哪个在当前 checkpoint 中占主要作用？
+改变外部 padding 时，最终预测可能经两条路线改变：**①** 不同 FFT length 的频谱使 latent attention/gate `a,b` 改变；**②** gate 即使近似不变，reconstruction length 变化也会改变循环反射位置。哪个在当前 checkpoint 中占主要作用？
 
 ### M：2×2 推理干预
 
-读取 **3 个 seeds（0–2）** 的原始动态 global FLaG 已训练 checkpoint（早期 \`0/True\`），保持模型权重、数据及其他参数不变。对同一批样本分别构造：
+读取 **3 个 seeds（0–2）** 的原始动态 global FLaG 已训练 checkpoint（早期 `0/True`），保持模型权重、数据及其他参数不变。对同一批样本分别构造：
 
-- \`N_g\`：仅用于获取频谱并**生成 gate**的 FFT length；
-- \`N_r\`：gate 应用于该长度的**global 频谱**，并使用该长度做 irFFT reconstruction；
-- \`T\`：当前正常 batch padded length；\`128\`：固定长度。
+- `N_g`：仅用于获取频谱并**生成 gate**的 FFT length；
+- `N_r`：gate 应用于该长度的**global 频谱**，并使用该长度做 irFFT reconstruction；
+- `T`：当前正常 batch padded length；`128`：固定长度。
 
-| 条件 | gate 观测 \`N_g\` | gated spectrum 与 reconstruction \`N_r\` | 想隔离什么 |
+| 条件 | gate 观测 `N_g` | gated spectrum 与 reconstruction `N_r` | 想隔离什么 |
 | --- | ---: | ---: | --- |
 | **TT** | T | T | 原生 FLaG |
 | **128T** | 128 | T | 只改变生成 gate 所看频谱的长度 |
@@ -120,9 +120,9 @@ global FLaG 对 FFT length 的敏感性，在结构上可通过**实虚非对称
 
 ### M
 
-使用同样的 global FLaG checkpoint 做推理反事实，不重新训练。保留 gate 给出的两个实际乘数 \`a,b\`，将它们共同替换为 **\((a+b)/2\)**，使新乘数满足 \`a=b\`，从而令反射系数 \(\beta=0\)，记为 \`SYM\`。将 \`SYM\` 与原生 \`TT\`、P1 的 \`T128\` 比较。
+使用同样的 global FLaG checkpoint 做推理反事实，不重新训练。保留 gate 给出的两个实际乘数 `a,b`，将它们共同替换为 **\((a+b)/2\)**，使新乘数满足 `a=b`，从而令反射系数 \(\beta=0\)，记为 `SYM`。将 `SYM` 与原生 `TT`、P1 的 `T128` 比较。
 
-注意：**T128 本身不保证反射项对所有有效 token 精确为零**；只有在满足前面 \`N≥2L−1\` 等条件的位置上，反射源才一定落入零 padding。这个实验检验的是**相似的预测扰动是否来自反射混合**。
+注意：**T128 本身不保证反射项对所有有效 token 精确为零**；只有在满足前面 `N≥2L−1` 等条件的位置上，反射源才一定落入零 padding。这个实验检验的是**相似的预测扰动是否来自反射混合**。
 
 ### R
 
@@ -132,7 +132,7 @@ global FLaG 对 FFT length 的敏感性，在结构上可通过**实虚非对称
 | T128 − TT | **0.005520 ± 0.000805** |
 | SYM − T128 | **0.000295 ± 0.000003** |
 
-句对层面，SYM 和 T128 引发的扰动相关约 \`0.99853±0.00046\`；它们之间的平均绝对差约为相对 TT 的大漂移的 \`5.4%\`。当前材料还记录 SYM 对 validation Spearman 的改变仅在 \`1e-4\` 数量级，未见一致性能收益。
+句对层面，SYM 和 T128 引发的扰动相关约 `0.99853±0.00046`；它们之间的平均绝对差约为相对 TT 的大漂移的 `5.4%`。当前材料还记录 SYM 对 validation Spearman 的改变仅在 `1e-4` 数量级，未见一致性能收益。
 
 ### C
 
@@ -148,20 +148,20 @@ P1 研究**同一种 global 算子内部**的 FFT length。P2 研究**两个不�
 
 ### M：在同一套权重上做 GG / LG / GL / LL
 
-同一组 hidden 同时生成 global 频谱 \`F_G\` 和 E12 局部频谱 \`F_L\`。分别让同一份权重的 latent attention 读取两种频谱，得到**样本级通道 gate** \`g_G\`、\`g_L\`。这个 gate 对频率 bin 共享，形状为 \`[2D]\`，因此 global/local 生成的 gate 都能乘到两种频谱上。之后独立改变 gated spectrum **及其匹配的完整 inverse reconstruction**：
+同一组 hidden 同时生成 global 频谱 `F_G` 和 E12 局部频谱 `F_L`。分别让同一份权重的 latent attention 读取两种频谱，得到**样本级通道 gate** `g_G`、`g_L`。这个 gate 对频率 bin 共享，形状为 `[2D]`，因此 global/local 生成的 gate 都能乘到两种频谱上。之后独立改变 gated spectrum **及其匹配的完整 inverse reconstruction**：
 
 | 模式 | 生成 gate 的观测来源 | 实际 gated spectrum | 逆变换/重建 |
 | --- | --- | --- | --- |
-| **GG** | Global \`F_G\` | Global \`F_G\` | global irFFT |
-| **LG** | Local \`F_L\` | Global \`F_G\` | global irFFT |
-| **GL** | Global \`F_G\` | Local \`F_L\` | **逐帧 local irFFT + frame stitching** |
-| **LL** | Local \`F_L\` | Local \`F_L\` | 逐帧 local irFFT + stitching |
+| **GG** | Global `F_G` | Global `F_G` | global irFFT |
+| **LG** | Local `F_L` | Global `F_G` | global irFFT |
+| **GL** | Global `F_G` | Local `F_L` | **逐帧 local irFFT + frame stitching** |
+| **LL** | Local `F_L` | Local `F_L` | 逐帧 local irFFT + stitching |
 
-**GL 有明确的实验意义**：global 频谱**只负责生成 gate**；真正被 gate 调制并做局部逆变换的仍然是**local 频谱**。我们没有把 global rFFT 的长频谱直接塞给长度 16 的 local irFFT。LG 则保持 global 重建，只替换 gate 的来源。这样，\`LG−GG\` 观察**固定 global 重建时**的 gate 来源效应；\`GL−GG\` 观察**固定 global gate 时**的完整 global/local 重建路线效应。
+**GL 有明确的实验意义**：global 频谱**只负责生成 gate**；真正被 gate 调制并做局部逆变换的仍然是**local 频谱**。我们没有把 global rFFT 的长频谱直接塞给长度 16 的 local irFFT。LG 则保持 global 重建，只替换 gate 的来源。这样，`LG−GG` 观察**固定 global 重建时**的 gate 来源效应；`GL−GG` 观察**固定 global gate 时**的完整 global/local 重建路线效应。
 
-该方案分别用两种训练来源执行：**FLaG-trained** 与 **E12-trained** checkpoints，各使用 **seeds 0–2**。每一种来源内，将**相同 state_dict**加载到 global/local operator，eval 模式、同 batch 同 hidden、统一 post-norm 和 projection；核对**手写 GG / LL**是否匹配各自 native forward（实现容差 \`2×10^-5\`）。**不同训练来源的 checkpoint 权重不能直接混成“固定权重”比较。**
+该方案分别用两种训练来源执行：**FLaG-trained** 与 **E12-trained** checkpoints，各使用 **seeds 0–2**。每一种来源内，将**相同 state_dict**加载到 global/local operator，eval 模式、同 batch 同 hidden、统一 post-norm 和 projection；核对**手写 GG / LL**是否匹配各自 native forward（实现容差 `2×10^-5`）。**不同训练来源的 checkpoint 权重不能直接混成“固定权重”比较。**
 
-此处的“reconstruction effect”是简写，严格说包含**频谱组织方式 + gate 应用到对应谱 + inverse transform + frame stitching/temporal support**，并非只替换 \`irfft()\` 单独一个函数。
+此处的“reconstruction effect”是简写，严格说包含**频谱组织方式 + gate 应用到对应谱 + inverse transform + frame stitching/temporal support**，并非只替换 `irfft()` 单独一个函数。
 
 ### R：两个层次，不要混为一谈
 
@@ -172,7 +172,7 @@ P1 研究**同一种 global 算子内部**的 FFT length。P2 研究**两个不�
 | FLaG-trained | \(2.86\times10^{-7}\) | **0.005770** |
 | E12-trained | \(2.14\times10^{-7}\) | **0.005970** |
 
-因此在这组固定 checkpoint 中，\`LG≈GG\`、\`GL≈LL\`；完整 local/global 输出差异主要体现在**重建路线**，而不是两套频谱生成了显著不同的句级 gate。
+因此在这组固定 checkpoint 中，`LG≈GG`、`GL≈LL`；完整 local/global 输出差异主要体现在**重建路线**，而不是两套频谱生成了显著不同的句级 gate。
 
 第二层是**辅助性能结果**。本探针默认在 **STSB validation** 上执行；3-seed 汇总的 Spearman 为：
 
