@@ -1,0 +1,37 @@
+site_name: FLaG / STFT Mechanism Experiments
+site_description: FLaG / STFT 实验记录与机制分析
+
+nav:
+  - 首页: index.md
+  - STSB:
+      - E1–E8：早期实验: stsb/01-experiments.md
+      - E9–E14：Padding 与配置: stsb/02-padding.md
+      - 循环反射与 P1/P2: stsb/03-mechanism.md
+  - Sprint:
+      - 迁移协议: sprint/01-protocol.md
+      - S1–S5: sprint/02-experiments.md
+
+theme:
+  name: material
+  language: zh
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - toc.follow
+    - content.code.copy
+
+markdown_extensions:
+  - tables
+  - attr_list
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.arithmatex:
+      generic: true
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
