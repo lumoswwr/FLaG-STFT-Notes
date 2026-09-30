@@ -270,10 +270,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#stsb" class="md-nav__link">
+  <a href="#stsbflagmean" class="md-nav__link">
     <span class="md-ellipsis">
       
-        STSB
+        STSB数据集(FLaG表现不如Mean的数据集，任务为预测句子相似度)
       
     </span>
   </a>
@@ -281,10 +281,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sprint" class="md-nav__link">
+  <a href="#sprintflagmean" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sprint
+        Sprint数据集(FLaG表现高于Mean的数据集，任务为判断句子语义是否重复)
       
     </span>
   </a>
@@ -626,10 +626,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#stsb" class="md-nav__link">
+  <a href="#stsbflagmean" class="md-nav__link">
     <span class="md-ellipsis">
       
-        STSB
+        STSB数据集(FLaG表现不如Mean的数据集，任务为预测句子相似度)
       
     </span>
   </a>
@@ -637,10 +637,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#sprint" class="md-nav__link">
+  <a href="#sprintflagmean" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Sprint
+        Sprint数据集(FLaG表现高于Mean的数据集，任务为判断句子语义是否重复)
       
     </span>
   </a>
@@ -682,13 +682,13 @@
 
 <h1 id="flag-stft-mechanism-experiments">FLaG / STFT Mechanism Experiments<a class="headerlink" href="#flag-stft-mechanism-experiments" title="Permanent link">&para;</a></h1>
 <h2 id="_1">当前结构<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
-<h3 id="stsb">STSB<a class="headerlink" href="#stsb" title="Permanent link">&para;</a></h3>
+<h3 id="stsbflagmean">STSB数据集(FLaG表现不如Mean的数据集，任务为预测句子相似度)<a class="headerlink" href="#stsbflagmean" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>E1–E8</strong>：Hann window、STFT、多窗口、位置编码、frequency/token knockout、DC attention。</li>
 <li><strong>E9–E14</strong>：padding 敏感性、不重叠窗口、固定 padding、dropout / post-pool LayerNorm 配置补充。</li>
 <li><strong>机制分析</strong>：循环反射的时域推导，以及 P1 / P1 补充 / P2 交叉验证。</li>
 </ul>
-<h3 id="sprint">Sprint<a class="headerlink" href="#sprint" title="Permanent link">&para;</a></h3>
+<h3 id="sprintflagmean">Sprint数据集(FLaG表现高于Mean的数据集，任务为判断句子语义是否重复)<a class="headerlink" href="#sprintflagmean" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>迁移协议</strong>：STSB 与 Sprint 任务设置差异。</li>
 <li><strong>S1–S5</strong>：Mean / FLaG / E12 对比、10-seed、global/local gate-reconstruction、配置对齐和 dropout × norm 控制实验。</li>
