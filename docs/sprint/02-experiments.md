@@ -169,6 +169,6 @@ AP 配对差的 95% t 区间约 `[+0.0356,+0.0608]`。它表明**这两套实际
 
 **性能层面的限制**：Sprint S1/S2 的大幅 AP 差是**两套原始配置**之间的结果；在 S4 的 `0/True` 匹配控制中，不存在稳定的 local 优势；S5 说明 dropout×norm 本身足以大幅改变 global 的 validation AP。**不能**把“reconstruction 是表示差异主要来源”换写成“local reconstruction 是性能提升的已证明原因”。
 
-**下一步跨任务配置线索**：STSB 的 [E14](../stsb/02-padding.md#e14在原论文-text-配置下重新比较-flag-和-e12) 在论文文本配置 `0.1/True` 下，10-seed FLaG/E12 **test Spearman** 分别为 `0.839065±0.004154` 与 `0.838944±0.001882`（配对 E12−FLaG `−0.000121±0.004039`，5/10 正向）。这是另一数据集的独立配置敏感性观察，**不是** Sprint 的 S5 结果。
+**下一步跨任务配置线索**：STSB 的 [E14](../stsb/02-padding.md) 在论文文本配置 `0.1/True` 下，10-seed FLaG/E12 **test Spearman** 分别为 `0.839065±0.004154` 与 `0.838944±0.001882`（配对 E12−FLaG `−0.000121±0.004039`，5/10 正向）。这是另一数据集的独立配置敏感性观察，**不是** Sprint 的 S5 结果。
 
 **源代码：** [Sprint train](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/train_sprint.py) · [Sprint P2 probe](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/probe_sprint_global_local_2x2.py) · [机制研究过程摘要](https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/STFT_MECHANISM_SUMMARY.md)。
