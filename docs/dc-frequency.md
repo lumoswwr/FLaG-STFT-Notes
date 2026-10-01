@@ -309,3 +309,10 @@ Sprint 的 B0-only 同样保留 **91.4%** baseline，而且 B0 knockout 同样�
 - Sprint 在 L11 → L12 出现明显的 DC contribution drop；
 - STSB 更像中层达到 DC dependency 高峰，再在高层减弱。
 
+
+
+STSB中非DC频带整体预测能力低，重要性变化大，但重要性求和数值大于Sprint
+
+Sprint中非DC频带预测能力较高，重要性平缓，不是很大
+
+就感觉这个结论在打架
