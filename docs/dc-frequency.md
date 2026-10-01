@@ -1,6 +1,6 @@
 # DC / 频带机制：STSB 与 Sprint 的 frozen-backbone 对照
 
-本页记录一组专门回答 **“DC 分量到底承载了什么，以及模型是否真的依赖 DC”** 的机制实验。为了避免 STSB 与 Sprint 在 backbone 训练方式上的混杂，这里只保留统一的 **frozen RoBERTa-base + trainable FLaG** 设置。
+本页记录一组专门回答 **“DC 分量到底承载了什么，以及模型是否真的依赖 DC”** 的机制实验。使用 **frozen RoBERTa-base + trainable FLaG** 设置。
 
 > 当前页面使用 seed 0 的 frozen-backbone 控制实验。STSB 指标为 **Spearman**，Sprint 指标为 **Average Precision (AP)**。两者指标不同，因此跨任务比较时优先看相对变化，而不是直接比较绝对数值。
 
@@ -39,10 +39,6 @@ Frozen STSB FLaG 的 seed-0 test 结果：
 
 - Spearman = **0.710535**
 - Pearson = **0.720285**
-
-Knockout 重新评估时 baseline Spearman 为 **0.710311**。两者只差约 0.00022，主要来自 evaluation batch / dynamic padding 的轻微差异，不影响机制结论。
-
-Sprint frozen FLaG 的 validation baseline AP 为 **0.757690**。
 
 ---
 
@@ -138,18 +134,17 @@ L12: 0.264
 
 也就是**最后一层 DC dependency 明显下降**。这一模式与 AMP 机制实验中“最终层 DC contribution 骤降”的观察方向相似。
 
-> 注意：这里的“contribution”指 **band knockout 导致的性能变化**，不是严格意义上的 Shapley attribution 或唯一因果分解。
+注意到非DC频带
 
-<!--
-生成 paper-style 图后，将图片复制到：
-docs/assets/dc/stsb_sprint_knockout_relative_paperstyle.png
+> 在STSB上 的 B1-B7 **几乎全部是正 drop，所有drop里只有一个负数**，说明这些非 DC 成分虽然不如 B0，但基本都在提供正向信息。
 
-然后取消下面这一行的注释：
+> 在Sprint 上**drop正负交替**，每一个频带提供信息抖动，但求和发现带来的整体drop大部分layer上高于STSB任务
+
+> 经过平均计算后，发现Sprint上每一层非DC频带的整体平均值大部分高于STSB，且变化程度高，不如STSB上平缓
 
 ![Frozen RoBERTa + FLaG 的相对 band-knockout sensitivity](assets/dc/stsb_sprint_knockout_relative_paperstyle.png)
--->
 
----
+
 
 ## 4. Band-only：只给一个频带，模型还能做多少？
 
@@ -210,17 +205,19 @@ Sprint L12：
 
 这说明 B0/DC 不只是“删掉以后很重要”，而且**单独留下 B0 就已经接近完整模型性能**。
 
-<!--
-生成 band-only 图后，将图片复制到：
-docs/assets/dc/stsb_layer_band_only.png
-docs/assets/dc/sprint_layer_band_only.png
+注意到非DC频带
 
-然后取消下面两行的注释：
+> STSB集上虽然 B0 仍然是绝对主导，但非 DC 频带中仍然分散着更多可用的任务信息。
+
+> Sprint据集上它高度依赖 B0，而且除了 B0 之外，单个非 DC 频带几乎都没有很强的独立预测能力。
+
+
 
 ![STSB layer × band-only](assets/dc/stsb_layer_band_only.png)
 
+
+
 ![Sprint layer × band-only](assets/dc/sprint_layer_band_only.png)
--->
 
 ---
 
@@ -266,14 +263,6 @@ docs/assets/dc/sprint_layer_band_only.png
 
 特别是 Sprint，从 L1 的 1.8% 增长到 L11 的 100.4%，表现得像一个逐层把 task-relevant global information 汇入 B0 的“信息漏斗”。
 
-不过中间层 band-only 仍然会经过后续 Transformer，因此这个层间趋势应解释为：
-
-> “该层 B0 是否已经包含足够的信息，让后续网络恢复任务表现。”
-
-而不是：
-
-> “该层之后网络只剩 B0。”
-
 ---
 
 ## 6. 当前可以得出的结论
@@ -302,8 +291,6 @@ STSB 的目标本身就是 sentence-level semantic similarity。
 
 > **STSB 所需的句级整体语义相似性信息，在最终 RoBERTa 表示中高度集中于、或至少高度可由 DC / global-mean component 读取。**
 
-这里更推荐写“高度集中于 / highly readable from”，而不是绝对说“所有语义都在 DC”。
-
 ### C3. DC 不能简单等同于“语义”
 
 Sprint 的 B0-only 同样保留 **91.4%** baseline，而且 B0 knockout 同样造成最大损失。
@@ -321,14 +308,4 @@ Sprint 的 B0-only 同样保留 **91.4%** baseline，而且 B0 knockout 同样�
 - Sprint 的 B0 knockout sensitivity 整体很强；
 - Sprint 在 L11 → L12 出现明显的 DC contribution drop；
 - STSB 更像中层达到 DC dependency 高峰，再在高层减弱。
-
-因此更合适的任务差异表述是：
-
-> **不同任务会以不同的深度轨迹组织和利用 DC/global information，而不是简单地由“整体语义任务用 DC、局部任务不用 DC”来区分。**
-
----
-
-## 7. 一句话总结
-
-> **Frozen-backbone experiments show that the final RoBERTa DC component is both highly sufficient and strongly required for FLaG predictions on STSB and Sprint. On STSB, retaining B0 alone preserves 96.4% of full-model performance, providing direct evidence that sentence-level semantic-similarity information is strongly concentrated in the DC/global-mean component. Sprint shows a similarly dominant DC channel, indicating that DC more generally acts as a carrier of global task-relevant information rather than semantics alone.**
 
