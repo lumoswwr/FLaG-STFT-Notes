@@ -13,7 +13,7 @@
         <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/stsb/01-experiments/">
       
       
-        <link rel="prev" href="../../findings/">
+        <link rel="prev" href="../../MTEB/">
       
       
         <link rel="next" href="../02-padding/">
@@ -27,7 +27,7 @@
     
     
       
-        <title>E1–E8：算子探索与机制探针 - FLaG / STFT Mechanism Experiments</title>
+        <title>E1–E8 - FLaG / STFT Mechanism Experiments</title>
       
     
     
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              E1–E8：算子探索与机制探针
+              E1–E8
             
           </span>
         </div>
@@ -278,6 +278,33 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../MTEB/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MTEB数据集三种文本任务观察感受
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -304,10 +331,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -325,8 +352,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -359,7 +386,7 @@
   <span class="md-ellipsis">
     
   
-    E1–E8：算子探索与机制探针
+    E1–E8
   
 
     
@@ -377,7 +404,7 @@
   <span class="md-ellipsis">
     
   
-    E1–E8：算子探索与机制探针
+    E1–E8
   
 
     
@@ -403,10 +430,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-stsb" class="md-nav__link">
+  <a href="#e1e5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A. STSB 统一协议
+        E1–E5 配置及结果对照
       
     </span>
   </a>
@@ -414,10 +441,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#b-e1e8" class="md-nav__link">
+  <a href="#e1global-hann" class="md-nav__link">
     <span class="md-ellipsis">
       
-        B. E1–E8 配置对照表
+        E1：Global Hann
       
     </span>
   </a>
@@ -425,32 +452,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#c-e1e5" class="md-nav__link">
+  <a href="#e2-stft168" class="md-nav__link">
     <span class="md-ellipsis">
       
-        C. E1–E5 性能汇总
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#e1global-fft-hann" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E1：global FFT 前加入 Hann
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#e2-local-stft168" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E2：第一次引入 local STFT（16/8）
+        E2：首次改为 STFT（16/8）
       
     </span>
   </a>
@@ -461,7 +466,7 @@
   <a href="#e384" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E3：缩短局部窗口（8/4）
+        E3：缩短窗口（8/4）
       
     </span>
   </a>
@@ -472,7 +477,7 @@
   <a href="#e4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E4：局部帧的位置编码
+        E4：添加帧位置编码
       
     </span>
   </a>
@@ -480,10 +485,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e5-hann-centered-stft" class="md-nav__link">
+  <a href="#e5-hann" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E5：周期 Hann + centered STFT
+        E5：局部 Hann
       
     </span>
   </a>
@@ -491,10 +496,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e6-hidden-dct-knockout" class="md-nav__link">
+  <a href="#e6-knockout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E6：对最终层 hidden 做 DCT 频带 knockout
+        E6：频带 Knockout
       
     </span>
   </a>
@@ -502,10 +507,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e7-token-hidden-knockout" class="md-nav__link">
+  <a href="#e7token-hidden-knockout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E7：逐内容 token hidden knockout
+        E7：Token Hidden Knockout
       
     </span>
   </a>
@@ -516,7 +521,7 @@
   <a href="#e8dc-attention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E8：DC attention“偏好比”是什么，怎么算？
+        E8：DC Attention 偏好比
       
     </span>
   </a>
@@ -546,7 +551,7 @@
   <span class="md-ellipsis">
     
   
-    E9–E14：Padding、窗口与配置
+    E9–E14
   
 
     
@@ -574,7 +579,7 @@
   <span class="md-ellipsis">
     
   
-    循环反射、P1 与 P2
+    循环反射与 P1/P2
   
 
     
@@ -621,10 +626,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -642,8 +647,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -667,7 +672,7 @@
   <span class="md-ellipsis">
     
   
-    数据、训练与指标
+    数据与训练
   
 
     
@@ -695,7 +700,7 @@
   <span class="md-ellipsis">
     
   
-    S1–S5：跨任务实验与控制
+    S1–S5
   
 
     
@@ -743,10 +748,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#a-stsb" class="md-nav__link">
+  <a href="#e1e5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        A. STSB 统一协议
+        E1–E5 配置及结果对照
       
     </span>
   </a>
@@ -754,10 +759,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#b-e1e8" class="md-nav__link">
+  <a href="#e1global-hann" class="md-nav__link">
     <span class="md-ellipsis">
       
-        B. E1–E8 配置对照表
+        E1：Global Hann
       
     </span>
   </a>
@@ -765,32 +770,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#c-e1e5" class="md-nav__link">
+  <a href="#e2-stft168" class="md-nav__link">
     <span class="md-ellipsis">
       
-        C. E1–E5 性能汇总
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#e1global-fft-hann" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E1：global FFT 前加入 Hann
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#e2-local-stft168" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        E2：第一次引入 local STFT（16/8）
+        E2：首次改为 STFT（16/8）
       
     </span>
   </a>
@@ -801,7 +784,7 @@
   <a href="#e384" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E3：缩短局部窗口（8/4）
+        E3：缩短窗口（8/4）
       
     </span>
   </a>
@@ -812,7 +795,7 @@
   <a href="#e4" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E4：局部帧的位置编码
+        E4：添加帧位置编码
       
     </span>
   </a>
@@ -820,10 +803,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e5-hann-centered-stft" class="md-nav__link">
+  <a href="#e5-hann" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E5：周期 Hann + centered STFT
+        E5：局部 Hann
       
     </span>
   </a>
@@ -831,10 +814,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e6-hidden-dct-knockout" class="md-nav__link">
+  <a href="#e6-knockout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E6：对最终层 hidden 做 DCT 频带 knockout
+        E6：频带 Knockout
       
     </span>
   </a>
@@ -842,10 +825,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#e7-token-hidden-knockout" class="md-nav__link">
+  <a href="#e7token-hidden-knockout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E7：逐内容 token hidden knockout
+        E7：Token Hidden Knockout
       
     </span>
   </a>
@@ -856,7 +839,7 @@
   <a href="#e8dc-attention" class="md-nav__link">
     <span class="md-ellipsis">
       
-        E8：DC attention“偏好比”是什么，怎么算？
+        E8：DC Attention 偏好比
       
     </span>
   </a>
@@ -880,252 +863,107 @@
 
 
 
-<h1 id="stsbe1e8">STSB：E1–E8，频域变换探索及早期机制探针<a class="headerlink" href="#stsbe1e8" title="Permanent link">&para;</a></h1>
-<p>这部分研究从“global FFT 是否受到序列边界影响”出发，逐步尝试 local STFT、局部帧位置编码和窗函数，随后使用 frequency/token knockout 与 DC-attention 诊断解释模型行为。<strong>E1–E5 是重新训练的候选模型；E6–E8 是已训练模型的推理诊断，不能与前者混作一张性能排行榜。</strong></p>
-<h2 id="a-stsb">A. STSB 统一协议<a class="headerlink" href="#a-stsb" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>项目</th>
-<th>设置</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>数据集</td>
-<td>STSBenchmark（STSB），英文句对语义相似度，原始标签 0–5</td>
-</tr>
-<tr>
-<td>划分与用途</td>
-<td>官方 train 训练；官方 development/validation 按 Spearman 选 epoch；官方 test 报最终性能</td>
-</tr>
-<tr>
-<td>Backbone</td>
-<td>RoBERTa-base，端到端微调；两句各产生一个句向量</td>
-</tr>
-<tr>
-<td>主性能指标</td>
-<td><strong>test Spearman</strong>（预测/标签的秩相关）和 <strong>test Pearson</strong>（线性相关），均越高越好</td>
-</tr>
-<tr>
-<td>训练目标</td>
-<td><code>MSE(cosine(z1,z2), label/5)</code></td>
-</tr>
-<tr>
-<td>Epoch / Batch</td>
-<td>3 epochs；batch=4 句对；梯度累积 4（等效 batch=16）；max length=128</td>
-</tr>
-<tr>
-<td>优化</td>
-<td>AdamW；backbone LR=<code>1e-5</code>，pool LR=<code>1e-3</code>，weight decay=<code>0.01</code>，warmup ratio=<code>0.1</code>，线性 LR schedule，clip grad=1</td>
-</tr>
-<tr>
-<td>FLaG/STFT 共享设置</td>
-<td>8 个 latent queries；4 attention heads；residual gate；masked max time pooling；输出 projection</td>
-</tr>
-<tr>
-<td><strong>E1–E5 统一非算子设置</strong></td>
-<td><strong>pooling dropout=0；post-pool LayerNorm=True</strong>；窗口/位置编码差异见下表</td>
-</tr>
-<tr>
-<td>Seeds</td>
-<td><strong>E1–E5：3 seeds（0、1、2）</strong>。E6–E8：读取相同三个 seed 的 FLaG/E3 checkpoint，不重新训练</td>
-</tr>
-<tr>
-<td>统计</td>
-<td>逐 seed 计算 test 指标，再报 <strong>3-seed 均值 ± 样本标准差</strong>；对比优先使用同 seed 配对差</td>
-</tr>
-</tbody>
-</table>
-<div class="admonition note">
-<p class="admonition-title">配置与论文的区别</p>
-<p>本页使用 <strong>0 / True</strong> 是原 STSB 探索线的统一控制条件。原论文文本主配置为 <strong>0.1 / True</strong>，后续补充实验 E14 专门检查这一配置，不应把两条线混作同一实验。</p>
-</div>
-<h2 id="b-e1e8">B. E1–E8 配置对照表<a class="headerlink" href="#b-e1e8" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>编号</th>
-<th>训练/分析对象</th>
-<th>频域与关键配置（相对基线的变化）</th>
-<th>Seeds</th>
-<th>结果属于什么指标</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Baseline</td>
-<td>Global FLaG</td>
-<td>整句 <code>rFFT/irFFT</code>；无窗口；<code>FFT length=batch T</code></td>
-<td>0、1、2</td>
-<td>test Spearman / Pearson</td>
-</tr>
-<tr>
-<td><strong>E1</strong></td>
-<td>新训练：Global Hann</td>
-<td>在 global rFFT 前给各样本<strong>有效 token</strong>加 symmetric Hann；FFT 仍为 global</td>
-<td>0、1、2</td>
-<td>test Spearman / Pearson</td>
-</tr>
-<tr>
-<td><strong>E2</strong></td>
-<td>新训练：STFT</td>
-<td>rect；<code>win=16,hop=8,center=False</code>，8-token overlap</td>
-<td>0、1、2</td>
-<td>test Spearman / Pearson</td>
-</tr>
-<tr>
-<td><strong>E3</strong></td>
-<td>新训练：STFT</td>
-<td>rect；<code>win=8,hop=4,center=False</code>，4-token overlap</td>
-<td>0、1、2</td>
-<td>test Spearman / Pearson</td>
-</tr>
-<tr>
-<td><strong>E4</strong></td>
-<td>新训练：E3 + 帧位置编码</td>
-<td>E3 上为 attention 的局部频谱 token 加 learned frame position</td>
-<td>0、1、2</td>
-<td>test Spearman / Pearson</td>
-</tr>
-<tr>
-<td><strong>E5</strong></td>
-<td>新训练：E3 + Hann/center</td>
-<td>E3 改为 <code>periodic Hann,center=True</code>，仍 <code>win=8,hop=4</code></td>
-<td>0、1、2</td>
-<td>test Spearman / Pearson</td>
-</tr>
-<tr>
-<td><strong>E6</strong></td>
-<td><strong>探针</strong>：FLaG vs E3</td>
-<td>对最终层 content-token hidden 做 DCT，划为 8 频带，每次置零一个后逆变换</td>
-<td>0、1、2</td>
-<td>eligible test 子集的 Spearman 降幅及预测扰动</td>
-</tr>
-<tr>
-<td><strong>E7</strong></td>
-<td><strong>探针</strong>：FLaG vs E3</td>
-<td>逐个将 content-token hidden 置零，不重新运行/训练 backbone</td>
-<td>0、1、2</td>
-<td>平方误差响应、预测响应、位置异质性</td>
-</tr>
-<tr>
-<td><strong>E8</strong></td>
-<td><strong>探针</strong>：FLaG vs E3</td>
-<td>读取频谱 latent-attention，分别统计 DC 与非 DC 的<strong>每 token 平均权重</strong></td>
-<td>0、1、2</td>
-<td>test 句子的 DC attention 偏好比</td>
-</tr>
-</tbody>
-</table>
-<p>E2–E5 的 local STFT 都将所有<strong>有效帧的频率 token</strong>送给同一组 latent queries，汇总生成一个<strong>句级</strong>通道 gate；门控所有频率 token，之后才逐帧逆变换，并非每个 frame 生成独立 gate。</p>
-<h2 id="c-e1e5">C. E1–E5 性能汇总<a class="headerlink" href="#c-e1e5" title="Permanent link">&para;</a></h2>
-<p>下表均为 <strong>STSB official test，seeds=0/1/2</strong>；E3/E12 后续的 10-seed 数据另有表述。</p>
+<h1 id="stsbe1e8">STSB：E1–E8<a class="headerlink" href="#stsbe1e8" title="Permanent link">&para;</a></h1>
+<p>本页使用 <strong>STSB</strong>。E1–E5 重新训练，使用 <strong>seeds 0、1、2</strong>，结果为 <strong>test Spearman / Pearson（mean ± std）</strong>；E6–E8 则使用这些 seed 的<strong>已训练 FLaG/E3 checkpoint</strong> 做分析，不重新训练。共同配置见<a href="../../methods/">实验设置</a>。</p>
+<h2 id="e1e5">E1–E5 配置及结果对照<a class="headerlink" href="#e1e5" title="Permanent link">&para;</a></h2>
+<p>除表内变化，统一采用 <strong>dropout=0、post-pool Norm=True</strong>，8 latents、4 heads、3 epochs。</p>
 <table>
 <thead>
 <tr>
 <th>模型</th>
-<th>主要修改</th>
+<th>与 global FLaG 的主要区别</th>
 <th style="text-align: right;">test Spearman ↑</th>
 <th style="text-align: right;">test Pearson ↑</th>
-<th style="text-align: right;">与同 seed FLaG 的平均 Spearman 差</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>FLaG baseline</td>
-<td>整句 global FFT</td>
+<td>FLaG</td>
+<td>整句 FFT</td>
 <td style="text-align: right;">0.841128 ± 0.002177</td>
 <td style="text-align: right;">0.836765 ± 0.001782</td>
-<td style="text-align: right;">0</td>
 </tr>
 <tr>
-<td>E1</td>
-<td>global Hann</td>
+<td><strong>E1</strong></td>
+<td>Global FFT 前加 symmetric Hann</td>
 <td style="text-align: right;">0.837019 ± 0.002763</td>
 <td style="text-align: right;">0.836682 ± 0.000282</td>
-<td style="text-align: right;">−0.004109</td>
 </tr>
 <tr>
-<td>E2</td>
-<td>STFT 16/8 rect</td>
+<td><strong>E2</strong></td>
+<td>STFT：rect，win16/hop8</td>
 <td style="text-align: right;">0.842204 ± 0.001824</td>
 <td style="text-align: right;">0.837783 ± 0.003514</td>
-<td style="text-align: right;">+0.001076，2/3 正向</td>
 </tr>
 <tr>
-<td>E3</td>
-<td>STFT 8/4 rect</td>
+<td><strong>E3</strong></td>
+<td>STFT：rect，win8/hop4</td>
 <td style="text-align: right;">0.843000 ± 0.001047</td>
 <td style="text-align: right;">0.838685 ± 0.001421</td>
-<td style="text-align: right;">+0.001873，3/3 正向</td>
 </tr>
 <tr>
-<td>E4</td>
-<td>E3 + learned frame pos</td>
+<td><strong>E4</strong></td>
+<td>E3 + learned frame position</td>
 <td style="text-align: right;">0.842282 ± 0.001834</td>
-<td style="text-align: right;"></td>
-<td style="text-align: right;">参见 E4；相对 E3 −0.000718</td>
+<td style="text-align: right;">未汇总</td>
 </tr>
 <tr>
-<td>E5</td>
-<td>E3 + periodic Hann + center</td>
+<td><strong>E5</strong></td>
+<td>E3 + periodic Hann，center=True</td>
 <td style="text-align: right;">0.843027 ± 0.000593</td>
 <td style="text-align: right;">0.838083 ± 0.002720</td>
-<td style="text-align: right;">相对 E3 +0.000027</td>
 </tr>
 </tbody>
 </table>
+<p>E2/E3 使用 <code>center=False</code>，均只生成<strong>一个句级 gate</strong>；E5 <strong>同时改变了窗函数与 center 设置</strong>，不能将变化单独归因于 Hann。</p>
+<h2 id="e1global-hann">E1：Global Hann<a class="headerlink" href="#e1global-hann" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> global FFT 前加 Hann，能否减轻边界影响并改善性能？</p>
+<p><strong>M：</strong> 按<strong>每句话自身有效 token 长度</strong>（包括特殊 token）生成 symmetric Hann，乘到 RoBERTa hidden 上，再执行原 global FFT；padding 仍为零。有效长度 ≤2 时使用全 1 窗口。其他设置与 FLaG 一致，<strong>3 seeds</strong>。</p>
+<p><strong>R：</strong> Spearman <code>0.837019 ± 0.002763</code>，比同 seed FLaG 平均 <strong>−0.004109</strong>。</p>
+<p><strong>C：</strong> 未改善性能，但不能据此排除频谱泄漏，因为加窗同时减弱了边界 token 的输入。</p>
+<h2 id="e2-stft168">E2：首次改为 STFT（16/8）<a class="headerlink" href="#e2-stft168" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 把整句 FFT 换成局部 STFT 是否改善结果？</p>
+<p><strong>M：</strong> rect 窗，<code>win=16,hop=8,center=False</code>，相邻帧重叠 8 token。所有有效帧的频率 token 共同生成一个句级 gate；逐帧逆变换并重建，<strong>3 seeds</strong>。</p>
+<p><strong>R：</strong> Spearman <code>0.842204 ± 0.001824</code>，比 FLaG 平均 <strong>+0.001076</strong>，2/3 seeds 正向。</p>
+<p><strong>C：</strong> 观察到小幅正向结果，继续检查窗口大小。</p>
+<h2 id="e384">E3：缩短窗口（8/4）<a class="headerlink" href="#e384" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 部分短句在 win16 下只有一个有效帧，缩短窗口后效果如何？</p>
+<p><strong>M：</strong> 延续 E2 的做法，改为 <code>win=8,hop=4</code>，其余不变，<strong>3 seeds</strong>。</p>
+<p><strong>R：</strong> Spearman <code>0.843000 ± 0.001047</code>；比 FLaG 平均 <strong>+0.001873</strong>（3/3 正向），比 E2 平均 <strong>+0.000796</strong>。</p>
+<p><strong>C：</strong> 早期观察到小幅改善，因此选择 E3 进行 E6–E8 机制分析；3 seeds 不能证明稳定优势。</p>
+<h2 id="e4">E4：添加帧位置编码<a class="headerlink" href="#e4" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 局部帧的位置顺序信息是否有帮助？</p>
+<p><strong>M：</strong> 在 E3 的频率 token 进入 latent attention 前，加 <strong>learned frame positional encoding</strong>；窗长及其他配置不变，重新训练 <strong>3 seeds</strong>。</p>
+<p><strong>R：</strong> Spearman <code>0.842282 ± 0.001834</code>，比 E3 平均 <strong>−0.000718</strong>。</p>
+<p><strong>C：</strong> 这种帧位置编码没有带来改善，后续不采用。</p>
+<h2 id="e5-hann">E5：局部 Hann<a class="headerlink" href="#e5-hann" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 给局部帧加窗是否继续改善 E3？</p>
+<p><strong>M：</strong> 在 E3 的 win8/hop4 上，将 rect 换成 <strong>periodic Hann</strong>，并同时设 <code>center=True</code>；重新训练 <strong>3 seeds</strong>。</p>
+<p><strong>R：</strong> Spearman <code>0.843027 ± 0.000593</code>，比 E3 平均 <strong>+0.000027</strong>。</p>
+<p><strong>C：</strong> 基本持平，后续优先使用更简单的 rect 实现。本实验未单独拆分 Hann 与 centering 的作用。</p>
 <hr />
-<h2 id="e1global-fft-hann">E1：global FFT 前加入 Hann<a class="headerlink" href="#e1global-fft-hann" title="Permanent link">&para;</a></h2>
-<p><strong>Q（问题）：</strong> global FFT 默认将有限长度序列周期性延拓，序列首尾不连续可能引起频谱泄漏；在输入前加 Hann 是否改善 STSB 表现？</p>
-<p><strong>M（方法）：</strong> 以相同 seed 的 FLaG 为对照，仅在 FFT 前加窗。根据每个样本的 attention mask 得到有效长度 <code>L</code>，在这些位置使用 symmetric Hann（<code>periodic=False</code>）；padding 仍为零。对于 <code>L&gt;2</code>：</p>
+<h2 id="e6-knockout">E6：频带 Knockout<a class="headerlink" href="#e6-knockout" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> FLaG 与 E3 分别依赖哪些输入频带？</p>
+<p><strong>M：</strong> 固定两组已训练 checkpoint（<strong>seeds 0–2</strong>）。对 RoBERTa <strong>最后一层的内容 token hidden</strong> 沿位置做 DCT-II，按几何比例划分为 <strong>8 个频带 B0–B7</strong>（B0 为最低频）；每次只将一段的系数置零、逆 DCT，再交给原模型预测。特殊 token 不变。只使用<strong>句对两侧均至少有 8 个内容 token</strong> 的 test 子集。</p>
+<p>频带的重要性用 <strong>Spearman 降幅</strong>衡量：</p>
 <div class="arithmatex">\[
-w[n]=\frac{1}{2}\left(1-\cos\frac{2\pi n}{L-1}\right),\quad n=0,\ldots,L-1.
+\Delta\rho_b=\rho_{\mathrm{before}}-\rho_{\mathrm{after},b}.
 \]</div>
-<p>窗函数逐位置乘在 RoBERTa hidden 上（<strong>有效特殊 token 也参与加窗</strong>），随后仍按 batch padded 长度做<strong>整句</strong> global rFFT。原实现对 <code>L≤2</code> 使用全 1 窗口。除加窗外，gate、逆变换、池化、训练和 seed 全部不变，<strong>没有固定 FFT 长度</strong>。</p>
-<p><strong>R（结果）：</strong> 3-seed test Spearman <code>0.837019±0.002763</code>，低于配对 FLaG 的 <code>0.841128±0.002177</code>（平均 −0.004109）；Pearson <code>0.836682±0.000282</code>，与 FLaG <code>0.836765±0.001782</code> 很接近。</p>
-<p><strong>C（结论）：</strong> 当前加 Hann 的实现没有提升 STSB 性能，但<strong>不能推断频谱泄漏不存在</strong>。加窗同时改变了靠近句子首尾的 token hidden，泄漏变化与输入信息减弱并未分离。</p>
-<h2 id="e2-local-stft168">E2：第一次引入 local STFT（16/8）<a class="headerlink" href="#e2-local-stft168" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> 如果整句的频域表示不够适合语义信息，改为相互重叠的局部频谱是否带来变化？</p>
-<p><strong>M：</strong> 不加 Hann，采用 rectangular frame，<code>win_length=16</code>、<code>hop_length=8</code>、<code>center=False</code>，相邻局部帧重叠 8 token；有效句子尾部不足一帧时在局部完成零填充。每帧做 16 点 rFFT，展平有效帧的频率 token 供共享 latent attention 产生<strong>一个</strong>句级 gate；对各帧频谱施加 gate 后逐帧逆变换，并按实现的重叠处理恢复 token 序列。其余配置与 FLaG 一致（0/True，3 seeds）。</p>
-<p><strong>R：</strong> 3-seed <strong>test</strong> Spearman <code>0.842204±0.001824</code>、Pearson <code>0.837783±0.003514</code>。相对同 seed FLaG 的平均 Spearman 差为 <code>+0.001076</code>，2/3 seeds 正向。</p>
-<p><strong>C：</strong> 看到小幅探索性正向信号</p>
-<h2 id="e384">E3：缩短局部窗口（8/4）<a class="headerlink" href="#e384" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> <code>win=16</code> 时，部分短句只生成一个有效帧；缩小窗口能否让短句也有更细的局部频谱？</p>
-<p><strong>M：</strong> 在 E2 的 rect、非居中、单个句级 gate 基础上，改为 <code>win=8,hop=4</code>，相邻帧重叠 4 token。其余协议保持不变，仍为 <strong>3 seeds（0–2）</strong>。</p>
-<p><strong>R：</strong> 3-seed test Spearman <code>0.843000±0.001047</code>，Pearson <code>0.838685±0.001421</code>；配对 FLaG 的 Spearman 差为 <code>+0.002003,+0.000591,+0.003024</code>（均值 <code>+0.001873</code>，3/3 正向）。相对 E2 的平均 Spearman 为 <code>+0.000796</code>。</p>
-<p><strong>C：</strong> 在这三个 seeds 上有小幅提高，因此后续暂用 E3 开展机制探针。该结果不是 10-seed 显著性结论，也不能仅凭分数认定模型一定利用了更多局部结构。</p>
-<h2 id="e4">E4：局部帧的位置编码<a class="headerlink" href="#e4" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> E3 将 frame 频率 token 展平后送入 attention，没有额外的帧位置信息；加入 learned frame position 是否有帮助？</p>
-<p><strong>M：</strong> 在 E3 上启用 <code>use_frame_positional_encoding=True</code>（实现中 <code>max_frame_positions=32</code>），按 frame id 将<strong>可学习帧位置向量加在进入 attention 的频率 token 上</strong>；局部窗、hop、重建和其他设置不变。与 E3 同样的 seeds 0–2 重新训练。位置编码改变了参数化，因此这是新的训练实验，不是给 E3 checkpoint 直接附加位置编码。</p>
-<p><strong>R：</strong> 3-seed test Spearman <code>0.842282±0.001834</code>，相对 E3 的均值为 <code>−0.000718</code>；</p>
-<p><strong>C：</strong> <strong>这种</strong>可学习帧位置编码未观察到收益，后续候选不使用它；</p>
-<h2 id="e5-hann-centered-stft">E5：周期 Hann + centered STFT<a class="headerlink" href="#e5-hann-centered-stft" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> 即使局部 STFT 已引入局部边界，各帧的边界不连续仍可能发生；加入窗口是否进一步影响表现？</p>
-<p><strong>M：</strong> 在 E3 <code>win=8,hop=4</code> 的基础上，将 rect 改为 <strong>periodic Hann</strong>，同时将 <code>center=False</code> 改为 <strong><code>center=True</code></strong>（帧提取前在序列左右加入 <code>win/2</code> 零填充）。保持单句级 gate、0/True 和 seeds 0–2。</p>
-<p><strong>R：</strong> 3-seed test Spearman <code>0.843027±0.000593</code>、Pearson <code>0.838083±0.002720</code>。与 E3 Spearman 均值相差 <code>+0.000027</code>，几乎持平。</p>
-<p><strong>C：</strong> 没有看到这一组合带来有意义的性能提升。为了降低结构复杂度，后续优先采用 rectangular、非居中的局部实现；</p>
-<hr />
-<h2 id="e6-hidden-dct-knockout">E6：对最终层 hidden 做 DCT 频带 knockout<a class="headerlink" href="#e6-hidden-dct-knockout" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> E3 的早期分数变化是否伴随对不同输入频段的不同依赖？低频是否更重要？</p>
-<p><strong>M：</strong> <strong>不重新训练</strong>。分别读取 seeds 0–2 的 FLaG 与 E3 checkpoint，并在相同 STSB official test 句对上运行 RoBERTa。对最后一层 hidden 中<strong>内容 token</strong>（排除首尾特殊 token）沿 token 位置做 <strong>DCT-II</strong>；用 8 个按几何方式分配宽度的频带 <code>B0…B7</code>（代码设 <code>num_bands=8,base=4.0</code>，先给每带至少一个系数，再按 <code>4^b</code> 的权重分配其余系数并用最大余数法保证数量总和；<code>B0</code> 含 DC/最低频，后续频带频率逐渐提高），一次仅将其中一带的全部 hidden 通道 DCT 系数置零，逆 DCT 恢复内容 token hidden，特殊 token 不变，然后用<strong>原模型的 pooling</strong> 重新计算句对 cosine。</p>
-<p>只有<strong>句对双方各至少 8 个内容 token</strong> 才进入本探针的八频带分析。按这一 <strong>eligible test 子集</strong> 的预测，逐 seed 计算：</p>
+<p><strong>R：</strong> B0 引起的平均 Spearman 降幅最大：FLaG <strong>0.146694</strong>，E3 <strong>0.198943</strong>。</p>
+<p><strong>C：</strong> 两个模型都对最低频敏感；E3 与 FLaG 的相对差异随 seed 变化，不能据此确认 E3 的性能变化由低频造成。</p>
+<h2 id="e7token-hidden-knockout">E7：Token Hidden Knockout<a class="headerlink" href="#e7token-hidden-knockout" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> E3 是否对特定 token 位置更敏感？</p>
+<p><strong>M：</strong> 固定 FLaG/E3 的 <strong>3-seed checkpoint</strong>。逐个把<strong>内容 token 的最后一层 hidden 向量置零</strong>，其他 token、特殊 token 和 mask 不变，重新计算句对 cosine。</p>
+<p>令原预测为 <code>s</code>，扰动后为 <code>s'</code>，标签为 <code>y</code>（原始分数除以 5）。对每个位置计算<strong>绝对平方误差变化</strong>：</p>
 <div class="arithmatex">\[
-\Delta\rho_b=\rho_{\mathrm{baseline,eligible}}-\rho_{\mathrm{knockout}(b),eligible}.
+R_{\text{token}}=\left|(s'-y)^2-(s-y)^2\right|.
 \]</div>
-<p>另外保存每个句对 knockout 前后的 <strong>绝对预测变化</strong>和<strong>绝对平方误差变化</strong>，它们与 Spearman 降幅是不同统计量。</p>
-<p><strong>R：</strong> 已记录的 B0 平均 Spearman 降幅：FLaG <code>0.146694</code>，E3 <code>0.198943</code>，均明显；但 E3 相对 FLaG 的低频敏感性差异随 seed/子集而变化，其余频带差异没有构成稳健解释。</p>
-<p><strong>C：</strong> B0 是两个模型的重要输入频带。这个实验不足以证明“E3 性能变化由更偏好 DC 造成”；频带扰动的重要性和 attention 分配要分开解释。</p>
-<h2 id="e7-token-hidden-knockout">E7：逐内容 token hidden knockout<a class="headerlink" href="#e7-token-hidden-knockout" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> E3 是否比 global FLaG 更重视特定位置的 token，从而表现出不同的句内位置敏感性？</p>
-<p><strong>M：</strong> 使用同一组 <strong>3 个 seeds（0–2）</strong> 的已训练 FLaG/E3，在 STSB <strong>test</strong> 上做推理探针，不更新参数。对于每一个句子的每个 <strong>content token</strong>，单独将其<strong>最后层 hidden 向量全部置零</strong>，保留特殊 token 与原有效 attention mask、其他 token 不变；重新做 pooling，再与句对另一侧<strong>未扰动</strong>的 embedding 算 cosine。</p>
-<p>设原预测 <code>s</code>、扰动后 <code>s'</code>、标签 <code>y/5</code>。每个位置记录 <code>|s'-s|</code> 与 <code>|(s'-y/5)^2-(s-y/5)^2|</code>。下表的<strong>位置响应</strong>为后者：先对同一句、同位置在各 seed 的响应对齐求平均，然后统计句内位置的均值、最大值与总体标准差，最后跨句求平均。将 content tokens 的<strong>相对位置</strong>划为前、中、后等五段，观察位置曲线。</p>
-<p><strong>R：</strong> 以下为报告中保留的 <strong>seeds 0–2 聚合、STSB test</strong> 结果，单位为**绝对平方误差变化：</p>
+<p>先按相同句子、相同 token 位置对齐三个 seed 的响应取平均，再统计句内位置分布。以下数字<strong>不是</strong> Spearman。</p>
+<p><strong>R：</strong> STSB test，3-seed 聚合：</p>
 <table>
 <thead>
 <tr>
-<th>位置响应统计</th>
+<th>指标</th>
 <th style="text-align: right;">FLaG</th>
 <th style="text-align: right;">E3</th>
 </tr>
@@ -1148,65 +986,24 @@ w[n]=\frac{1}{2}\left(1-\cos\frac{2\pi n}{L-1}\right),\quad n=0,\ldots,L-1.
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr>
-<th>Content-token 相对位置区域</th>
-<th style="text-align: right;">FLaG</th>
-<th style="text-align: right;">E3</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>开头段</td>
-<td style="text-align: right;">0.003000</td>
-<td style="text-align: right;">0.002850</td>
-</tr>
-<tr>
-<td>前部</td>
-<td style="text-align: right;">0.002771</td>
-<td style="text-align: right;">0.002790</td>
-</tr>
-<tr>
-<td>中部</td>
-<td style="text-align: right;">0.002786</td>
-<td style="text-align: right;">0.002719</td>
-</tr>
-<tr>
-<td>后部</td>
-<td style="text-align: right;">0.002843</td>
-<td style="text-align: right;">0.002780</td>
-</tr>
-<tr>
-<td>末尾段</td>
-<td style="text-align: right;">0.002256</td>
-<td style="text-align: right;">0.002146</td>
-</tr>
-</tbody>
-</table>
-<p><strong>C：</strong> E3 与 FLaG 在该扰动下的位置响应统计十分接近，没有证据支持 E3 因为更强的 token 位置选择性而取得早期小幅性能差异。</p>
-<h2 id="e8dc-attention">E8：DC attention“偏好比”是什么，怎么算？<a class="headerlink" href="#e8dc-attention" title="Permanent link">&para;</a></h2>
-<p><strong>Q：</strong> E6 发现两个模型对低频 B0 的 knockout 敏感，那么 E3 的<strong>频域 latent attention</strong> 是否也更偏向 DC token？</p>
-<p><strong>M：</strong> 使用 FLaG/E3 同一 3 个 seeds 的已训练 checkpoint，在 STSB test 运行正常 forward，读取缓存的 spectral tokens 和 latent cross-attention weights。若权重保留 attention heads，先平均 heads；再在 8 个 latent queries 上平均，得到每个有效频率 token 的权重 <code>A_k</code>。Global FLaG 的 <code>k=0</code> 是唯一 DC token；E3 将<strong>各有效 frame 的 <code>k=0</code></strong> 都作为 DC token，屏蔽无效 frame。</p>
-<p><strong>不能直接比较 DC 的总 attention 质量</strong>：E3 可能有多个 DC tokens。代码先在两个集合内部求<strong>每 token 平均注意力</strong>，对每个句子计算偏好比：</p>
+<p><strong>C：</strong> 两组的 token 位置响应接近，没有观察到 E3 更强的位置选择性。</p>
+<h2 id="e8dc-attention">E8：DC Attention 偏好比<a class="headerlink" href="#e8dc-attention" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> E3 是否比 global FLaG 更偏向 DC（零频）？</p>
+<p><strong>M：</strong> 固定 <strong>3-seed checkpoint</strong>，从正常 forward 中读取 latent attention 权重，先在 latent queries（以及需要时的 attention heads）上取平均。FLaG 的全局 <code>k=0</code> 是 DC；E3 将<strong>每个有效局部帧</strong>的 <code>k=0</code> 都计为 DC。</p>
+<p>对每句话，分别计算 DC 与非 DC 的<strong>每 token 平均注意力</strong>，再求比值：</p>
 <div class="arithmatex">\[
-r_{\mathrm{DC}} =
-\frac{
-    \displaystyle \frac{1}{N_{\mathrm{DC}}}
-    \sum_{k\in\mathrm{DC}}A_k
-}{
-    \displaystyle \frac{1}{N_{\mathrm{nonDC}}}
-    \sum_{k\in\mathrm{nonDC}}A_k + 10^{-12}
-}.
+r_{\mathrm{DC}}=
+\frac{\left(\sum_{k\in\mathrm{DC}}A_k\right)/N_{\mathrm{DC}}}
+{\left(\sum_{k\in\mathrm{nonDC}}A_k\right)/N_{\mathrm{nonDC}}+10^{-12}}.
 \]</div>
-<p>其中 <code>N_DC</code> / <code>N_nonDC</code> 是该句<strong>有效频率 token 的数量</strong>。<strong>r&gt;1</strong>：平均每个 DC token 的注意力超过平均每个非 DC token；<strong>r≈1</strong>：两组平均分配接近。对所有 test 句子先各算一个比值，再在各 seed 内对句子求平均。它既不是 DC 频谱<strong>能量</strong>，也不是 E6 的频带<strong>性能重要性</strong>。</p>
-<p><strong>R：</strong> 下表为 <strong>3 个 seeds（0–2）的句均 DC attention 偏好比</strong>，不是相关系数：</p>
+<p><code>r_DC&gt;1</code> 表示<strong>平均每个 DC token</strong> 的注意力较高。表中的数值为每个 seed 在 <strong>STSB test 句子</strong>上的平均偏好比，不是 DC 能量占比。</p>
+<p><strong>R：</strong></p>
 <table>
 <thead>
 <tr>
 <th style="text-align: right;">Seed</th>
-<th style="text-align: right;">Global FLaG</th>
-<th style="text-align: right;">E3（8/4 STFT）</th>
+<th style="text-align: right;">FLaG</th>
+<th style="text-align: right;">E3</th>
 </tr>
 </thead>
 <tbody>
@@ -1227,8 +1024,7 @@ r_{\mathrm{DC}} =
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 三个 seeds 上，E3 的 DC <strong>相对 attention 比值</strong>低于 FLaG。该结果与 E6 的“某些设置下 E3 的 B0 knockout 更敏感”<strong>不是同一件事</strong>：一个测 attention 分配，一个测删频带后预测性能；也不能直接对全局 DC 与局部 frame DC 赋予完全相同的频率语义。</p>
-<hr />
+<p><strong>C：</strong> E3 在三个 seed 上的 DC attention 偏好比都较低。但 attention 分配与 E6 的 knockout 性能敏感性<strong>不是同一个指标</strong>，不能仅凭偏好比判断 DC 的实际重要性。</p>
 
 
 

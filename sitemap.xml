@@ -2,34 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
+    </url>
+    <url>
+         <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/MTEB/</loc>
+         <lastmod>2026-10-01</lastmod>
     </url>
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/findings/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
     </url>
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/methods/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
     </url>
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/sprint/01-protocol/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
     </url>
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/sprint/02-experiments/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
     </url>
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/stsb/01-experiments/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
     </url>
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/stsb/02-padding/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
     </url>
     <url>
          <loc>https://lumoswwr.github.io/FLaG-STFT-Notes/stsb/03-mechanism/</loc>
-         <lastmod>2026-09-30</lastmod>
+         <lastmod>2026-10-01</lastmod>
     </url>
 </urlset>

@@ -207,24 +207,6 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    首页
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="." class="md-nav__link md-nav__link--active">
         
   
@@ -241,36 +223,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        核心研究路线
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -336,6 +288,33 @@
   
   
   
+    <li class="md-nav__item">
+      <a href="MTEB/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MTEB数据集三种文本任务观察感受
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
     
     
       
@@ -358,10 +337,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -379,8 +358,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -404,7 +383,7 @@
   <span class="md-ellipsis">
     
   
-    E1–E8：算子探索与机制探针
+    E1–E8
   
 
     
@@ -432,7 +411,7 @@
   <span class="md-ellipsis">
     
   
-    E9–E14：Padding、窗口与配置
+    E9–E14
   
 
     
@@ -460,7 +439,7 @@
   <span class="md-ellipsis">
     
   
-    循环反射、P1 与 P2
+    循环反射与 P1/P2
   
 
     
@@ -507,10 +486,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -528,8 +507,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -553,7 +532,7 @@
   <span class="md-ellipsis">
     
   
-    数据、训练与指标
+    数据与训练
   
 
     
@@ -581,7 +560,7 @@
   <span class="md-ellipsis">
     
   
-    S1–S5：跨任务实验与控制
+    S1–S5
   
 
     
@@ -622,25 +601,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        核心研究路线
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -657,66 +617,46 @@
 
 
 <h1 id="flag-stft">FLaG / STFT 实验报告<a class="headerlink" href="#flag-stft" title="Permanent link">&para;</a></h1>
-<p>本报告记录 <strong>FLaG 全局 FFT 与局部 STFT-FLaG</strong>在两个英文句对任务上的探索、消融与机制分析。</p>
-<div class="admonition info">
-<p class="admonition-title">建议阅读顺序</p>
-<p><strong>第一次阅读</strong>：先看<a href="methods/">数据与评价协议</a>，再浏览<a href="findings/">研究结论综述</a>，之后按导航依次阅读 STSB E1–E8、E9–E14、循环反射/P1/P2，最后阅读 Sprint 迁移与 S1–S5。每个独立实验均以 <strong>Q / M / R / C</strong> 编写；章节开头还有<strong>实验矩阵</strong>，方便直接对照参数和 seeds。</p>
-</div>
-<h2 id="_1">核心研究路线<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<p>研究目标：在原始 <strong>FLaG（Global FFT）</strong> 的基础上尝试 <strong>STFT 局部频域池化</strong>，比较性能，并分析 global/local 的实际结构差异。</p>
 <table>
 <thead>
 <tr>
-<th>阶段</th>
-<th>数据集/任务</th>
-<th>核心问题</th>
-<th>章节</th>
+<th>内容</th>
+<th>说明</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>统一协议</td>
-<td>STSB + Sprint</td>
-<td>使用什么数据、分割、损失、指标与 seeds？</td>
-<td><a href="methods/">协议与指标</a></td>
+<td><a href="methods/">实验设置与指标</a></td>
+<td>模型、数据集、训练配置、评价指标</td>
 </tr>
 <tr>
-<td>第一阶段</td>
-<td>STSB，句对语义相似度</td>
-<td>边缘 Hann、局部 STFT、窗口/重叠/帧位置有何影响？如何定义 knockout 和 DC attention？</td>
-<td><a href="stsb/01-experiments/">E1–E8</a></td>
+<td><a href="stsb/01-experiments/">STSB E1–E8</a></td>
+<td>Hann、STFT、窗长、频带和 token 分析</td>
 </tr>
 <tr>
-<td>第二阶段</td>
-<td>STSB</td>
-<td>padding 是什么问题？固定长度训练与 E12 的 10-seed 结果如何？原论文 text 配置下如何？</td>
-<td><a href="stsb/02-padding/">E9–E14</a></td>
+<td><a href="stsb/02-padding/">STSB E9–E14</a></td>
+<td>Padding、窗口重叠、固定 FFT、10-seed 配置对照</td>
 </tr>
 <tr>
-<td>第三阶段</td>
-<td>STSB</td>
-<td>实/虚门控为什么会产生循环反射？P1 与 P2 各隔离了什么？</td>
-<td><a href="stsb/03-mechanism/">循环反射、P1/P2</a></td>
+<td><a href="stsb/03-mechanism/">循环反射与 P1/P2</a></td>
+<td>分析 padding 和 global/local 预测差异的来源</td>
 </tr>
 <tr>
-<td>第四阶段</td>
-<td>Sprint，重复问题检测</td>
-<td>冻结 RoBERTa 和分类器之后，数据划分/阈值/AP 怎么算？</td>
-<td><a href="sprint/01-protocol/">Sprint 协议</a></td>
+<td><a href="sprint/01-protocol/">Sprint 设置</a></td>
+<td>冻结 RoBERTa 后的分类训练和指标</td>
 </tr>
 <tr>
-<td>第五阶段</td>
-<td>Sprint</td>
-<td>早期结果、推理重建干预、matched global、dropout×norm 交互分别说明什么？</td>
-<td><a href="sprint/02-experiments/">S1–S5</a></td>
+<td><a href="sprint/02-experiments/">Sprint S1–S5</a></td>
+<td>跨任务性能、机制验证及配置控制</td>
 </tr>
 <tr>
-<td>结论</td>
-<td>两个任务</td>
-<td>哪些是可复核结构发现、哪些性能结论仍受配置影响？</td>
-<td><a href="findings/">研究结果综述</a></td>
+<td><a href="findings/">结果总结</a></td>
+<td>整体实验结论</td>
 </tr>
 </tbody>
 </table>
+<p><strong>阅读约定</strong>：各实验采用 <strong>Q（问题）、M（方法）、R（结果）、C（结论）</strong>。性能表写明是 <strong>test</strong> 还是 <strong>validation</strong>、使用几个随机种子；机制实验的“预测漂移”不等于性能提高。</p>
 
 
 

@@ -10,13 +10,13 @@
       
       
       
-        <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/findings/">
+        <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/MTEB/">
       
       
-        <link rel="prev" href="../methods/">
+        <link rel="prev" href="../findings/">
       
       
-        <link rel="next" href="../MTEB/">
+        <link rel="next" href="../stsb/01-experiments/">
       
       
         
@@ -27,7 +27,7 @@
     
     
       
-        <title>研究结果综述 - FLaG / STFT Mechanism Experiments</title>
+        <title>MTEB数据集三种文本任务观察感受 - FLaG / STFT Mechanism Experiments</title>
       
     
     
@@ -68,7 +68,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#_1" class="md-skip">
+        <a href="#mteb" class="md-skip">
           跳转至
         </a>
       
@@ -104,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              研究结果综述
+              MTEB数据集三种文本任务观察感受
             
           </span>
         </div>
@@ -251,37 +251,10 @@
       
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    研究结果综述
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../findings/" class="md-nav__link">
         
   
   
@@ -297,48 +270,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="目录">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        性能
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        机制
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -347,10 +278,19 @@
       
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../MTEB/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -366,6 +306,7 @@
   
 
       </a>
+      
     </li>
   
 
@@ -662,36 +603,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      目录
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        性能
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        机制
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -707,47 +618,11 @@
 
 
 
-<h1 id="_1">实验结果总结<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<h2 id="_2">性能<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>数据集与设置</th>
-<th style="text-align: right;">Global FLaG</th>
-<th style="text-align: right;">E12（STFT 16/16）</th>
-<th style="text-align: right;">同 seed E12−FLaG</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>STSB test Spearman</strong>，0 dropout / 有 norm，10 seeds</td>
-<td style="text-align: right;">0.841559 ± 0.003538</td>
-<td style="text-align: right;">0.842739 ± 0.003214</td>
-<td style="text-align: right;">+0.001180 ± 0.002107（7/10 正向）</td>
-</tr>
-<tr>
-<td><strong>STSB test Spearman</strong>，0.1 dropout / 有 norm，10 seeds</td>
-<td style="text-align: right;">0.839065 ± 0.004154</td>
-<td style="text-align: right;">0.838944 ± 0.001882</td>
-<td style="text-align: right;">−0.000121 ± 0.004039（5/10 正向）</td>
-</tr>
-<tr>
-<td><strong>Sprint validation AP</strong>，两者均 0 dropout / 有 norm，10 seeds</td>
-<td style="text-align: right;">0.795830 ± 0.017156</td>
-<td style="text-align: right;">0.789136 ± 0.014094</td>
-<td style="text-align: right;">−0.006693 ± 0.017279（4/10 正向）</td>
-</tr>
-</tbody>
-</table>
-<p>作为参照，STSB Mean pooling 在相同早期协议下的 10-seed test Spearman 为 <strong>0.851201 ± 0.002000</strong>。STSB 上 E12 的小幅正向趋势未在不同配置下稳定出现。Sprint 早期 E12 的 <strong>official-test AP</strong> 高于早期 FLaG，但当时 dropout/norm 不匹配，不能据此认定算子带来增益。</p>
-<h2 id="_3">机制<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>E9/E10</strong>：仅改变 pooling 输入的右 padding，global FLaG 预测会变；当前 local STFT 实现近似不变。</li>
-<li><strong>循环反射与 P1</strong>：实、虚 gate 不同会产生循环反射；global 对 padding 的预测漂移主要来自重建长度，而非 gate 变化。</li>
-<li><strong>P2 与 Sprint S3</strong>：在固定 checkpoint 下，global/local 的 gate 几乎相同，预测差异主要来自<strong>完整重建路线</strong>。</li>
-<li><strong>Sprint S5</strong>：global FLaG 的 dropout 与 post-pool Norm 存在明显交互；四种测试配置中，<code>0.1 dropout + 有 norm</code> 的 validation AP 为 <strong>0.819156 ± 0.015250</strong>。</li>
-</ul>
-<p><strong>目前可以确定的是结构差异的来源；尚未证明 local STFT 能稳定提高下游性能。</strong> 具体数值和配置见各实验页面。</p>
+<h1 id="mteb">MTEB数据集分析<a class="headerlink" href="#mteb" title="Permanent link">&para;</a></h1>
+<p>STSB的任务是匹配两个句子semantic similarity，把所有token平均我感觉更能表达整体语义中。FLaG本身就是去到频域中，对不同频率做变换，论文里也分析了，不同频率重要性不一样，DC的影响比较大，这种频率的依赖是不平衡的。从映射到频域，做操作，再变换回去，可能全局语义中心会有一定影响？</p>
+<p>Sprint的任务是问题句子和答案句子是否匹配？也就是不能驴唇不对马嘴。这个就不是十分看重整体语义平均，数据集里也大部分是一个问句 一个陈述句。就比如：问 "我的手机怎么开机" 答 "点击开机键"or"点击音量键" 后面二者语义上可能重合度很高，但是答案就是一个匹配一个不匹配。所以Mean token的话可能效果就下来了</p>
+<p>Mean pooling数学上等价于完全依赖DC分量，而我们的FLaG也是DC敏感性最大，这种平均语义集中在DC上</p>
+<p>除此之外MTEB数据集上最后一个文本任务IMBD，论文中FLaG和Mean基本持平。这个文本任务是看电影评论，判断positive or negative。整体上来看也是语义中心。但是和STSB不一样的是，STSB几乎全是sentence。而MTEB上几乎全是大段paragraph，Mean在长文本上对语义中心的归纳可能就不是特别强。可能大段的话不像一句话那样，简单集中体现某种语义</p>
 
 
 
