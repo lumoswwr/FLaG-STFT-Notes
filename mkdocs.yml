@@ -5,19 +5,17 @@ site_url: https://lumoswwr.github.io/FLaG-STFT-Notes/
 nav:
   - 首页: index.md
   - 实验协议与指标: methods.md
-<<<<<<< HEAD
-=======
   - 研究结果综述: findings.md
   - MTEB数据集三种文本任务观察感受: MTEB.md
->>>>>>> b7b87f3 (MTEB analysis)
+
   - STSB:
       - E1–E8: stsb/01-experiments.md
       - E9–E14: stsb/02-padding.md
       - 循环反射与 P1/P2: stsb/03-mechanism.md
+
   - Sprint:
       - 数据与训练: sprint/01-protocol.md
       - S1–S5: sprint/02-experiments.md
-  - 结果总结: findings.md
 
 theme:
   name: material
