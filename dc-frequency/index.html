@@ -13,6 +13,10 @@
         <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/dc-frequency/">
       
       
+        <link rel="prev" href="../MTEB/">
+      
+      
+        <link rel="next" href="../stsb/01-experiments/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>DC / 频带机制：STSB 与 Sprint 的 frozen-backbone 对照 - FLaG / STFT Mechanism Experiments</title>
+        <title>DC / 频带机制 - FLaG / STFT Mechanism Experiments</title>
       
     
     
@@ -100,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              DC / 频带机制：STSB 与 Sprint 的 frozen-backbone 对照
+              DC / 频带机制
             
           </span>
         </div>
@@ -301,6 +305,280 @@
       
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DC / 频带机制
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DC / 频带机制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 问题
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 统一实验设置
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-band-knockout" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Band knockout：删除哪个频带最伤模型？
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="3. Band knockout：删除哪个频带最伤模型？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#31-l12" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.1 最后一层 L12
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#32-b0-dependency" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3.2 B0 dependency 随层变化
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-band-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Band-only：只给一个频带，模型还能做多少？
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="4. Band-only：只给一个频带，模型还能做多少？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#41-l12b0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4.1 L12：B0 单独几乎可以恢复完整模型
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-b0-only" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. B0-only 随深度变化
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="5. B0-only 随深度变化">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#stsb" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        STSB
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sprint" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sprint
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. 当前可以得出的结论
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="6. 当前可以得出的结论">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#c1-dcb0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C1. DC/B0 是两个任务共同的核心全局信息通道
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c2-stsb-dc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C2. STSB 提供了“语义信息高度集中于 DC”的直接任务证据
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c3-dc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C3. DC 不能简单等同于“语义”
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#c4-stsb-sprint-dc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        C4. STSB 与 Sprint 的主要差异不在“谁更依赖 DC”，而在深度方向上的组织方式
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 一句话总结
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
   
   
     
@@ -325,10 +603,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
             
   
   
@@ -346,8 +624,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_5">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -474,10 +752,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
         
           
-          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="">
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
             
   
   
@@ -495,8 +773,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_6">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
             <span class="md-nav__icon md-icon"></span>
             
   
