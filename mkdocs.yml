@@ -7,6 +7,7 @@ nav:
   - 实验协议与指标: methods.md
   - 研究结果综述: findings.md
   - MTEB数据集三种文本任务观察感受: MTEB.md
+  - DC / 频带机制: dc-frequency.md
 
   - STSB:
       - E1–E8: stsb/01-experiments.md
