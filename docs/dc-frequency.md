@@ -401,7 +401,7 @@ Sprint official test 上：
 
 ---
 
-## 9. Exact DC 实验后的更新结论
+## 8. Exact DC 实验后的更新结论
 
 结合前面的 B0 频带实验和本节 exact-DC 训练实验，目前更合适的表述是：
 
