@@ -316,3 +316,189 @@ STSB中非DC频带整体预测能力低，重要性变化大，但重要性求�
 Sprint中非DC频带预测能力较高，重要性平缓，不是很大
 
 就感觉这个结论在打架
+
+
+---
+
+## 7. 训练过程中直接删除 / 仅保留 exact DC
+
+前面的 layer-band knockout / band-only 使用的是 **Prism B0–B7 频带划分**。这里进一步做一个更严格的控制：
+
+> **直接对 FLaG 实际 rFFT 后的精确 \(k=0\) 系数进行操作。**
+
+因此本节里的 **exact DC** 与前文的 **B0 低频带** 要区分开：
+
+- **B0**：Prism 划分下最低频带，可能包含 DC 及其它低频系数；
+- **exact DC**：严格只指 rFFT 的 \(k=0\) 系数。
+
+### 7.1 实验设计
+
+为了避免“训练时删除 DC”和“只保留 DC”两边模型容量不同，主比较使用三个严格匹配的 frozen-backbone FLaG：
+
+| 条件 | RoBERTa | FLaG | 可见频率 | 是否训练 |
+| --- | --- | --- | --- | --- |
+| **Full FLaG** | frozen | trainable | \(k=0\) + \(k>0\) | 是 |
+| **No-DC FLaG** | frozen | trainable | 仅 \(k>0\) | 是 |
+| **DC-only FLaG** | frozen | trainable | 仅 \(k=0\) | 是 |
+
+另外保留：
+
+| 参考项 | 说明 |
+| --- | --- |
+| **Exact DC / Mean** | frozen RoBERTa + masked Mean pooling；parameter-free exact-DC readout |
+
+三个 FLaG 条件的 backbone、模型容量、优化器和训练协议保持一致，唯一变量是 **训练过程中允许模型看到哪些频率**。
+
+实现上：
+
+- No-DC：在真实 rFFT 后将 spec[:, 0] 置零；
+- DC-only：保留 spec[:, 0]，其余 spec[:, 1:] 全部置零；
+- sanity check 同时验证：
+  - No-DC 只改变 \(k=0\)；
+  - DC-only 只保留 \(k=0\)；
+  - 其它频率不会被连带修改。
+
+### 7.2 Seed-0 结果
+
+#### STSB：test Spearman
+
+| 条件 | Spearman | 相对 Full |
+| --- | ---: | ---: |
+| **Full FLaG** | 0.710535 | 100.0% |
+| **No-DC FLaG** | 0.646152 | 90.9% |
+| **DC-only FLaG** | **0.746003** | **105.0%** |
+| Exact DC / Mean | 0.543549 | 76.5% |
+
+#### Sprint：validation AP
+
+| 条件 | Validation AP | 相对 Full |
+| --- | ---: | ---: |
+| **Full FLaG** | 0.757690 | 100.0% |
+| **No-DC FLaG** | 0.628402 | 82.9% |
+| **DC-only FLaG** | **0.916407** | **120.9%** |
+| Exact DC / Mean | 0.302018 | 39.9% |
+
+Sprint official test 上：
+
+| 条件 | Test AP |
+| --- | ---: |
+| **Full FLaG** | 0.724596 |
+| **No-DC FLaG** | 0.534044 |
+| **DC-only FLaG** | **0.894565** |
+
+这说明 Sprint 上的 DC-only 增益并不只出现在 validation，official test 同样保持。
+
+### 7.3 直接观察
+
+#### STSB
+
+- 训练阶段持续删除 exact DC 后，仍保留约 **90.9%** 的 Full 性能；
+- 只保留 exact DC 并训练同一个 FLaG，反而达到 **0.7460**，高于 Full 的 **0.7105**；
+- parameter-free Mean 只有 **0.5435**。
+
+因此：
+
+> **DC 中包含很强的 STSB task-relevant information，但“DC 中有信息”不等于“直接 Mean + cosine 就能充分读取这些信息”。**
+
+#### Sprint
+
+- No-DC FLaG test AP 从 **0.7246** 降到 **0.5340**；
+- DC-only FLaG test AP 达到 **0.8946**；
+- frozen Mean / exact-DC raw readout 只有 validation AP **0.3020**。
+
+因此 Sprint 上更明显地表现出：
+
+> **预训练 RoBERTa 的 final-layer exact DC 中已经存在很强的任务相关信息；专门针对 DC 训练的 FLaG readout 可以把这些信息显著解码出来。**
+
+与此同时：
+
+> **No-DC 仍然能取得不低的性能，说明 non-DC 中也存在可利用信息，但在当前设置下其独立能力明显弱于 DC-only。**
+
+---
+
+## 8. Sprint DC-only 的 padding / length shortcut 排查
+
+由于 Sprint DC-only FLaG 的 test AP 达到 **0.894565**，需要排查其是否只是利用了 dynamic padding、batch composition 或句长捷径。
+
+### 8.1 Dynamic-padding batch size
+
+同一个 DC-only checkpoint，在不同 batch size 下重新评估 validation AP：
+
+| Batch size | Validation AP |
+| ---: | ---: |
+| 1 | 0.917211 |
+| 8 | 0.916872 |
+| 32 | 0.915688 |
+| 64 | 0.916407 |
+| 128 | 0.916413 |
+
+最大波动约 **0.0015 AP**，非常小。
+
+### 8.2 改变 batch grouping / order
+
+固定 batch size = 64：
+
+| 顺序 | Validation AP |
+| --- | ---: |
+| Natural order | 0.916407 |
+| Permuted order | 0.916893 |
+| Absolute difference | **0.000486** |
+
+随机改变样本分组后结果几乎不变。
+
+### 8.3 Dynamic padding vs fixed padding=128
+
+| Split | Dynamic padding | Static padding=128 |
+| --- | ---: | ---: |
+| Validation AP | 0.916407 | 0.906464 |
+| Test AP | 0.894565 | **0.884416** |
+
+固定 padding 后确实下降约 **0.01 AP**，说明 padding 方式有轻微影响，但无法解释整体高性能。
+
+即使使用 static padding=128：
+
+\[
+0.8844 \gg 0.7246
+\]
+
+仍明显高于 Full FLaG 的 test AP。
+
+### 8.4 Length-only baseline
+
+仅使用两句话的 token length、长度差、长度比例等简单长度特征：
+
+| Baseline | Validation AP | Test AP |
+| --- | ---: | ---: |
+| Logistic regression on length features | 0.011315 | 0.010996 |
+| \(-|L_1-L_2|\) | 0.011421 | 0.010553 |
+
+这一水平接近 Sprint 的正样本比例，说明**简单句长信息本身几乎不能完成任务**。
+
+### 8.5 当前结论
+
+综合 batch size、batch grouping、fixed padding 和 length-only baseline：
+
+> **Sprint DC-only FLaG 的高性能不能由 dynamic padding、batch composition 或简单 sentence-length shortcut 解释。**
+
+目前更合理的解释是：
+
+> **Frozen RoBERTa 的 final-layer exact DC 中存在高度可利用的 Sprint task-relevant information；训练后的 FLaG 可以从该单一频率成分中解码出远强于 raw Mean + cosine 的任务信号。**
+
+但目前仍是 **seed 0 机制控制**。如果这一现象作为正式核心结论使用，下一步应补 multi-seed 稳定性，并进一步检查 DC magnitude normalization 等控制。
+
+---
+
+## 9. Exact DC 实验后的更新结论
+
+结合前面的 B0 频带实验和本节 exact-DC 训练实验，目前更合适的表述是：
+
+1. **B0 / 低频频带在两个任务中都是显著的重要信息通道。**
+2. **Exact DC 本身包含大量任务相关信息，但其可读性高度依赖 readout。**
+3. **Mean pooling 不是“DC 信息量”的上限。** frozen Mean 较低只说明 raw mean + cosine 解码能力有限。
+4. **训练时删除 DC 后模型仍可利用 non-DC 补偿，但 Sprint 的损失更大。**
+5. **只保留 exact DC 并训练相同 FLaG 时，STSB 和 Sprint 都能达到甚至超过 Full FLaG 的 seed-0 结果。**
+6. Sprint DC-only 的异常高性能已通过 padding / length audit，当前没有证据表明它主要来自简单长度或 batch-padding 捷径。
+
+一句话总结：
+
+> **DC 并不是唯一的信息来源，但在 frozen RoBERTa 的最终表示中，它是一个极其强的 task-relevant information carrier；模型是否能利用这些信息，很大程度上取决于后续 readout，而不是由 Mean pooling 的表现单独决定。**
