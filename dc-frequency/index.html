@@ -663,78 +663,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#8-sprint-dc-only-padding-length-shortcut" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Sprint DC-only 的 padding / length shortcut 排查
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="8. Sprint DC-only 的 padding / length shortcut 排查">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#81-dynamic-padding-batch-size" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.1 Dynamic-padding batch size
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#82-batch-grouping-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.2 改变 batch grouping / order
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#83-dynamic-padding-vs-fixed-padding128" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.3 Dynamic padding vs fixed padding=128
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#84-length-only-baseline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.4 Length-only baseline
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#85" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.5 当前结论
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#9-exact-dc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1338,78 +1266,6 @@
         
       </ul>
     </nav>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#8-sprint-dc-only-padding-length-shortcut" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8. Sprint DC-only 的 padding / length shortcut 排查
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="8. Sprint DC-only 的 padding / length shortcut 排查">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#81-dynamic-padding-batch-size" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.1 Dynamic-padding batch size
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#82-batch-grouping-order" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.2 改变 batch grouping / order
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#83-dynamic-padding-vs-fixed-padding128" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.3 Dynamic padding vs fixed padding=128
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#84-length-only-baseline" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.4 Length-only baseline
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#85" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        8.5 当前结论
-      
-    </span>
-  </a>
   
 </li>
         
@@ -2079,15 +1935,6 @@ FLaG
 <p>就感觉这个结论在打架</p>
 <hr />
 <h2 id="7-exact-dc">7. 训练过程中直接删除 / 仅保留 exact DC<a class="headerlink" href="#7-exact-dc" title="Permanent link">&para;</a></h2>
-<p>前面的 layer-band knockout / band-only 使用的是 <strong>Prism B0–B7 频带划分</strong>。这里进一步做一个更严格的控制：</p>
-<blockquote>
-<p><strong>直接对 FLaG 实际 rFFT 后的精确 <span class="arithmatex">\(k=0\)</span> 系数进行操作。</strong></p>
-</blockquote>
-<p>因此本节里的 <strong>exact DC</strong> 与前文的 <strong>B0 低频带</strong> 要区分开：</p>
-<ul>
-<li><strong>B0</strong>：Prism 划分下最低频带，可能包含 DC 及其它低频系数；</li>
-<li><strong>exact DC</strong>：严格只指 rFFT 的 <span class="arithmatex">\(k=0\)</span> 系数。</li>
-</ul>
 <h3 id="71">7.1 实验设计<a class="headerlink" href="#71" title="Permanent link">&para;</a></h3>
 <p>为了避免“训练时删除 DC”和“只保留 DC”两边模型容量不同，主比较使用三个严格匹配的 frozen-backbone FLaG：</p>
 <table>
@@ -2121,21 +1968,6 @@ FLaG
 <td>trainable</td>
 <td>仅 <span class="arithmatex">\(k=0\)</span></td>
 <td>是</td>
-</tr>
-</tbody>
-</table>
-<p>另外保留：</p>
-<table>
-<thead>
-<tr>
-<th>参考项</th>
-<th>说明</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>Exact DC / Mean</strong></td>
-<td>frozen RoBERTa + masked Mean pooling；parameter-free exact-DC readout</td>
 </tr>
 </tbody>
 </table>
@@ -2264,138 +2096,24 @@ FLaG
 <p><strong>No-DC 仍然能取得不低的性能，说明 non-DC 中也存在可利用信息，但在当前设置下其独立能力明显弱于 DC-only。</strong></p>
 </blockquote>
 <hr />
-<h2 id="8-sprint-dc-only-padding-length-shortcut">8. Sprint DC-only 的 padding / length shortcut 排查<a class="headerlink" href="#8-sprint-dc-only-padding-length-shortcut" title="Permanent link">&para;</a></h2>
-<p>由于 Sprint DC-only FLaG 的 test AP 达到 <strong>0.894565</strong>，需要排查其是否只是利用了 dynamic padding、batch composition 或句长捷径。</p>
-<h3 id="81-dynamic-padding-batch-size">8.1 Dynamic-padding batch size<a class="headerlink" href="#81-dynamic-padding-batch-size" title="Permanent link">&para;</a></h3>
-<p>同一个 DC-only checkpoint，在不同 batch size 下重新评估 validation AP：</p>
-<table>
-<thead>
-<tr>
-<th style="text-align: right;">Batch size</th>
-<th style="text-align: right;">Validation AP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0.917211</td>
-</tr>
-<tr>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">0.916872</td>
-</tr>
-<tr>
-<td style="text-align: right;">32</td>
-<td style="text-align: right;">0.915688</td>
-</tr>
-<tr>
-<td style="text-align: right;">64</td>
-<td style="text-align: right;">0.916407</td>
-</tr>
-<tr>
-<td style="text-align: right;">128</td>
-<td style="text-align: right;">0.916413</td>
-</tr>
-</tbody>
-</table>
-<p>最大波动约 <strong>0.0015 AP</strong>，非常小。</p>
-<h3 id="82-batch-grouping-order">8.2 改变 batch grouping / order<a class="headerlink" href="#82-batch-grouping-order" title="Permanent link">&para;</a></h3>
-<p>固定 batch size = 64：</p>
-<table>
-<thead>
-<tr>
-<th>顺序</th>
-<th style="text-align: right;">Validation AP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Natural order</td>
-<td style="text-align: right;">0.916407</td>
-</tr>
-<tr>
-<td>Permuted order</td>
-<td style="text-align: right;">0.916893</td>
-</tr>
-<tr>
-<td>Absolute difference</td>
-<td style="text-align: right;"><strong>0.000486</strong></td>
-</tr>
-</tbody>
-</table>
-<p>随机改变样本分组后结果几乎不变。</p>
-<h3 id="83-dynamic-padding-vs-fixed-padding128">8.3 Dynamic padding vs fixed padding=128<a class="headerlink" href="#83-dynamic-padding-vs-fixed-padding128" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Split</th>
-<th style="text-align: right;">Dynamic padding</th>
-<th style="text-align: right;">Static padding=128</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Validation AP</td>
-<td style="text-align: right;">0.916407</td>
-<td style="text-align: right;">0.906464</td>
-</tr>
-<tr>
-<td>Test AP</td>
-<td style="text-align: right;">0.894565</td>
-<td style="text-align: right;"><strong>0.884416</strong></td>
-</tr>
-</tbody>
-</table>
-<p>固定 padding 后确实下降约 <strong>0.01 AP</strong>，说明 padding 方式有轻微影响，但无法解释整体高性能。</p>
-<p>即使使用 static padding=128：</p>
-<div class="arithmatex">\[
-0.8844 \gg 0.7246
-\]</div>
-<p>仍明显高于 Full FLaG 的 test AP。</p>
-<h3 id="84-length-only-baseline">8.4 Length-only baseline<a class="headerlink" href="#84-length-only-baseline" title="Permanent link">&para;</a></h3>
-<p>仅使用两句话的 token length、长度差、长度比例等简单长度特征：</p>
-<table>
-<thead>
-<tr>
-<th>Baseline</th>
-<th style="text-align: right;">Validation AP</th>
-<th style="text-align: right;">Test AP</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Logistic regression on length features</td>
-<td style="text-align: right;">0.011315</td>
-<td style="text-align: right;">0.010996</td>
-</tr>
-<tr>
-<td>(-</td>
-<td style="text-align: right;">L_1-L_2</td>
-<td style="text-align: right;">)</td>
-</tr>
-</tbody>
-</table>
-<p>这一水平接近 Sprint 的正样本比例，说明<strong>简单句长信息本身几乎不能完成任务</strong>。</p>
-<h3 id="85">8.5 当前结论<a class="headerlink" href="#85" title="Permanent link">&para;</a></h3>
-<p>综合 batch size、batch grouping、fixed padding 和 length-only baseline：</p>
-<blockquote>
-<p><strong>Sprint DC-only FLaG 的高性能不能由 dynamic padding、batch composition 或简单 sentence-length shortcut 解释。</strong></p>
-</blockquote>
-<p>目前更合理的解释是：</p>
-<blockquote>
-<p><strong>Frozen RoBERTa 的 final-layer exact DC 中存在高度可利用的 Sprint task-relevant information；训练后的 FLaG 可以从该单一频率成分中解码出远强于 raw Mean + cosine 的任务信号。</strong></p>
-</blockquote>
-<p>但目前仍是 <strong>seed 0 机制控制</strong>。如果这一现象作为正式核心结论使用，下一步应补 multi-seed 稳定性，并进一步检查 DC magnitude normalization 等控制。</p>
-<hr />
 <h2 id="9-exact-dc">9. Exact DC 实验后的更新结论<a class="headerlink" href="#9-exact-dc" title="Permanent link">&para;</a></h2>
 <p>结合前面的 B0 频带实验和本节 exact-DC 训练实验，目前更合适的表述是：</p>
 <ol>
-<li><strong>B0 / 低频频带在两个任务中都是显著的重要信息通道。</strong></li>
-<li><strong>Exact DC 本身包含大量任务相关信息，但其可读性高度依赖 readout。</strong></li>
-<li><strong>Mean pooling 不是“DC 信息量”的上限。</strong> frozen Mean 较低只说明 raw mean + cosine 解码能力有限。</li>
-<li><strong>训练时删除 DC 后模型仍可利用 non-DC 补偿，但 Sprint 的损失更大。</strong></li>
-<li><strong>只保留 exact DC 并训练相同 FLaG 时，STSB 和 Sprint 都能达到甚至超过 Full FLaG 的 seed-0 结果。</strong></li>
-<li>Sprint DC-only 的异常高性能已通过 padding / length audit，当前没有证据表明它主要来自简单长度或 batch-padding 捷径。</li>
+<li>
+<p><strong>B0 / 低频频带在两个任务中都是显著的重要信息通道。</strong></p>
+</li>
+<li>
+<p><strong>Exact DC 本身包含大量任务相关信息，但其可读性高度依赖 readout。</strong></p>
+</li>
+<li>
+<p><strong>Mean pooling 不是“DC 信息量”的上限。</strong> frozen Mean 较低只说明 raw mean + cosine 解码能力有限。</p>
+</li>
+<li>
+<p><strong>训练时删除 DC 后模型仍可利用 non-DC 补偿，但 Sprint 的损失更大。</strong></p>
+</li>
+<li>
+<p><strong>只保留 exact DC 并训练相同 FLaG 时，STSB 和 Sprint 都能达到甚至超过 Full FLaG 的 seed-0 结果。</strong></p>
+</li>
 </ol>
 <p>一句话总结：</p>
 <blockquote>
