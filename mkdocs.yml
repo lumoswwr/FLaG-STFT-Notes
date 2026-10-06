@@ -8,6 +8,7 @@ nav:
   - 研究结果综述: findings.md
   - MTEB数据集三种文本任务观察感受: MTEB.md
   - DC / 频带机制: dc-frequency.md
+  - Mean-compatible FLaG: mean-compatible-flag.md
 
   - STSB:
       - E1–E8: stsb/01-experiments.md
