@@ -1,281 +1,368 @@
-# FLaG 的门控与输出线性变换：从表示夹角到简化模型对照
+# FLaG 中 Gate 和输出线性层的作用：一次逐步深入的机制分析
 
-!!! info "研究范围与结果性质"
-    本页是原有 [Mean-compatible FLaG](mean-compatible-flag.md)、[循环反射和 P1/P2](stsb/03-mechanism.md)、[DC / 频带机制](dc-frequency.md) 的**后续机制研究**，不是对原有实验的替代。核心研究对象是 **Global FLaG 在 time pooling = masked Mean、关闭 post-pool LayerNorm、dropout = 0 的专门对照配置**。原论文常见的 Max pooling / LayerNorm 配置，以及局部 STFT-FLaG，不应直接套用本页结论。
-    
-    本页既有只看一个训练完成模型的推理时修改实验，也有从头训练不同结构的实验。前者检验已经训练好的模型依赖什么；后者检验简单结构能否在相同协议下训练出相近性能。
+> **这一阶段最重要的结果**：在 Sprint 的冻结 RoBERTa 实验中，直接 Mean pooling 的 AP 较低；但在 Mean 后增加一个**可训练的线性层**，就能够达到与复杂 FLaG 接近、甚至更高的测试集 AP。即使让两种模型的线性层从**完全相同的初始权重**开始训练，三个随机种子中也没有观察到 FLaG 的测试集优势。另一方面，训练后的 FLaG Gate 表现出高度饱和、不同句子之间变化极小的现象，并倾向于降低少数高能通道的**相对权重**。
+>
+> 这些是当前特定配置下的**探索性发现**。它们不能证明 FFT 或 latent attention 在其他配置中没有作用，也不能直接替代原报告关于 STFT 的结论。
 
-## 1. 为什么开始这组实验？
+这篇记录接续已有的 [Mean-compatible FLaG](mean-compatible-flag.md)、[循环反射与 P1/P2](stsb/03-mechanism.md) 和 [DC / 频带机制](dc-frequency.md)。与之前把 Global FFT 改为 Local STFT 的研究不同，这里主要想解释：**Global FLaG 本身究竟通过哪些操作改善句向量表示？**
 
-之前有两个现象需要解释：
+## 1. 从一个疑问开始：直接 Mean 为什么有时不如 FLaG？
 
-- STSB 上，直接 Mean pooling 往往比原始 FLaG 的结果更好；但 Sprint 上，原始 FLaG 又明显好于直接 Mean。
-- 原有 P1、P2 和 Sprint S3 发现，**换 Gate 的生成来源几乎不改变预测，改变频谱重建路径却会改变输出**。之前已解释实部与虚部门控不同产生循环反射，并不是本页首次推导。
-
-于是本阶段不再只比较 Global FFT 和 Local STFT，而是逐层追问：
-
-1. FLaG 的哪个环节使输出不再与 Mean 同方向？
-2. 训练后的 Gate 是否真的随着输入句子显著改变，它调整了哪些通道？
-3. 如果不使用 FFT 和 latent attention，只保留可学习的通道缩放或线性变换，模型还能达到怎样的性能？
-
-本页继续沿用原报告的 **Q（问题）/ M（方法）/ R（结果）/ C（结论）** 格式。
-
-## 2. 实验协议与必须区分的变量
-
-| 设置 | STSB | SprintDuplicateQuestions |
-| --- | --- | --- |
-| 任务 | 句对语义相似度 | 重复问题判别 |
-| Backbone | RoBERTa-base，参与微调 | RoBERTa-base，冻结 |
-| 训练 | 3 epochs | 10 epochs |
-| Batch | 32 | 32 |
-| 主要结果 | 官方 test Spearman | 官方 test AP（Average Precision） |
-| 选择 checkpoint | validation Spearman | 早期机制实验：validation Accuracy；最新多种子结构对照：**validation AP** |
-| FLaG 时间池化 | masked Mean | masked Mean |
-| Post-pool LayerNorm | 关闭 | 关闭 |
-| Pooling dropout | 0 | 0 |
-
-各组实验使用相同任务内部的数据集划分方法、冻结状态和学习率，但**早期结果与最新结果的 checkpoint 选择方式不同**。不能把不同选择规则下的模型混在一起求均值。
-
-尤其需要记住：在 Sprint 中，原始直接 Mean 通常把 RoBERTa 冻结后生成的 Mean 向量直接用于 cosine；新的 Mean + Projection 则额外**训练**了一个线性层。这不是相同容量的模型。
-
-## 3. Q1：FLaG 在哪一步使 Mean 向量发生方向变化？
-
-**Q：** FFT 的零频率分量已经包含均值信息，为什么最终的 FLaG 与直接 Mean 方向不一致？
-
-**M：** 以一个句子的 RoBERTa 输出 $H\in\mathbb R^{T\times D}$ 为起点。直接 Mean 向量为 $m$，频域 DC（第 0 个频率位置）为：
+对一句话，RoBERTa 输出 $T$ 个 token 的特征矩阵：
 
 $$
-X_0=\sum_{t\in\mathrm{valid}}h_t=Lm .
+H\in\mathbb R^{T\times D},\qquad D=768.
 $$
 
-因此理论上 DC 和 Mean 同向。我们在相同输入上记录 DC、Gate 处理后的 DC、iFFT 后 masked Mean 的输出和最终 Projection 输出，并逐阶段计算角度。为了做出严格的 Mean 起点，还比较了以下配置：
+直接 Mean pooling 很简单：把有效 token 对应的向量平均，得到句向量 $m$：
 
-| 代号 | Gate | 最后线性 Projection 初始化 |
-| --- | --- | --- |
-| FLaG | $g=1+\sigma(\ell)$ | 随机 |
-| A1 | $g=1+\sigma(\ell)$ | 单位矩阵 |
-| B1 | $g=2\sigma(\ell)$ | 单位矩阵 |
-| B2 | $g=2\sigma(\ell)$，最后 Gate 输出层参数初始化为 0 | 单位矩阵 |
+$$
+m=\frac{1}{L}\sum_{t\in\mathrm{valid}}h_t.
+$$
 
-B2 初始化时 $g=2\sigma(0)=1$，因此在本页的 Mean-pooling / no-LN 配置下，初始输出**严格等于直接 Mean**。
+随后根据两句话的句向量计算 cosine similarity（余弦相似度）。
 
-**R：** 在 seed 0 的 B2 第 1 个 epoch 后：
+而 FLaG 的路径复杂得多：
 
-| 阶段角度 | STSB | Sprint |
+$$
+H
+\rightarrow \mathrm{rFFT}
+\rightarrow \text{频谱}
+\rightarrow \text{Gate 门控}
+\rightarrow \mathrm{iFFT}
+\rightarrow \text{时域池化}
+\rightarrow \text{输出线性层}.
+$$
+
+其中 Gate 不是固定写死的系数：模型会先用 **latent attention（可学习查询注意力）**汇集频谱信息，再通过多层感知机生成每个隐藏特征通道的缩放系数。
+
+此前实验有一个值得追问的现象：**在 STSB 上直接 Mean 有时好于 FLaG，而在 Sprint 上 FLaG 又明显强于直接 Mean**。于是我们首先尝试将 FLaG 最后的 Max pooling 改成 Mean pooling。它在不同任务上改变了表现，却没有完全解释差异。
+
+这使我们意识到，应该把 FLaG 的复杂路径拆开看：即使最后做 Mean，**Gate 和最后的线性层仍然会改变向量**。
+
+!!! info "这篇报告使用了哪一种 FLaG？"
+    为了分析 Mean 的保留情况，本阶段专门使用 **Global FFT + time pooling = masked Mean + 无 post-pool LayerNorm + pooling dropout = 0**。它和原始 Max-pooling、带 LayerNorm 的 FLaG 并不完全相同。下面的模型结构结论与性能数值，不能直接推广到原始完整配置或 STFT-FLaG。
+
+## 2. 第一步：找到 Mean 向量在哪里被改变
+
+### 2.1 DC 与 Mean 究竟是什么关系？
+
+rFFT 是沿 token 序列这个维度进行的。输出第一个频率位置称为 **DC（零频率分量）**。
+
+对于 FFT 前已将 padding 位置置零的输入，有：
+
+$$
+X_0=\sum_{t\in\mathrm{valid}}h_t=Lm.
+$$
+
+所以 DC 的**实部**就是有效 token 特征的总和，与 Mean 向量只差一个正的倍数。DC 的虚部理论上为零。
+
+为了找出方向在哪里改变，我们在同一句话上记录原始 Mean、原始 DC、经过 Gate 的 DC、iFFT 后的 masked Mean，以及最终线性层的输出，分别计算向量夹角。
+
+这里的夹角是“同一句话在两个步骤中的表示方向差了多少”，**不是两句话之间的相似度**。
+
+### 2.2 为什么还要研究 Gate 和线性层的初始化？
+
+仅观察训练完成的 FLaG，难以分清方向变化来自起点还是训练过程。因此比较了以下模型：
+
+| 实验代号 | Gate 的缩放公式 | 输出线性层如何初始化 | 初始化是否严格等于 Mean |
+| --- | --- | --- | --- |
+| FLaG（原始参数化） | $g=1+\sigma(\ell)$ | 随机矩阵 | 否 |
+| A1 | $g=1+\sigma(\ell)$ | 单位矩阵 | 否 |
+| B1 | $g=2\sigma(\ell)$ | 单位矩阵 | 否 |
+| B2 | $g=2\sigma(\ell)$，且 Gate 最后一层初始化为零 | 单位矩阵 | **是** |
+
+$\sigma$ 表示 sigmoid 函数，$\ell$ 是 Gate 的线性层输出。
+
+B2 为什么等于 Mean？因为初始 $\ell=0$，于是 $g=2\sigma(0)=1$，所有频谱系数均不改变，最后的输出线性层也不改变向量。在本阶段的 Mean/no-LN 配置下，B2 的初始输出严格等于 Mean。
+
+### 2.3 实际测到哪些位置转了角度？
+
+B2、seed 0、完成第一个 epoch 后：
+
+| 同一句话的两个阶段 | STSB 平均角度 | Sprint 平均角度 |
 | --- | ---: | ---: |
-| 直接 Mean 与原始 DC | 约 0° | 约 0° |
-| 原始 DC 与经过 Gate 的 DC | 64.715° | 77.867° |
-| 原始 Mean 与 iFFT 后 masked Mean | 64.523° | 77.655° |
-| Projection 输入与输出 | 34.657° | 83.668° |
+| 直接 Mean vs. 原始 DC | 约 0° | 约 0° |
+| 原始 DC vs. Gate 处理后的 DC | **64.715°** | **77.867°** |
+| 直接 Mean vs. iFFT 后的 masked Mean | 64.523° | 77.655° |
+| 输出线性层的输入 vs. 输出 | 34.657° | 83.668° |
 
-**C：** FFT 的 DC 仍与 Mean 同向；主要的向量方向变化发生在 **Gate 通道缩放**和**最后的可学习 Projection**。B2 即使严格从 Mean 开始，也会在训练后改变方向。
+**我们得到的第一个解释**：FFT 自身保留 DC / Mean 的方向，重要的方向变化主要发生在 **Gate 缩放**和**最后的可学习线性层**。
 
-但是，这里测的是同一句话的 Mean 与 FLaG **两个表示向量之间的角度**，并不是不同句子之间的相似度。角度大不能直接证明语义信息受损或任务表现变差。
+但这并不是说“大角度导致性能下降”。如果所有句向量被一个共同正交变换旋转，每个句子相对于原来的方向可能变化很大，句子之间的余弦相似度却可以保持不变。
 
-另一个严格的数学事实：原始 Gate 的缩放值在 $(1,2)$，对固定 DC 向量的逐通道正数缩放造成的角度理论上不超过约 $19.47^\circ$；B2 的门控值位于 $(0,2)$，允许部分通道接近零，因此可产生更大的转角。两个模型角度差异，不能直接解释成一个学得更好或更坏。
+还有一个数学约束：原始 FLaG 的 Gate 位于 $(1,2)$，对 DC 做逐通道正缩放所能造成的最大角度约为 $19.47^\circ$；B2 位于 $(0,2)$，允许部分通道接近零，角度就能接近 $90^\circ$。因此，B2 比原始 FLaG 转得远，部分原因是两种 Gate **允许的缩放范围不同**，不能直接判断模型优劣。
 
-## 4. Q2：训练后的 Gate 是否随句子明显变化？
+**接下来的问题**：Gate 为什么这样缩放？它真的根据每句话改变吗？
 
-**Q：** FLaG 利用频谱和 latent attention，为每个句子计算 Gate。训练后这种输入相关性在输出上是否明显？
+## 3. 第二步：观察训练后的 Gate 实际在做什么
 
-**M：** 固定已经训练好的 seed-0 checkpoint，不重新训练；分别使用：
+### 3.1 不同句子的 Gate 是否不同？
 
-| 名称 | 实际操作 |
+按照 FLaG 的设计，每个句子经过 FFT、latent attention 和 Gate MLP，会计算出自己的 Gate。为检验“每句话都需要自己那套 Gate”是否真的影响预测，我们固定一个已经训练好的模型，不重新训练，只在推理时换 Gate：
+
+| 处理 | 具体含义 |
 | --- | --- |
-| Full | 每句使用由自身频谱和 latent attention 计算出的 Gate |
-| Training-set mean Gate | 从训练集句子估算一套平均 Gate，评估时所有句子共用 |
-| Swap Gate between sentences | 在同一批中交换不同句子的 Gate，保持句子内容和模型其他参数不变 |
+| 使用自身 Gate | 句子 A 使用根据 A 计算的缩放系数 |
+| 使用训练集平均 Gate | 先用训练集句子算出平均缩放系数，以后所有句子共用 |
+| 交换句子 Gate | 句子 A 使用同一批中其他句子计算的缩放系数 |
 
-三个操作使用相同的 Backbone、输出 Projection、句对打分头和验证/测试样本。
+结果是，**四个模型/任务组合的官方 test 指标，三种处理方式都相同到小数点后六位**：
 
-**R：** test 指标：
-
-| Task / Model | Full | 训练集平均 Gate | 交换句子 Gate |
+| 模型与任务 | 使用自身 Gate | 训练集平均 Gate | 交换其他句子的 Gate |
 | --- | ---: | ---: | ---: |
-| STSB FLaG，Spearman | 0.843379 | 0.843379 | 0.843379 |
-| STSB B2，Spearman | 0.845488 | 0.845488 | 0.845488 |
-| Sprint FLaG，AP | 0.848503 | 0.848503 | 0.848503 |
-| Sprint B2，AP | 0.833946 | 0.833946 | 0.833946 |
+| STSB：FLaG，Spearman | 0.843379 | 0.843379 | 0.843379 |
+| STSB：B2，Spearman | 0.845488 | 0.845488 | 0.845488 |
+| Sprint：FLaG，AP | 0.848503 | 0.848503 | 0.848503 |
+| Sprint：B2，AP | 0.833946 | 0.833946 | 0.833946 |
 
-对应的 Gate 与训练集均值的差异，在原有输出中打印至五位小数为 0.00000。Gate sigmoid 输出也高度接近两端，Sprint B2 中约 95.96% 高于 0.95、约 4.04% 低于 0.05。
+与此同时，当前输出记录中，Gate 与训练集平均 Gate 的偏差打印到五位小数为 $0.00000$。
 
-**C：** 在**这些训练好的 checkpoint 的推理行为**中，用训练集固定 Gate 或别的句子的 Gate 替换自身 Gate，并未使最终评价指标发生六位小数可见的变化。这支持“Gate 在训练后近乎固定”的解释，且比仅仅比较 Global/Local Gate 来源更直接。
+因此，**已训练模型的 Gate 很可能几乎不随句子改变**。至少在现有数值精度下，把自己的 Gate 换成别人的，预测排序指标没有变化。
 
-需要特别注意：
+还需谨慎：输出打印为 0 并不证明所有元素**严格**相同。高精度最大误差及 sigmoid 前后跨句子方差的复核代码已补充，但这份报告尚未包含对应的运行结果。
 
-- “指标显示相同”不代表每个 Gate 元素逐位严格相同；还需要最大绝对误差、Sigmoid 前后通道方差等高精度数值。
-- “训练后近乎固定”不代表 FFT/latent attention 在**训练过程中**一定没有作用。
-- 早期 P1/P2 已经发现 Gate 来源不敏感，本次新增的是直接交换**不同句子生成的 Gate**。
+这个现象与网站原有的 P1/P2、Sprint S3 相衔接：**旧实验**已发现更换 Gate 的频谱来源几乎不影响输出；**本次新增实验**则直接交换不同句子的 Gate，进一步测试输入相关性。
 
-## 5. Q3：Gate 调整了 DC 的哪些特征通道？
+### 3.2 为什么 Gate 会接近固定？
 
-**Q：** 如果只有少数通道的 Gate 值明显偏低，为什么它仍能造成很大的 DC 转角？
+检查 Gate 中 sigmoid 的输出分布发现，大量通道已经接近两端，例如 Sprint 的 B2 中：
 
-**M：** 对一个句子的原始 DC 实部向量 $x=(x_1,\ldots,x_D)$，取 $D=768$。Gate 的输出是 $2D$ 维，前 $D$ 项缩放实部、后 $D$ 项缩放虚部。DC 的虚部为零，因此这一分析只看**实部 Gate**。
+- 约 95.96% 的 sigmoid 输出大于 0.95；
+- 约 4.04% 的 sigmoid 输出小于 0.05。
 
-设 $S$ 为实部 Gate 较低的**通道编号集合**，而不是 token 位置或频率位置。本实验低值标准是原始 Sigmoid 输出小于 $0.05$：
+这叫 **sigmoid 饱和**，即输入落在 sigmoid 曲线两端的平坦区域。B2 的实际系数 $g=2\sigma(\ell)$，因此多数通道接近 2，少数通道接近 0。
 
-- 原始 FLaG：$g_i=1+\sigma(\ell_i)$，低值对应 $g_i<1.05$；
-- B2：$g_i=2\sigma(\ell_i)$，低值对应 $g_i<0.1$。
+这能说明 Gate 形成了非常不均匀的通道权重，也与输入变化小的现象相容。但**仅靠饱和，不能证明 latent attention 在训练过程中没有作用**。
 
-计算这些位置在**Gate 作用前**占全部 DC 平方能量的比例：
+### 3.3 那些 Gate 较小的通道，原本有什么特点？
+
+这里需要把“通道”说清楚。
+
+设一条句子的原始 DC 实部为：
 
 $$
-E_S=\frac{\sum_{i\in S}x_i^2}{\sum_{i=1}^{D}x_i^2}.
+x=(x_1,x_2,\ldots,x_{768}).
 $$
 
-**R：** Sprint official test，seed 0：
+Gate 的总长度是 $1536=2\times768$，前 768 项对应频谱**实部**的通道缩放，后 768 项对应**虚部**。由于 DC 虚部为零，这里只看前 768 项。
 
-| 统计 | FLaG | B2 |
+假设某句子的 DC 向量为 $x=(10,1,1)$，B2 的实部 Gate 为 $g_R=(0.02,1.9,1.9)$。第一个位置 Gate 很小，我们把它的**通道编号**放进集合 $S$，即 $S=\{1\}$。$S$ 不是 token 的位置，也不是 FFT 的频率编号。
+
+我们计算的是：Gate 较小的通道，在**使用 Gate 以前**占了多少 DC 的平方能量。
+
+$$
+\text{低 Gate 值通道的 DC 能量比例}
+=
+\frac{\sum_{i\in S}x_i^2}{\sum_{i=1}^{768}x_i^2}.
+$$
+
+例如 $x=(10,1,1)$ 中，通道 1 占 $100/(100+1+1)\approx98.0\%$ 的平方能量。只调整这一个通道，就可能明显改变向量方向。
+
+本实验将 sigmoid 输出小于 $0.05$ 的实部通道记为低值通道。对原始 FLaG，这意味着实际 Gate 小于 $1.05$；对 B2，意味着实际 Gate 小于 $0.1$。
+
+**Sprint official test（seed 0）：**
+
+| 统计 | 原始 FLaG | B2 |
 | --- | ---: | ---: |
-| 低 Gate 值实部通道占比 | 2.214% | 3.776% |
-| 这些通道占原始 DC 平方能量的比例 | 93.720% | 95.488% |
-| 平均 DC Gate 转角 | 12.811° | 77.773° |
+| 低值实部通道占 768 个通道的比例 | 2.214% | 3.776% |
+| 这些通道占原始 DC 平方能量的比例 | **93.720%** | **95.488%** |
+| 原始 DC 与门控后 DC 的平均夹角 | 12.811° | 77.773° |
 
-STSB test 对应的低值实部通道能量占比为 75.416%（FLaG）与 80.208%（B2）。
+STSB test 的能量比例分别为 75.416% 和 80.208%。
 
-**C：** 在当前 RoBERTa 输出坐标下，DC 平方能量高度集中于少数通道，而训练后的 Gate 正好对这些高能通道赋予相对较低的缩放权重。
+**重要观察**：少量低 Gate 值通道恰好承载了原始 DC 的大量平方能量。原始 FLaG 将这些通道乘以约 1、其他许多通道乘以约 2，所以它是在**相对减弱**这些高能通道，而不是将其删除。B2 的相应 Gate 则可接近 0，抑制更强。
 
-这解释了为什么很少的通道被重新加权，就可能造成大的向量方向变化。但 **FLaG 的低值是接近 1 而非 0**，应称为相对降低权重，不能说它删除了这些通道。更不能直接推断高能通道都是无用噪声，或断言它们对应某个已确定的语义成分。
+因此我们现在能够解释：**较少的通道被赋予不同的权重，也足以造成很大的 DC 方向变化。**
 
-## 6. Q4：关闭 Gate 的哪些部分，预测会变化？
+但不能仅凭这些统计认定高能通道是“无用信息”或“噪声”；也不能把坐标通道能量集中直接等同于某个已识别的语义主成分。
 
-**Q：** Gate 改变向量方向，是否真的对已训练模型的预测有作用？
+## 4. 第三步：这些操作对预测性能真的有用吗？
 
-**M：** 固定训练好的 checkpoint，在推理阶段分别关闭 DC 门控、关闭 DC 以外的门控、完全关闭 Gate，以及绕过最后 Projection。其他部分仍使用训练好的参数。这属于**训练后干预**，不是从零训练结构消融。
+前面说明了 Gate 怎么改变向量。接着我们想知道：**如果临时关闭某部分 Gate，训练好的 FLaG 还能正常预测吗？**
 
-**R：** Sprint official test，seed 0：
+我们固定原 checkpoint，不再训练，分别把 DC 的 Gate 改为 1、把非 DC 的 Gate 改为 1、全部改为 1，或者直接跳过输出线性层。
 
-| 推理方式 | FLaG AP | B2 AP |
+Sprint official test（seed 0）：
+
+| 修改方式 | 原始 FLaG AP | B2 AP |
 | --- | ---: | ---: |
-| Full | 0.848503 | 0.833946 |
-| DC 的 Gate 改成 1 | 0.838674 | **0.678850** |
-| 非 DC 频率的 Gate 改成 1 | 0.849550 | 0.835823 |
-| 全部 Gate 改成 1 | 0.840069 | 0.784842 |
-| 保留 Gate，但跳过最后 Projection | **0.464409** | **0.494782** |
+| 什么都不改 | **0.848503** | **0.833946** |
+| 仅取消 DC Gate 的缩放 | 0.838674 | 0.678850 |
+| 仅取消非 DC 频率的 Gate 缩放 | 0.849550 | 0.835823 |
+| 取消全部 Gate 缩放 | 0.840069 | 0.784842 |
+| 保留 Gate、跳过最后的可学习线性层 | 0.464409 | 0.494782 |
 
-**C：** 已训练的 B2 尤其依赖其 DC Gate；完整 FLaG 和 B2 在 Sprint 上绕过 Projection 后，性能都显著下降。另一方面，关闭非 DC 部分并没有明显伤害 Sprint AP。
+这张表说明：
 
-但一个模块被训练好的模型依赖，并不意味着该模块对**从零训练一个同等性能的模型**不可替代；参数可能已经与它共同适配。这正是下一部分需要独立训练简化模型的原因。
+- **B2 的已训练参数高度依赖 DC Gate**：取消 DC 缩放，AP 从 0.833946 降为 0.678850。
+- **在当前 Sprint 设置下，单独取消非 DC 缩放几乎没有损失**，但不能因此说所有非 DC 信息在所有任务中均无意义；STSB B2 的对应修改就出现了性能下降。
+- **已训练的模型非常依赖最后的可学习线性层**。不经过它，Sprint AP 大幅降低。
 
-注意上述 Sprint checkpoint 来自**早期按 validation Accuracy 选择的 seed-0 机制实验**，不能与后面采用 validation AP 选模的三种子结果混合求均值。
+这里尤其要区分两件事：训练完成后把 Projection 删除，模型当然可能崩，因为前面各层已与它共同适应；这并不表示“如果从一开始就不用复杂 Gate，模型就学不到好结果”。
 
-## 7. Q5：如果不使用 FFT 和 latent attention，从零训练能否得到相近性能？
+因此，真正有必要做的是：**从一开始就训练一个不含复杂频域模块的简单模型**，而不是继续在现有 checkpoint 中删除组件。
 
-**Q：** 如果已训练 Gate 的作用接近固定通道缩放，我们是否需要完整频域模型才能达到类似性能？
+!!! note "这一节指标的来源"
+    上述机制干预使用早期按 validation Accuracy 选 checkpoint 的 seed-0 模型。下面的三种子对照采用 validation AP 选模型，数值和均值必须分开报告。
 
-**M：** 从头训练三个结构简单的模型，且均使用可训练、初始为单位矩阵的输出 Projection：
+## 5. 第四步：不使用 FFT 和 latent attention，重新训练简单模型
 
-| 名称 | 输入 Mean 之后的操作 |
-| --- | --- |
-| StaticReIm | 学习一套对所有句子共享的实部/虚部通道系数，用原有 FFT 调制 + iFFT 的**等价时域公式**计算，再做 Projection |
-| StaticDiag | 学习一套对所有句子共享的逐通道系数，直接乘到 Mean 向量，再做 Projection |
-| MeanProjection | 不使用 Gate，直接对 Mean 向量做可训练线性 Projection |
+### 5.1 为什么首先想到 Mean + 一个可训练线性层？
 
-这里 Static 表示**相同权重用于不同句子**，不代表权重在训练中不更新。
+直接 Mean 与 FLaG 不仅差在频域门控，还差在 **Projection**：
 
-原有 P1 已推导：当实部与虚部使用不等的共享通道门控系数时，固定门控后的 FFT → Gate → iFFT 等价于原序列和循环反转序列的加权混合。因此 StaticReIm 不必真的做 FFT；这条公式在原有 [P1 报告](stsb/03-mechanism.md) 已记录。
+$$
+m=\operatorname{Mean}(H),\qquad z=Wm+b.
+$$
 
-**R：** 第一轮 seed-0 official test：
+其中 $W$ 是训练过程中会更新的矩阵，不是固定随机矩阵。它可以组合原有的 768 个特征通道，使句对 cosine 更适合当前任务。
 
-| 方法 | STSB Spearman | Sprint AP |
-| --- | ---: | ---: |
-| FLaG-B2 | 0.845490 | 0.834217 |
-| StaticReIm | 0.841483 | 0.820715 |
-| StaticDiag | 0.840198 | 0.824215 |
-| MeanProjection（单位矩阵初始） | 0.841056 | 0.833765 |
+这和简单地“算出 Mean 就直接取 cosine”不是同一个模型。
 
-对于 Sprint，MeanProjection 比 B2 只低 0.000452 AP。
-
-**C：** 在这个 seed 上，**仅对 Mean 向量学习一个线性变换**已经能得到接近 B2 的 AP。
-
-从数学上，对于静态对角门控 $D$ 与任意可训练线性投影 $W$：
+从数学上，如果 Gate 是一套不随句子变化的逐通道缩放系数，把它写成对角矩阵 $D$，后面再接完整可训练线性层 $W$，就有：
 
 $$
 z=W(Dm)+b=(WD)m+b=W'm+b.
 $$
 
-因此静态逐通道门控再接一个不受约束的线性 Projection，并没有增加模型能表达的函数范围；但不同参数化仍可能影响初始化与训练优化。这个代数关系不意味着原始**输入相关**的 Gate 和具有实虚不对称反转项的完整 FLaG 也等价于 Mean + Linear。
+所以：**静态对角 Gate + 完整可训练线性层，不增加 Mean + 线性层的函数表达范围**。不过参数初始化、优化过程和学习到的结果仍可能不同。这也不适用于任意输入相关的动态 Gate。
 
-## 8. Q6：Projection 初始化和真正的结构差异，谁影响更大？
+### 5.2 第一轮简化模型分别是什么？
 
-**Q：** 原始 FLaG 的 Projection 从随机参数开始，而 B2/前述 MeanProjection 从单位矩阵开始。是否应当把原始 FLaG 直接同**随机初始化的 Mean + Projection**比较？
+| 代码代号 | 通俗解释 | 是否有可训练 Projection |
+| --- | --- | --- |
+| StaticReIm | 学习所有句子共享的一套**实部和虚部**通道缩放系数，使用已知的时域等价公式完成处理，不运行 FFT / latent attention | 有，单位矩阵初始化 |
+| StaticDiag | 在直接 Mean 的 768 个通道上分别乘以一套可训练、但不随句子变化的系数 | 有，单位矩阵初始化 |
+| MeanProjection | 没有 Gate，直接 Mean 后接可训练线性层 | 有，单位矩阵初始化 |
+| FLaG-B2 | 保留频域门控，但 Gate 与 Projection 初始化时严格输出 Mean | 有，单位矩阵初始化 |
 
-**M：** 使用 Sprint seeds 0、1、2，统一在 validation 上根据 **AP** 选 checkpoint，并在相同冻结 RoBERTa、训练/验证划分及 Mean-pooling/no-LN 协议下从零训练：
+这里的 **Static（静态）只意味着同一套 Gate 用于不同句子**，不是 Gate 永远不学习。它的参数仍在训练中更新。
 
-- 原始 FLaG：原始 residual-sigmoid Gate，随机 Projection；
-- FLaG-B2：从严格 Mean 输出开始的 centered-sigmoid Gate、单位 Projection；
-- MeanProj-B2：直接 Mean + 单位初始化的可训练 Projection；
-- MeanProjRand：直接 Mean + **随机初始化、训练时仍会学习**的 Projection。
+StaticReIm 依据的是网站 [P1](stsb/03-mechanism.md) 已经证明的时域等价公式：
 
-**R：** 第一轮配对三种子 official-test AP：
+$$
+y_t=\frac{g_R+g_I}{2}x_t+\frac{g_R-g_I}{2}x_{(-t)\bmod N}.
+$$
 
-| 模型 | Test AP（mean ± sample SD） |
+它解释了为什么实部与虚部门控不同时会出现**循环反转/反射项**，以及为什么 padding 长度可能影响输出。**这条数学发现来自此前 P1 实验，不是本轮重新提出的创新点**。
+
+### 5.3 只训练一个随机种子的初步比较
+
+Seed 0，official test：
+
+| 模型 | STSB Spearman | Sprint AP |
+| --- | ---: | ---: |
+| FLaG-B2 | **0.845490** | **0.834217** |
+| StaticReIm | 0.841483 | 0.820715 |
+| StaticDiag | 0.840198 | 0.824215 |
+| Mean + 可训练 Projection（单位矩阵初始化） | 0.841056 | 0.833765 |
+
+最引人注意的是 Sprint：Mean + Projection 与复杂 B2 只差 $0.000452$ AP。
+
+**这个结果使我们提出新问题**：过去 Sprint 直接 Mean 的 AP 约为 0.4289，是不是不能说明 DC 中缺乏任务信息，而主要说明“直接 Mean + cosine”缺少合适的可训练变换？
+
+这一判断也与此前 [DC-only 机制实验](dc-frequency.md) 相呼应：即使只保留 DC，只要训练合适的后续处理，仍然可以得到很强的 Sprint 结果。
+
+但是单个种子不足以给出稳定结论，于是我们把对照扩大到三个种子。
+
+## 6. 第五步：排除 Projection 初始化差异后再比较
+
+### 6.1 先比较随机初始化和单位矩阵初始化
+
+原始 FLaG 的 Projection 是随机初始化，B2 与上面的 MeanProjection 是单位矩阵初始化。为了公平比较，我们增加另一种简单模型：
+
+**MeanProjRand = 直接 Mean + 随机初始化、随后正常训练的线性 Projection。**
+
+“随机初始化”不等于“随机矩阵固定不训练”。矩阵训练时仍然通过梯度更新。
+
+采用 Sprint seeds 0、1、2，并统一使用 **validation AP** 选择最佳 epoch，第一轮得到：
+
+| 模型 | 官方 test AP，3 seeds（mean ± sample SD） |
 | --- | ---: |
-| FLaG | 0.829813 ± 0.016874 |
-| FLaG-B2 | 0.824462 ± 0.011258 |
-| MeanProj-B2 | 0.818806 ± 0.016929 |
-| MeanProjRand | **0.840923 ± 0.008811** |
+| 原始 FLaG | 0.829813 ± 0.016874 |
+| B2 | 0.824462 ± 0.011258 |
+| Mean + 单位矩阵初始化 Projection | 0.818806 ± 0.016929 |
+| **Mean + 随机初始化 Projection** | **0.840923 ± 0.008811** |
 
-同 seed 的三个配对差值（FLaG − MeanProjRand）全为负，平均为 −0.011110 ± 0.013482。MeanProjRand 与 MeanProj-B2 的平均差值为 +0.022117，三个种子均为正。
+两种 Mean + Projection 只差在**初始矩阵**，随机初始化的 test AP 平均高 $0.022117$，三个种子都更高。这说明初始化与训练结果有关，不能忽略。
 
-不过：**相同 seed 不保证不同结构里的随机 Projection 矩阵完全相同**。这是因为创建其他网络层会消耗随机数。为控制这个混杂因素，我们追加了更严格的对照。
+而随机初始化的 Mean + Projection 平均比原始 FLaG 高 $0.011110$ AP，三个种子都高。
 
-### 8.1 严格匹配最初 Projection 矩阵的三种子实验（最后补充）
+不过，相同 seed 在两个不同结构中，并不保证一开始的 Projection 矩阵逐元素相同：初始化 Gate、latent attention 等其他参数会消耗随机数。因此我们又增加最后一个对照。
 
-**M：** 对每个 seed，强制让 FLaG 与 MeanProjRand 使用**完全相同的初始 Projection 权重和偏置**。相同任务、相同划分和 validation AP 选模。实现记录 Projection 初始参数的 SHA-256 指纹，用来核对两组是否一致。
+### 6.2 最后一次严格控制：两个模型从相同 Projection 权重开始
 
-**R：** 最新 Sprint official test 结果：
+这一次比较只保留：
 
-| 方法 | Test AP（3 seeds） | Validation AP（3 seeds） | 选中 epoch |
+- **FLaG**：完整频域 Gate + 可训练随机 Projection；
+- **MeanProjRand**：直接 Mean + 可训练随机 Projection。
+
+对于每一个 seed，程序强制把两者的初始 Projection 权重 $W$ 和偏置 $b$ 设为**完全相同**，并记录 SHA-256 指纹用于复查。RoBERTa 冻结状态、数据划分、训练 epoch 和 validation AP 选择规则均保持匹配。
+
+**Sprint official test，三个种子：**
+
+| 模型 | Test AP（mean ± sample SD） | Validation AP（mean ± sample SD） | 选中 epoch |
 | --- | ---: | ---: | --- |
 | FLaG | 0.830539 ± 0.016711 | **0.853535 ± 0.019891** | 10、9、8 |
-| MeanProjRand | **0.841386 ± 0.008833** | 0.851664 ± 0.017371 | 10、10、8 |
+| **Mean + 可训练随机 Projection** | **0.841386 ± 0.008833** | 0.851664 ± 0.017371 | 10、10、8 |
 
-严格配对的 test AP 差值：
+严格配对的差值（FLaG 的 test AP 减去 Mean + Projection 的 test AP）：
 
-| Seed | FLaG − MeanProjRand |
+| Seed | 差值 |
 | --- | ---: |
-| 0 | −0.001096 |
-| 1 | −0.028025 |
-| 2 | −0.003420 |
-| **均值 ± sample SD** | **−0.010847 ± 0.014922** |
+| 0 | -0.001096 |
+| 1 | -0.028025 |
+| 2 | -0.003420 |
+| **平均 ± sample SD** | **-0.010847 ± 0.014922** |
 
-三个 seed 中 MeanProjRand 都高于 FLaG 的 test AP。
+我们现在能说：
 
-还有一个应该如实记录的现象：FLaG 的**平均 validation AP**（0.853535）反而稍高于 MeanProjRand（0.851664）；到了 official test，顺序相反。因此不能说 MeanProjRand 在所有拆分上都领先，也不能由三种子结果推断确定的泛化优势。
+1. 三个种子中，**Mean + Projection 的 test AP 均高于 FLaG**；
+2. 这个现象在排除了**初始 Projection 权重不一致**的影响后仍然存在；
+3. 但平均 **validation AP 反而是 FLaG 略高**（0.853535 vs. 0.851664），所以不能说简单模型在所有划分上都更强；
+4. 只有三个种子，配对差值的波动也不小，目前属于探索性结果，不能宣称已证明普适的性能优势。
 
-**C：** 即使控制初始 Projection 参数完全相同，当前 Sprint Mean-pooling/no-LN 协议的三种子结果中，原始 FLaG 也**没有表现出相对于 Mean + 可训练随机 Projection 的 test AP 优势**。更简单的模型在三个种子上都略高或明显更高。
+!!! note "什么是“严格对齐 Projection”？"
+    我们只把**初始输出线性层**的矩阵和偏置设为一致，并不是让两个网络所有参数都一致：FLaG 额外包含 FFT 后的 latent attention 和 Gate，Mean + Projection 没有这些模块。实验目的正是让两者在这个关键的共同部件上公平起跑。
+    
+    新训练程序保存初始 Projection 指纹，并在配对汇总时检查匹配；归档时仍应保存相关日志、配置和指标文件，便于复查。
 
-这不等于数学上证明原始 FLaG 的 FFT 或 latent attention 无用，也不代表适用于原论文的 Max pooling / post-pool LayerNorm 或局部 STFT 模型。它只限定于当前控制实验，并且样本量是三个随机种子。
+## 7. 这些实验综合说明了什么？
 
-!!! note "严格配对的复现检查"
-    最新运行脚本会记录两组模型初始 Projection 的 SHA-256 指纹，并在汇总时进行一致性核对。最终归档时应一并保存训练日志或对应的模型指标文件，确保能复查指纹一致性。本页数值来自已完成的三种子汇总。
+把上面五步连起来看：
 
-## 9. 目前最清楚的研究结论与尚未解决的问题
+1. **先定位变化**：FFT 的 DC 保留了 Mean 方向，但 Gate 和 Projection 会明显改变输出。
+2. **再观察 Gate 的行为**：已训练 Gate 高度饱和，交换不同句子的 Gate 几乎不影响性能，说明在这些 checkpoint 中**输入相关的 Gate 变化可能很小**。
+3. **检查它在调整什么**：少量 Gate 较低的实部通道恰好占据大量 DC 平方能量；模型正在改变各特征通道之间的相对权重。
+4. **检查训练后依赖性**：关闭某些 Gate 或跳过 Projection，会影响训练好的模型，但这不意味着这些部件在重新训练时一定不可替代。
+5. **最后从头训练简化模型**：Mean + 可训练线性 Projection 在 Sprint 三种子中取得了与完整 FLaG 接近或更高的 test AP；即使初始 Projection 权重完全相同，仍没有观察到 FLaG 的 test AP 优势。
 
-### 已有证据支持的结论
+### 目前可以比较有把握地说
 
-1. **DC 与直接 Mean 同向**；在本配置下使表示偏离 Mean 方向的主要操作是 Gate 和 Projection。向量角度本身不能代替下游任务性能。
-2. 已训练 Gate 的 sigmoid 输出高度饱和；交换句子 Gate 或使用训练集平均 Gate，指标在六位小数精度下与 Full 相同。说明**这些 checkpoint 在推理时几乎不依赖明显的逐句 Gate 变化**。
-3. 低 Gate 值的**实部通道**集中承载大量原始 DC 平方能量。当前 Gate 的一个显著作用是对不同通道重新赋权，但目前不能判断这些通道是否语义冗余。
-4. 对冻结 RoBERTa 的 Sprint，**Mean + 可训练 Projection** 是一个比“直接 Mean + cosine”强得多的必要对照。原始 FLaG 优于直接 Mean，不能把增益全部归功于 FFT 或 latent attention。
-5. 三种子、相同初始随机 Projection 权重的结果中，完整 FLaG 没有优于 Mean + Linear。此处结论应写为**未观察到额外优势**，不是“证明它必然没有贡献”。
+**“直接 Mean + cosine”不是衡量 DC / Mean 表示潜在预测能力的充分基线。** 它没有可训练的句向量变换。现有结果表明，只给 Mean 之后加一个可训练线性层，就能明显提高冻结 RoBERTa 的 Sprint AP。
 
-### 尚不能从现有结果断言
+因此，**原始 FLaG 相比直接 Mean 的性能增益，不应直接全部归因于 FFT 或 latent attention**。要衡量复杂频域结构带来了什么，必须与具有类似可训练输出变换能力的简单模型比较。
 
-- FFT / latent attention 在训练全过程中完全不重要；
-- 被压低的高能通道一定是噪声或与语义无关；
-- 任意文本任务和原始 Max-pooling 版本的 FLaG 都可无损替换为 Mean + Linear；
-- 三个随机种子已足以证明一个稳定、普适的性能排序。
+### 仍然需要保留的结论边界
 
-### 阶段性判断
+- Gate 近乎不变是对**已训练 checkpoint**的观察，不能据此声称 latent attention 在训练中必然没有作用；高精度 Gate 张量比较也仍待补充。
+- 高能通道被相对抑制，不等于它们不包含任务信息，也不等于模型已明确执行某种“去噪”操作。
+- 实验集中于 Global FFT + time pooling=Mean + no post-pool LN；不能推广到原始 Max-pooling 配置和全部局部 STFT 版本。
+- 目前三种子结果存在波动，而且研究过程中曾多次查看 Sprint official test 后再调整实验设计，因此应作为**探索性机制证据**。如果要支撑正式论文中的更广泛结论，需要事先固定方案，并使用独立的任务或数据做确认。
 
-本阶段最值得继续追问的科学问题，已经从“怎样把 FLaG 的角度拉回 Mean”变为：
+## 8. 下一步与给学姐的阶段性结论
 
-> **在冻结预训练编码器的句对任务里，FLaG 相比直接 Mean 的增益，有多少来自频域门控本身，有多少来自对 Mean 向量施加的可训练线性变换？**
+现在已有完整的研究过程，**可以先向学姐汇报，不需要在第一次汇报前继续添加新结构**。
 
-在向学姐做第一次阶段汇报时，以上实验已经能组成完整证据链。后续是否扩大到更多 seeds、其他任务或恢复原始 Max/LayerNorm 配置，可以在汇报后再确定。
+建议汇报时重点表达：
 
-!!! warning "实验范围与探索性分析"
-    本研究是在多次查看同一 Sprint test 结果后逐步设计实验的，因此应将本阶段 test 比较视为**探索性**证据。用于正式论文的最终结论，建议预先确定实验方案，并采用新的独立测试任务或评估数据进行确认。原报告 STFT 章节中某些 seed、数据划分和 checkpoint 选择规则与本页不同，必须分别记录。
+> 我们从 FLaG 无法始终保留 Mean 表现的问题出发，先定位了 Gate 和 Projection 对句向量的作用。进一步发现，训练后的 Gate 在目前的对照配置中高度饱和，几乎不依赖当前输入句子，并重点改变少数高能通道的相对权重。通过重新训练更简单的模型，我们发现 Sprint 上仅使用 Mean pooling 加一个可训练线性层就能获得很高的 AP。最后使用相同的初始 Projection 权重进行三种子对照后，也没有观察到完整 FLaG 在 test AP 上的额外优势。
+>
+> 这提示我们需要重新区分：原始 FLaG 相对直接 Mean 的提升，到底来自频域 Gate 的信息处理，还是来自可学习的句向量变换。目前证据支持后者的重要性，但还不足以证明频域结构在所有设置下没有价值。
+
+后续是否扩至更多 seeds、迁移到原始 Max/LayerNorm 配置、检查不同任务或研究 Gate 在训练过程中的变化，应根据第一次汇报反馈确定，而不是继续无限增加消融。
+
+---
+
+*术语快速对照：DC = 零频率向量；Gate = 按通道相乘的缩放系数；Projection = $Wz+b$ 可训练线性层；checkpoint = 选出的训练模型权重；seed = 控制随机过程的数值；AP = 按分数排序衡量检出正例质量的 Average Precision；Spearman = 预测排序与真实相似度排序的相关系数。*
