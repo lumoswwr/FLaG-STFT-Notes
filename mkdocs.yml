@@ -9,6 +9,7 @@ nav:
   - MTEB数据集三种文本任务观察感受: MTEB.md
   - DC / 频带机制: dc-frequency.md
   - Mean-compatible FLaG: mean-compatible-flag.md
+  - FLaG 门控与输出线性投影: flag-gate-projection.md
 
   - STSB:
       - E1–E8: stsb/01-experiments.md
