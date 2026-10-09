@@ -13,6 +13,10 @@
         <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/flag-gate-projection/">
       
       
+        <link rel="prev" href="../mean-compatible-flag/">
+      
+      
+        <link rel="next" href="../stsb/01-experiments/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>FLaG 的门控与输出线性变换：从表示夹角到简化模型对照 - FLaG / STFT Mechanism Experiments</title>
+        <title>FLaG 门控与输出线性投影 - FLaG / STFT Mechanism Experiments</title>
       
     
     
@@ -100,7 +104,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              FLaG 的门控与输出线性变换：从表示夹角到简化模型对照
+              FLaG 门控与输出线性投影
             
           </span>
         </div>
@@ -355,6 +359,235 @@
       
   
   
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FLaG 门控与输出线性投影
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    FLaG 门控与输出线性投影
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 为什么开始这组实验？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 实验协议与必须区分的变量
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-q1flag-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Q1：FLaG 在哪一步使 Mean 向量发生方向变化？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-q2-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Q2：训练后的 Gate 是否随句子明显变化？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-q3gate-dc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Q3：Gate 调整了 DC 的哪些特征通道？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-q4-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Q4：关闭 Gate 的哪些部分，预测会变化？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-q5-fft-latent-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Q5：如果不使用 FFT 和 latent attention，从零训练能否得到相近性能？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-q6projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Q6：Projection 初始化和真正的结构差异，谁影响更大？
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Q6：Projection 初始化和真正的结构差异，谁影响更大？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 严格匹配最初 Projection 矩阵的三种子实验（最后补充）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 目前最清楚的研究结论与尚未解决的问题
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. 目前最清楚的研究结论与尚未解决的问题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        已有证据支持的结论
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        尚不能从现有结果断言
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段性判断
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
   
   
     
@@ -379,10 +612,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
         
           
-          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
             
   
   
@@ -400,8 +633,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_7">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -528,10 +761,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_9" >
         
           
-          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+          <label class="md-nav__link" for="__nav_9" id="__nav_9_label" tabindex="">
             
   
   
@@ -549,8 +782,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_8">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_9">
             <span class="md-nav__icon md-icon"></span>
             
   
