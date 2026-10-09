@@ -23,7 +23,7 @@
 
 [新增机制章节](flag-gate-projection.md) 在**Global FLaG、time pooling=Mean、关闭 post-pool LayerNorm、dropout=0** 的单独配置下，继续分析了 Gate 与输出线性层的实际作用。与本页 Global/Local STFT 结论属于不同实验协议，不能直接混合数值。
 
-- **Gate 输出**：训练后高度饱和，用训练集平均 Gate 或其他句子的 Gate 替换时，STSB 和 Sprint 指标在六位小数精度下不变；当前仅支持“输出几乎不随输入变化”，不是严格恒等的证明。
+- **Gate 输出及高精度复核**：训练后的 Gate 高度饱和；用训练集平均 Gate 或其他句子的 Gate 替换时，STSB 和 Sprint 指标在六位小数精度下不变。高精度 validation 统计进一步发现，Sigmoid 前的 Gate logits 仍随句子变化（Sprint FLaG 的平均跨句子通道标准差约 **0.4394**），而实际 Gate 相对训练集平均值的平均绝对差仅约 **7.58×10⁻¹⁴**。因此结论是**实际 Gate 的输入相关变化极小**，不是证明 Gate 严格不变；极小方差的数值计算也可能受浮点精度影响。
 - **DC 通道权重**：Sprint seed0 中，约 2.21%（FLaG）/3.78%（B2）的低 Gate 值实部通道，承载原始 DC 平方能量约 93.72%/95.49%。
 - **从头训练的对照**：Sprint 采用验证集 AP 选 checkpoint，且强制对齐初始 Projection 的 3-seed test AP：FLaG **0.830539 ± 0.016711**，Mean + 随机初始化、可训练 Projection **0.841386 ± 0.008833**。配对 FLaG−MeanProjRand 为 **−0.010847 ± 0.014922**，0/3 个种子为正。验证集 AP 均值则为 FLaG 0.853535、MeanProjRand 0.851664，顺序相反。
 
