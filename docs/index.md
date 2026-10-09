@@ -14,4 +14,4 @@
 | [DC / 频带机制](dc-frequency.md) | Frozen RoBERTa 下的 DC readability、band-only 与 band-knockout 机制分析 |
 | [FLaG 门控与输出线性投影](flag-gate-projection.md) | 逐阶段转角、Gate 输入依赖性、高能通道、简化模型与严格 Projection 匹配的三种子实验 |
 
-**阅读约定**：各实验采用 **Q（问题）、M（方法）、R（结果）、C（结论）**。性能表写明是 **test** 还是 **validation**、使用几个随机种子；机制实验的“预测漂移”不等于性能提高。
+**阅读说明**：早期实验多采用 **Q（问题）/ M（方法）/ R（结果）/ C（结论）** 形式；新增的 Gate 与 Projection 章节则按研究过程连续讲述，先交代问题、再解释实验和结果。性能表会标明 **test** 或 **validation**、随机种子数量以及模型配置；机制实验的“预测漂移”不等于性能提高。
