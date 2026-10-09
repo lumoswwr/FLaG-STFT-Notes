@@ -1,0 +1,1390 @@
+
+<!doctype html>
+<html lang="zh" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="FLaG / STFT 实验配置、指标与机制分析">
+      
+      
+      
+        <link rel="canonical" href="https://lumoswwr.github.io/FLaG-STFT-Notes/flag-gate-projection/">
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>FLaG 的门控与输出线性变换：从表示夹角到简化模型对照 - FLaG / STFT Mechanism Experiments</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#flag" class="md-skip">
+          跳转至
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="页眉">
+    <a href=".." title="FLaG / STFT Mechanism Experiments" class="md-header__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            FLaG / STFT Mechanism Experiments
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              FLaG 的门控与输出线性变换：从表示夹角到简化模型对照
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="搜索" placeholder="搜索" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="查找">
+        
+        <button type="reset" class="md-search__icon md-icon" title="清空当前内容" aria-label="清空当前内容" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            正在初始化搜索引擎
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="导航栏" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="FLaG / STFT Mechanism Experiments" class="md-nav__button md-logo" aria-label="FLaG / STFT Mechanism Experiments" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    FLaG / STFT Mechanism Experiments
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    首页
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../methods/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    实验协议与指标
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../findings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    研究结果综述
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../MTEB/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    MTEB数据集三种文本任务观察感受
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../dc-frequency/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    DC / 频带机制
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../mean-compatible-flag/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Mean-compatible FLaG
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    STSB
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    STSB
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stsb/01-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E1–E8
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stsb/02-padding/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    E9–E14
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../stsb/03-mechanism/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    循环反射与 P1/P2
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_8" id="__nav_8_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Sprint
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_8">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Sprint
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint/01-protocol/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    数据与训练
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../sprint/02-experiments/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    S1–S5
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="目录">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      目录
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. 为什么开始这组实验？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. 实验协议与必须区分的变量
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-q1flag-mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Q1：FLaG 在哪一步使 Mean 向量发生方向变化？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-q2-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Q2：训练后的 Gate 是否随句子明显变化？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-q3gate-dc" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        5. Q3：Gate 调整了 DC 的哪些特征通道？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-q4-gate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        6. Q4：关闭 Gate 的哪些部分，预测会变化？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-q5-fft-latent-attention" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. Q5：如果不使用 FFT 和 latent attention，从零训练能否得到相近性能？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-q6projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. Q6：Projection 初始化和真正的结构差异，谁影响更大？
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="8. Q6：Projection 初始化和真正的结构差异，谁影响更大？">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#81-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8.1 严格匹配最初 Projection 矩阵的三种子实验（最后补充）
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        9. 目前最清楚的研究结论与尚未解决的问题
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="9. 目前最清楚的研究结论与尚未解决的问题">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        已有证据支持的结论
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        尚不能从现有结果断言
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        阶段性判断
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="flag">FLaG 的门控与输出线性变换：从表示夹角到简化模型对照<a class="headerlink" href="#flag" title="Permanent link">&para;</a></h1>
+<div class="admonition info">
+<p class="admonition-title">研究范围与结果性质</p>
+<p>本页是原有 <a href="../mean-compatible-flag/">Mean-compatible FLaG</a>、<a href="../stsb/03-mechanism/">循环反射和 P1/P2</a>、<a href="../dc-frequency/">DC / 频带机制</a> 的<strong>后续机制研究</strong>，不是对原有实验的替代。核心研究对象是 <strong>Global FLaG 在 time pooling = masked Mean、关闭 post-pool LayerNorm、dropout = 0 的专门对照配置</strong>。原论文常见的 Max pooling / LayerNorm 配置，以及局部 STFT-FLaG，不应直接套用本页结论。</p>
+<p>本页既有只看一个训练完成模型的推理时修改实验，也有从头训练不同结构的实验。前者检验已经训练好的模型依赖什么；后者检验简单结构能否在相同协议下训练出相近性能。</p>
+</div>
+<h2 id="1">1. 为什么开始这组实验？<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
+<p>之前有两个现象需要解释：</p>
+<ul>
+<li>STSB 上，直接 Mean pooling 往往比原始 FLaG 的结果更好；但 Sprint 上，原始 FLaG 又明显好于直接 Mean。</li>
+<li>原有 P1、P2 和 Sprint S3 发现，<strong>换 Gate 的生成来源几乎不改变预测，改变频谱重建路径却会改变输出</strong>。之前已解释实部与虚部门控不同产生循环反射，并不是本页首次推导。</li>
+</ul>
+<p>于是本阶段不再只比较 Global FFT 和 Local STFT，而是逐层追问：</p>
+<ol>
+<li>FLaG 的哪个环节使输出不再与 Mean 同方向？</li>
+<li>训练后的 Gate 是否真的随着输入句子显著改变，它调整了哪些通道？</li>
+<li>如果不使用 FFT 和 latent attention，只保留可学习的通道缩放或线性变换，模型还能达到怎样的性能？</li>
+</ol>
+<p>本页继续沿用原报告的 <strong>Q（问题）/ M（方法）/ R（结果）/ C（结论）</strong> 格式。</p>
+<h2 id="2">2. 实验协议与必须区分的变量<a class="headerlink" href="#2" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>设置</th>
+<th>STSB</th>
+<th>SprintDuplicateQuestions</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>任务</td>
+<td>句对语义相似度</td>
+<td>重复问题判别</td>
+</tr>
+<tr>
+<td>Backbone</td>
+<td>RoBERTa-base，参与微调</td>
+<td>RoBERTa-base，冻结</td>
+</tr>
+<tr>
+<td>训练</td>
+<td>3 epochs</td>
+<td>10 epochs</td>
+</tr>
+<tr>
+<td>Batch</td>
+<td>32</td>
+<td>32</td>
+</tr>
+<tr>
+<td>主要结果</td>
+<td>官方 test Spearman</td>
+<td>官方 test AP（Average Precision）</td>
+</tr>
+<tr>
+<td>选择 checkpoint</td>
+<td>validation Spearman</td>
+<td>早期机制实验：validation Accuracy；最新多种子结构对照：<strong>validation AP</strong></td>
+</tr>
+<tr>
+<td>FLaG 时间池化</td>
+<td>masked Mean</td>
+<td>masked Mean</td>
+</tr>
+<tr>
+<td>Post-pool LayerNorm</td>
+<td>关闭</td>
+<td>关闭</td>
+</tr>
+<tr>
+<td>Pooling dropout</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+<p>各组实验使用相同任务内部的数据集划分方法、冻结状态和学习率，但<strong>早期结果与最新结果的 checkpoint 选择方式不同</strong>。不能把不同选择规则下的模型混在一起求均值。</p>
+<p>尤其需要记住：在 Sprint 中，原始直接 Mean 通常把 RoBERTa 冻结后生成的 Mean 向量直接用于 cosine；新的 Mean + Projection 则额外<strong>训练</strong>了一个线性层。这不是相同容量的模型。</p>
+<h2 id="3-q1flag-mean">3. Q1：FLaG 在哪一步使 Mean 向量发生方向变化？<a class="headerlink" href="#3-q1flag-mean" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> FFT 的零频率分量已经包含均值信息，为什么最终的 FLaG 与直接 Mean 方向不一致？</p>
+<p><strong>M：</strong> 以一个句子的 RoBERTa 输出 <span class="arithmatex">\(H\in\mathbb R^{T\times D}\)</span> 为起点。直接 Mean 向量为 <span class="arithmatex">\(m\)</span>，频域 DC（第 0 个频率位置）为：</p>
+<div class="arithmatex">\[
+X_0=\sum_{t\in\mathrm{valid}}h_t=Lm .
+\]</div>
+<p>因此理论上 DC 和 Mean 同向。我们在相同输入上记录 DC、Gate 处理后的 DC、iFFT 后 masked Mean 的输出和最终 Projection 输出，并逐阶段计算角度。为了做出严格的 Mean 起点，还比较了以下配置：</p>
+<table>
+<thead>
+<tr>
+<th>代号</th>
+<th>Gate</th>
+<th>最后线性 Projection 初始化</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLaG</td>
+<td><span class="arithmatex">\(g=1+\sigma(\ell)\)</span></td>
+<td>随机</td>
+</tr>
+<tr>
+<td>A1</td>
+<td><span class="arithmatex">\(g=1+\sigma(\ell)\)</span></td>
+<td>单位矩阵</td>
+</tr>
+<tr>
+<td>B1</td>
+<td><span class="arithmatex">\(g=2\sigma(\ell)\)</span></td>
+<td>单位矩阵</td>
+</tr>
+<tr>
+<td>B2</td>
+<td><span class="arithmatex">\(g=2\sigma(\ell)\)</span>，最后 Gate 输出层参数初始化为 0</td>
+<td>单位矩阵</td>
+</tr>
+</tbody>
+</table>
+<p>B2 初始化时 <span class="arithmatex">\(g=2\sigma(0)=1\)</span>，因此在本页的 Mean-pooling / no-LN 配置下，初始输出<strong>严格等于直接 Mean</strong>。</p>
+<p><strong>R：</strong> 在 seed 0 的 B2 第 1 个 epoch 后：</p>
+<table>
+<thead>
+<tr>
+<th>阶段角度</th>
+<th style="text-align: right;">STSB</th>
+<th style="text-align: right;">Sprint</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>直接 Mean 与原始 DC</td>
+<td style="text-align: right;">约 0°</td>
+<td style="text-align: right;">约 0°</td>
+</tr>
+<tr>
+<td>原始 DC 与经过 Gate 的 DC</td>
+<td style="text-align: right;">64.715°</td>
+<td style="text-align: right;">77.867°</td>
+</tr>
+<tr>
+<td>原始 Mean 与 iFFT 后 masked Mean</td>
+<td style="text-align: right;">64.523°</td>
+<td style="text-align: right;">77.655°</td>
+</tr>
+<tr>
+<td>Projection 输入与输出</td>
+<td style="text-align: right;">34.657°</td>
+<td style="text-align: right;">83.668°</td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> FFT 的 DC 仍与 Mean 同向；主要的向量方向变化发生在 <strong>Gate 通道缩放</strong>和<strong>最后的可学习 Projection</strong>。B2 即使严格从 Mean 开始，也会在训练后改变方向。</p>
+<p>但是，这里测的是同一句话的 Mean 与 FLaG <strong>两个表示向量之间的角度</strong>，并不是不同句子之间的相似度。角度大不能直接证明语义信息受损或任务表现变差。</p>
+<p>另一个严格的数学事实：原始 Gate 的缩放值在 <span class="arithmatex">\((1,2)\)</span>，对固定 DC 向量的逐通道正数缩放造成的角度理论上不超过约 <span class="arithmatex">\(19.47^\circ\)</span>；B2 的门控值位于 <span class="arithmatex">\((0,2)\)</span>，允许部分通道接近零，因此可产生更大的转角。两个模型角度差异，不能直接解释成一个学得更好或更坏。</p>
+<h2 id="4-q2-gate">4. Q2：训练后的 Gate 是否随句子明显变化？<a class="headerlink" href="#4-q2-gate" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> FLaG 利用频谱和 latent attention，为每个句子计算 Gate。训练后这种输入相关性在输出上是否明显？</p>
+<p><strong>M：</strong> 固定已经训练好的 seed-0 checkpoint，不重新训练；分别使用：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>实际操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full</td>
+<td>每句使用由自身频谱和 latent attention 计算出的 Gate</td>
+</tr>
+<tr>
+<td>Training-set mean Gate</td>
+<td>从训练集句子估算一套平均 Gate，评估时所有句子共用</td>
+</tr>
+<tr>
+<td>Swap Gate between sentences</td>
+<td>在同一批中交换不同句子的 Gate，保持句子内容和模型其他参数不变</td>
+</tr>
+</tbody>
+</table>
+<p>三个操作使用相同的 Backbone、输出 Projection、句对打分头和验证/测试样本。</p>
+<p><strong>R：</strong> test 指标：</p>
+<table>
+<thead>
+<tr>
+<th>Task / Model</th>
+<th style="text-align: right;">Full</th>
+<th style="text-align: right;">训练集平均 Gate</th>
+<th style="text-align: right;">交换句子 Gate</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STSB FLaG，Spearman</td>
+<td style="text-align: right;">0.843379</td>
+<td style="text-align: right;">0.843379</td>
+<td style="text-align: right;">0.843379</td>
+</tr>
+<tr>
+<td>STSB B2，Spearman</td>
+<td style="text-align: right;">0.845488</td>
+<td style="text-align: right;">0.845488</td>
+<td style="text-align: right;">0.845488</td>
+</tr>
+<tr>
+<td>Sprint FLaG，AP</td>
+<td style="text-align: right;">0.848503</td>
+<td style="text-align: right;">0.848503</td>
+<td style="text-align: right;">0.848503</td>
+</tr>
+<tr>
+<td>Sprint B2，AP</td>
+<td style="text-align: right;">0.833946</td>
+<td style="text-align: right;">0.833946</td>
+<td style="text-align: right;">0.833946</td>
+</tr>
+</tbody>
+</table>
+<p>对应的 Gate 与训练集均值的差异，在原有输出中打印至五位小数为 0.00000。Gate sigmoid 输出也高度接近两端，Sprint B2 中约 95.96% 高于 0.95、约 4.04% 低于 0.05。</p>
+<p><strong>C：</strong> 在<strong>这些训练好的 checkpoint 的推理行为</strong>中，用训练集固定 Gate 或别的句子的 Gate 替换自身 Gate，并未使最终评价指标发生六位小数可见的变化。这支持“Gate 在训练后近乎固定”的解释，且比仅仅比较 Global/Local Gate 来源更直接。</p>
+<p>需要特别注意：</p>
+<ul>
+<li>“指标显示相同”不代表每个 Gate 元素逐位严格相同；还需要最大绝对误差、Sigmoid 前后通道方差等高精度数值。</li>
+<li>“训练后近乎固定”不代表 FFT/latent attention 在<strong>训练过程中</strong>一定没有作用。</li>
+<li>早期 P1/P2 已经发现 Gate 来源不敏感，本次新增的是直接交换<strong>不同句子生成的 Gate</strong>。</li>
+</ul>
+<h2 id="5-q3gate-dc">5. Q3：Gate 调整了 DC 的哪些特征通道？<a class="headerlink" href="#5-q3gate-dc" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 如果只有少数通道的 Gate 值明显偏低，为什么它仍能造成很大的 DC 转角？</p>
+<p><strong>M：</strong> 对一个句子的原始 DC 实部向量 <span class="arithmatex">\(x=(x_1,\ldots,x_D)\)</span>，取 <span class="arithmatex">\(D=768\)</span>。Gate 的输出是 <span class="arithmatex">\(2D\)</span> 维，前 <span class="arithmatex">\(D\)</span> 项缩放实部、后 <span class="arithmatex">\(D\)</span> 项缩放虚部。DC 的虚部为零，因此这一分析只看<strong>实部 Gate</strong>。</p>
+<p>设 <span class="arithmatex">\(S\)</span> 为实部 Gate 较低的<strong>通道编号集合</strong>，而不是 token 位置或频率位置。本实验低值标准是原始 Sigmoid 输出小于 <span class="arithmatex">\(0.05\)</span>：</p>
+<ul>
+<li>原始 FLaG：<span class="arithmatex">\(g_i=1+\sigma(\ell_i)\)</span>，低值对应 <span class="arithmatex">\(g_i&lt;1.05\)</span>；</li>
+<li>B2：<span class="arithmatex">\(g_i=2\sigma(\ell_i)\)</span>，低值对应 <span class="arithmatex">\(g_i&lt;0.1\)</span>。</li>
+</ul>
+<p>计算这些位置在<strong>Gate 作用前</strong>占全部 DC 平方能量的比例：</p>
+<div class="arithmatex">\[
+E_S=\frac{\sum_{i\in S}x_i^2}{\sum_{i=1}^{D}x_i^2}.
+\]</div>
+<p><strong>R：</strong> Sprint official test，seed 0：</p>
+<table>
+<thead>
+<tr>
+<th>统计</th>
+<th style="text-align: right;">FLaG</th>
+<th style="text-align: right;">B2</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>低 Gate 值实部通道占比</td>
+<td style="text-align: right;">2.214%</td>
+<td style="text-align: right;">3.776%</td>
+</tr>
+<tr>
+<td>这些通道占原始 DC 平方能量的比例</td>
+<td style="text-align: right;">93.720%</td>
+<td style="text-align: right;">95.488%</td>
+</tr>
+<tr>
+<td>平均 DC Gate 转角</td>
+<td style="text-align: right;">12.811°</td>
+<td style="text-align: right;">77.773°</td>
+</tr>
+</tbody>
+</table>
+<p>STSB test 对应的低值实部通道能量占比为 75.416%（FLaG）与 80.208%（B2）。</p>
+<p><strong>C：</strong> 在当前 RoBERTa 输出坐标下，DC 平方能量高度集中于少数通道，而训练后的 Gate 正好对这些高能通道赋予相对较低的缩放权重。</p>
+<p>这解释了为什么很少的通道被重新加权，就可能造成大的向量方向变化。但 <strong>FLaG 的低值是接近 1 而非 0</strong>，应称为相对降低权重，不能说它删除了这些通道。更不能直接推断高能通道都是无用噪声，或断言它们对应某个已确定的语义成分。</p>
+<h2 id="6-q4-gate">6. Q4：关闭 Gate 的哪些部分，预测会变化？<a class="headerlink" href="#6-q4-gate" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> Gate 改变向量方向，是否真的对已训练模型的预测有作用？</p>
+<p><strong>M：</strong> 固定训练好的 checkpoint，在推理阶段分别关闭 DC 门控、关闭 DC 以外的门控、完全关闭 Gate，以及绕过最后 Projection。其他部分仍使用训练好的参数。这属于<strong>训练后干预</strong>，不是从零训练结构消融。</p>
+<p><strong>R：</strong> Sprint official test，seed 0：</p>
+<table>
+<thead>
+<tr>
+<th>推理方式</th>
+<th style="text-align: right;">FLaG AP</th>
+<th style="text-align: right;">B2 AP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Full</td>
+<td style="text-align: right;">0.848503</td>
+<td style="text-align: right;">0.833946</td>
+</tr>
+<tr>
+<td>DC 的 Gate 改成 1</td>
+<td style="text-align: right;">0.838674</td>
+<td style="text-align: right;"><strong>0.678850</strong></td>
+</tr>
+<tr>
+<td>非 DC 频率的 Gate 改成 1</td>
+<td style="text-align: right;">0.849550</td>
+<td style="text-align: right;">0.835823</td>
+</tr>
+<tr>
+<td>全部 Gate 改成 1</td>
+<td style="text-align: right;">0.840069</td>
+<td style="text-align: right;">0.784842</td>
+</tr>
+<tr>
+<td>保留 Gate，但跳过最后 Projection</td>
+<td style="text-align: right;"><strong>0.464409</strong></td>
+<td style="text-align: right;"><strong>0.494782</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>C：</strong> 已训练的 B2 尤其依赖其 DC Gate；完整 FLaG 和 B2 在 Sprint 上绕过 Projection 后，性能都显著下降。另一方面，关闭非 DC 部分并没有明显伤害 Sprint AP。</p>
+<p>但一个模块被训练好的模型依赖，并不意味着该模块对<strong>从零训练一个同等性能的模型</strong>不可替代；参数可能已经与它共同适配。这正是下一部分需要独立训练简化模型的原因。</p>
+<p>注意上述 Sprint checkpoint 来自<strong>早期按 validation Accuracy 选择的 seed-0 机制实验</strong>，不能与后面采用 validation AP 选模的三种子结果混合求均值。</p>
+<h2 id="7-q5-fft-latent-attention">7. Q5：如果不使用 FFT 和 latent attention，从零训练能否得到相近性能？<a class="headerlink" href="#7-q5-fft-latent-attention" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 如果已训练 Gate 的作用接近固定通道缩放，我们是否需要完整频域模型才能达到类似性能？</p>
+<p><strong>M：</strong> 从头训练三个结构简单的模型，且均使用可训练、初始为单位矩阵的输出 Projection：</p>
+<table>
+<thead>
+<tr>
+<th>名称</th>
+<th>输入 Mean 之后的操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>StaticReIm</td>
+<td>学习一套对所有句子共享的实部/虚部通道系数，用原有 FFT 调制 + iFFT 的<strong>等价时域公式</strong>计算，再做 Projection</td>
+</tr>
+<tr>
+<td>StaticDiag</td>
+<td>学习一套对所有句子共享的逐通道系数，直接乘到 Mean 向量，再做 Projection</td>
+</tr>
+<tr>
+<td>MeanProjection</td>
+<td>不使用 Gate，直接对 Mean 向量做可训练线性 Projection</td>
+</tr>
+</tbody>
+</table>
+<p>这里 Static 表示<strong>相同权重用于不同句子</strong>，不代表权重在训练中不更新。</p>
+<p>原有 P1 已推导：当实部与虚部使用不等的共享通道门控系数时，固定门控后的 FFT → Gate → iFFT 等价于原序列和循环反转序列的加权混合。因此 StaticReIm 不必真的做 FFT；这条公式在原有 <a href="../stsb/03-mechanism/">P1 报告</a> 已记录。</p>
+<p><strong>R：</strong> 第一轮 seed-0 official test：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align: right;">STSB Spearman</th>
+<th style="text-align: right;">Sprint AP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLaG-B2</td>
+<td style="text-align: right;">0.845490</td>
+<td style="text-align: right;">0.834217</td>
+</tr>
+<tr>
+<td>StaticReIm</td>
+<td style="text-align: right;">0.841483</td>
+<td style="text-align: right;">0.820715</td>
+</tr>
+<tr>
+<td>StaticDiag</td>
+<td style="text-align: right;">0.840198</td>
+<td style="text-align: right;">0.824215</td>
+</tr>
+<tr>
+<td>MeanProjection（单位矩阵初始）</td>
+<td style="text-align: right;">0.841056</td>
+<td style="text-align: right;">0.833765</td>
+</tr>
+</tbody>
+</table>
+<p>对于 Sprint，MeanProjection 比 B2 只低 0.000452 AP。</p>
+<p><strong>C：</strong> 在这个 seed 上，<strong>仅对 Mean 向量学习一个线性变换</strong>已经能得到接近 B2 的 AP。</p>
+<p>从数学上，对于静态对角门控 <span class="arithmatex">\(D\)</span> 与任意可训练线性投影 <span class="arithmatex">\(W\)</span>：</p>
+<div class="arithmatex">\[
+z=W(Dm)+b=(WD)m+b=W'm+b.
+\]</div>
+<p>因此静态逐通道门控再接一个不受约束的线性 Projection，并没有增加模型能表达的函数范围；但不同参数化仍可能影响初始化与训练优化。这个代数关系不意味着原始<strong>输入相关</strong>的 Gate 和具有实虚不对称反转项的完整 FLaG 也等价于 Mean + Linear。</p>
+<h2 id="8-q6projection">8. Q6：Projection 初始化和真正的结构差异，谁影响更大？<a class="headerlink" href="#8-q6projection" title="Permanent link">&para;</a></h2>
+<p><strong>Q：</strong> 原始 FLaG 的 Projection 从随机参数开始，而 B2/前述 MeanProjection 从单位矩阵开始。是否应当把原始 FLaG 直接同<strong>随机初始化的 Mean + Projection</strong>比较？</p>
+<p><strong>M：</strong> 使用 Sprint seeds 0、1、2，统一在 validation 上根据 <strong>AP</strong> 选 checkpoint，并在相同冻结 RoBERTa、训练/验证划分及 Mean-pooling/no-LN 协议下从零训练：</p>
+<ul>
+<li>原始 FLaG：原始 residual-sigmoid Gate，随机 Projection；</li>
+<li>FLaG-B2：从严格 Mean 输出开始的 centered-sigmoid Gate、单位 Projection；</li>
+<li>MeanProj-B2：直接 Mean + 单位初始化的可训练 Projection；</li>
+<li>MeanProjRand：直接 Mean + <strong>随机初始化、训练时仍会学习</strong>的 Projection。</li>
+</ul>
+<p><strong>R：</strong> 第一轮配对三种子 official-test AP：</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th style="text-align: right;">Test AP（mean ± sample SD）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLaG</td>
+<td style="text-align: right;">0.829813 ± 0.016874</td>
+</tr>
+<tr>
+<td>FLaG-B2</td>
+<td style="text-align: right;">0.824462 ± 0.011258</td>
+</tr>
+<tr>
+<td>MeanProj-B2</td>
+<td style="text-align: right;">0.818806 ± 0.016929</td>
+</tr>
+<tr>
+<td>MeanProjRand</td>
+<td style="text-align: right;"><strong>0.840923 ± 0.008811</strong></td>
+</tr>
+</tbody>
+</table>
+<p>同 seed 的三个配对差值（FLaG − MeanProjRand）全为负，平均为 −0.011110 ± 0.013482。MeanProjRand 与 MeanProj-B2 的平均差值为 +0.022117，三个种子均为正。</p>
+<p>不过：<strong>相同 seed 不保证不同结构里的随机 Projection 矩阵完全相同</strong>。这是因为创建其他网络层会消耗随机数。为控制这个混杂因素，我们追加了更严格的对照。</p>
+<h3 id="81-projection">8.1 严格匹配最初 Projection 矩阵的三种子实验（最后补充）<a class="headerlink" href="#81-projection" title="Permanent link">&para;</a></h3>
+<p><strong>M：</strong> 对每个 seed，强制让 FLaG 与 MeanProjRand 使用<strong>完全相同的初始 Projection 权重和偏置</strong>。相同任务、相同划分和 validation AP 选模。实现记录 Projection 初始参数的 SHA-256 指纹，用来核对两组是否一致。</p>
+<p><strong>R：</strong> 最新 Sprint official test 结果：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th style="text-align: right;">Test AP（3 seeds）</th>
+<th style="text-align: right;">Validation AP（3 seeds）</th>
+<th>选中 epoch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FLaG</td>
+<td style="text-align: right;">0.830539 ± 0.016711</td>
+<td style="text-align: right;"><strong>0.853535 ± 0.019891</strong></td>
+<td>10、9、8</td>
+</tr>
+<tr>
+<td>MeanProjRand</td>
+<td style="text-align: right;"><strong>0.841386 ± 0.008833</strong></td>
+<td style="text-align: right;">0.851664 ± 0.017371</td>
+<td>10、10、8</td>
+</tr>
+</tbody>
+</table>
+<p>严格配对的 test AP 差值：</p>
+<table>
+<thead>
+<tr>
+<th>Seed</th>
+<th style="text-align: right;">FLaG − MeanProjRand</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td style="text-align: right;">−0.001096</td>
+</tr>
+<tr>
+<td>1</td>
+<td style="text-align: right;">−0.028025</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: right;">−0.003420</td>
+</tr>
+<tr>
+<td><strong>均值 ± sample SD</strong></td>
+<td style="text-align: right;"><strong>−0.010847 ± 0.014922</strong></td>
+</tr>
+</tbody>
+</table>
+<p>三个 seed 中 MeanProjRand 都高于 FLaG 的 test AP。</p>
+<p>还有一个应该如实记录的现象：FLaG 的<strong>平均 validation AP</strong>（0.853535）反而稍高于 MeanProjRand（0.851664）；到了 official test，顺序相反。因此不能说 MeanProjRand 在所有拆分上都领先，也不能由三种子结果推断确定的泛化优势。</p>
+<p><strong>C：</strong> 即使控制初始 Projection 参数完全相同，当前 Sprint Mean-pooling/no-LN 协议的三种子结果中，原始 FLaG 也<strong>没有表现出相对于 Mean + 可训练随机 Projection 的 test AP 优势</strong>。更简单的模型在三个种子上都略高或明显更高。</p>
+<p>这不等于数学上证明原始 FLaG 的 FFT 或 latent attention 无用，也不代表适用于原论文的 Max pooling / post-pool LayerNorm 或局部 STFT 模型。它只限定于当前控制实验，并且样本量是三个随机种子。</p>
+<div class="admonition note">
+<p class="admonition-title">严格配对的复现检查</p>
+<p>最新运行脚本会记录两组模型初始 Projection 的 SHA-256 指纹，并在汇总时进行一致性核对。最终归档时应一并保存训练日志或对应的模型指标文件，确保能复查指纹一致性。本页数值来自已完成的三种子汇总。</p>
+</div>
+<h2 id="9">9. 目前最清楚的研究结论与尚未解决的问题<a class="headerlink" href="#9" title="Permanent link">&para;</a></h2>
+<h3 id="_1">已有证据支持的结论<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>DC 与直接 Mean 同向</strong>；在本配置下使表示偏离 Mean 方向的主要操作是 Gate 和 Projection。向量角度本身不能代替下游任务性能。</li>
+<li>已训练 Gate 的 sigmoid 输出高度饱和；交换句子 Gate 或使用训练集平均 Gate，指标在六位小数精度下与 Full 相同。说明<strong>这些 checkpoint 在推理时几乎不依赖明显的逐句 Gate 变化</strong>。</li>
+<li>低 Gate 值的<strong>实部通道</strong>集中承载大量原始 DC 平方能量。当前 Gate 的一个显著作用是对不同通道重新赋权，但目前不能判断这些通道是否语义冗余。</li>
+<li>对冻结 RoBERTa 的 Sprint，<strong>Mean + 可训练 Projection</strong> 是一个比“直接 Mean + cosine”强得多的必要对照。原始 FLaG 优于直接 Mean，不能把增益全部归功于 FFT 或 latent attention。</li>
+<li>三种子、相同初始随机 Projection 权重的结果中，完整 FLaG 没有优于 Mean + Linear。此处结论应写为<strong>未观察到额外优势</strong>，不是“证明它必然没有贡献”。</li>
+</ol>
+<h3 id="_2">尚不能从现有结果断言<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
+<ul>
+<li>FFT / latent attention 在训练全过程中完全不重要；</li>
+<li>被压低的高能通道一定是噪声或与语义无关；</li>
+<li>任意文本任务和原始 Max-pooling 版本的 FLaG 都可无损替换为 Mean + Linear；</li>
+<li>三个随机种子已足以证明一个稳定、普适的性能排序。</li>
+</ul>
+<h3 id="_3">阶段性判断<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h3>
+<p>本阶段最值得继续追问的科学问题，已经从“怎样把 FLaG 的角度拉回 Mean”变为：</p>
+<blockquote>
+<p><strong>在冻结预训练编码器的句对任务里，FLaG 相比直接 Mean 的增益，有多少来自频域门控本身，有多少来自对 Mean 向量施加的可训练线性变换？</strong></p>
+</blockquote>
+<p>在向学姐做第一次阶段汇报时，以上实验已经能组成完整证据链。后续是否扩大到更多 seeds、其他任务或恢复原始 Max/LayerNorm 配置，可以在汇报后再确定。</p>
+<div class="admonition warning">
+<p class="admonition-title">实验范围与探索性分析</p>
+<p>本研究是在多次查看同一 Sprint test 结果后逐步设计实验的，因此应将本阶段 test 比较视为<strong>探索性</strong>证据。用于正式论文的最终结论，建议预先确定实验方案，并采用新的独立测试任务或评估数据进行确认。原报告 STFT 章节中某些 seed、数据划分和 checkpoint 选择规则与本页不同，必须分别记录。</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  回到页面顶部
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
