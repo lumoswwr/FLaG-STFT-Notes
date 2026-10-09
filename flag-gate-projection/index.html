@@ -506,10 +506,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#32-gate" class="md-nav__link">
+  <a href="#32-sigmoid-gate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.2 为什么 Gate 会接近固定？
+        3.2 高精度复核：为什么 Sigmoid 前有变化，Gate 却几乎不变？
       
     </span>
   </a>
@@ -1034,10 +1034,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#32-gate" class="md-nav__link">
+  <a href="#32-sigmoid-gate" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3.2 为什么 Gate 会接近固定？
+        3.2 高精度复核：为什么 Sigmoid 前有变化，Gate 却几乎不变？
       
     </span>
   </a>
@@ -1360,18 +1360,90 @@ X_0=\sum_{t\in\mathrm{valid}}h_t=Lm.
 </tr>
 </tbody>
 </table>
-<p>与此同时，当前输出记录中，Gate 与训练集平均 Gate 的偏差打印到五位小数为 <span class="arithmatex">\(0.00000\)</span>。</p>
-<p>因此，<strong>已训练模型的 Gate 很可能几乎不随句子改变</strong>。至少在现有数值精度下，把自己的 Gate 换成别人的，预测排序指标没有变化。</p>
-<p>还需谨慎：输出打印为 0 并不证明所有元素<strong>严格</strong>相同。高精度最大误差及 sigmoid 前后跨句子方差的复核代码已补充，但这份报告尚未包含对应的运行结果。</p>
+<p>最初记录中，Gate 与训练集平均 Gate 的差异仅打印到五位小数，因此显示为 <span class="arithmatex">\(0.00000\)</span>。我们随后补做了高精度数值检查，确认<strong>实际 Gate 不是严格不变，但不同句子之间的变化极小</strong>。完整数据见下一节。</p>
+<p>这一结果与推理时交换 Gate 后指标不变的观察一致。但需注意：相同到六位小数的是 <strong>Spearman / AP 指标</strong>，不能据此推断每一句的预测值或 Gate 张量都逐元素完全相等。</p>
 <p>这个现象与网站原有的 P1/P2、Sprint S3 相衔接：<strong>旧实验</strong>已发现更换 Gate 的频谱来源几乎不影响输出；<strong>本次新增实验</strong>则直接交换不同句子的 Gate，进一步测试输入相关性。</p>
-<h3 id="32-gate">3.2 为什么 Gate 会接近固定？<a class="headerlink" href="#32-gate" title="Permanent link">&para;</a></h3>
-<p>检查 Gate 中 sigmoid 的输出分布发现，大量通道已经接近两端，例如 Sprint 的 B2 中：</p>
+<h3 id="32-sigmoid-gate">3.2 高精度复核：为什么 Sigmoid 前有变化，Gate 却几乎不变？<a class="headerlink" href="#32-sigmoid-gate" title="Permanent link">&para;</a></h3>
+<p>为了区分“Gate 网络没有响应不同句子”和“Gate 网络的输出虽然有变化，却被最后的 Sigmoid 压缩”这两种情况，我们分别统计：</p>
 <ul>
-<li>约 95.96% 的 sigmoid 输出大于 0.95；</li>
-<li>约 4.04% 的 sigmoid 输出小于 0.05。</li>
+<li><strong>Sigmoid 前的 logits</strong>：Gate MLP 最后一层产生的数值，还没有经过 Sigmoid。</li>
+<li><strong>实际 Gate</strong>：经过 Sigmoid 和缩放后，真正乘到频谱上的系数。</li>
 </ul>
-<p>这叫 <strong>sigmoid 饱和</strong>，即输入落在 sigmoid 曲线两端的平坦区域。B2 的实际系数 <span class="arithmatex">\(g=2\sigma(\ell)\)</span>，因此多数通道接近 2，少数通道接近 0。</p>
-<p>这能说明 Gate 形成了非常不均匀的通道权重，也与输入变化小的现象相容。但<strong>仅靠饱和，不能证明 latent attention 在训练过程中没有作用</strong>。</p>
+<p>对<strong>同一个 Gate 通道</strong>，先测它在不同句子间的标准差，再对所有通道的标准差取平均。这叫<strong>跨句子通道标准差</strong>。它衡量不同输入是否让该通道的系数发生变化，不是不同通道彼此之间的差异。</p>
+<p><strong>Validation，seed 0，高精度统计：</strong></p>
+<table>
+<thead>
+<tr>
+<th>任务与模型</th>
+<th style="text-align: right;">Sigmoid 前 logits 的平均跨句子标准差</th>
+<th style="text-align: right;">实际 Gate 的平均跨句子标准差</th>
+<th style="text-align: right;">Gate 相对训练集平均 Gate 的平均绝对差</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STSB FLaG</td>
+<td style="text-align: right;">0.292946</td>
+<td style="text-align: right;"><span class="arithmatex">\(7.86\times10^{-8}\)</span></td>
+<td style="text-align: right;"><span class="arithmatex">\(6.20\times10^{-8}\)</span></td>
+</tr>
+<tr>
+<td>STSB B2</td>
+<td style="text-align: right;">0.070029</td>
+<td style="text-align: right;"><span class="arithmatex">\(8.01\times10^{-10}\)</span></td>
+<td style="text-align: right;"><span class="arithmatex">\(6.53\times10^{-10}\)</span></td>
+</tr>
+<tr>
+<td>Sprint FLaG</td>
+<td style="text-align: right;">0.439389</td>
+<td style="text-align: right;">数值计算为 0（见下文）</td>
+<td style="text-align: right;"><span class="arithmatex">\(7.58\times10^{-14}\)</span></td>
+</tr>
+<tr>
+<td>Sprint B2</td>
+<td style="text-align: right;">0.227895</td>
+<td style="text-align: right;"><span class="arithmatex">\(1.73\times10^{-10}\)</span></td>
+<td style="text-align: right;"><span class="arithmatex">\(1.37\times10^{-10}\)</span></td>
+</tr>
+</tbody>
+</table>
+<p>从数据可以看到：<strong>四个模型的 Sigmoid 前输出都在随句子变化，但最后实际 Gate 的变化远小于这些中间数值的变化</strong>。</p>
+<p>进一步观察 Sigmoid：大量通道的输出已经非常接近两端。例如 Sprint B2 约 95.96% 的 Sigmoid 输出大于 0.95，约 4.04% 小于 0.05。Sigmoid 在接近 0 和 1 时曲线非常平坦，即使输入 logits 变化，输出也可能只改变极微小的数值。这叫 <strong>Sigmoid 饱和</strong>。原始 FLaG 使用 <span class="arithmatex">\(g=1+\sigma(\ell)\)</span>；B2 使用 <span class="arithmatex">\(g=2\sigma(\ell)\)</span>。</p>
+<p>我们还直接测量了 Gate 与<strong>训练集平均 Gate</strong> 的逐元素差异，避免只依赖四舍五入的指标：</p>
+<table>
+<thead>
+<tr>
+<th>任务与模型</th>
+<th style="text-align: right;">每个句子各通道的最大绝对差，再对句子取平均</th>
+<th style="text-align: right;">元素差异大于 <span class="arithmatex">\(10^{-5}\)</span> 的比例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>STSB FLaG</td>
+<td style="text-align: right;"><span class="arithmatex">\(1.67\times10^{-5}\)</span></td>
+<td style="text-align: right;">0.1603%</td>
+</tr>
+<tr>
+<td>STSB B2</td>
+<td style="text-align: right;"><span class="arithmatex">\(3.46\times10^{-7}\)</span></td>
+<td style="text-align: right;">0%</td>
+</tr>
+<tr>
+<td>Sprint FLaG</td>
+<td style="text-align: right;"><span class="arithmatex">\(1.16\times10^{-10}\)</span></td>
+<td style="text-align: right;">0%</td>
+</tr>
+<tr>
+<td>Sprint B2</td>
+<td style="text-align: right;"><span class="arithmatex">\(2.85\times10^{-8}\)</span></td>
+<td style="text-align: right;">0%</td>
+</tr>
+</tbody>
+</table>
+<p>这里第二列<strong>不是所有样本的全局最大值</strong>，而是先计算每个句子的最大通道差异，再对这些最大值求平均。尤其在 STSB FLaG 中，仍能测到少数非零变化，所以不能写成“Gate 严格恒定”。</p>
+<p><strong>数值精度说明：</strong> Sprint FLaG 的“Gate 跨句子标准差”在输出中显示为 0，但直接逐元素比较仍发现非零的极小差异。这是因为当前程序通过 <span class="arithmatex">\(E[g^2]-E[g]^2\)</span> 计算方差；当 Gate 几乎不变时，两个接近的量相减可能发生浮点精度损失。因此，“标准差为 0”<strong>不能解释为数学上完全相同</strong>。</p>
+<p><strong>本次更新后的结论：</strong> Gate 网络在 Sigmoid 前对不同输入仍然有响应；高度饱和的 Sigmoid 与最后 Gate 几乎不变的现象一致，说明输入引起的变化在最终缩放系数上被强烈压缩。结合前一节的 Gate 互换实验，<strong>当前训练好的模型在推理时几乎不依赖明显的逐句 Gate 差异</strong>。但这并不能证明 latent attention 在训练阶段没有作用。</p>
 <h3 id="33-gate">3.3 那些 Gate 较小的通道，原本有什么特点？<a class="headerlink" href="#33-gate" title="Permanent link">&para;</a></h3>
 <p>这里需要把“通道”说清楚。</p>
 <p>设一条句子的原始 DC 实部为：</p>
@@ -1664,7 +1736,7 @@ y_t=\frac{g_R+g_I}{2}x_t+\frac{g_R-g_I}{2}x_{(-t)\bmod N}.
 <p>把上面五步连起来看：</p>
 <ol>
 <li><strong>先定位变化</strong>：FFT 的 DC 保留了 Mean 方向，但 Gate 和 Projection 会明显改变输出。</li>
-<li><strong>再观察 Gate 的行为</strong>：已训练 Gate 高度饱和，交换不同句子的 Gate 几乎不影响性能，说明在这些 checkpoint 中<strong>输入相关的 Gate 变化可能很小</strong>。</li>
+<li><strong>再观察 Gate 的行为</strong>：已训练 Gate 高度饱和。高精度检查发现 <strong>Sigmoid 前的 logits 随句子变化，但实际 Gate 系数几乎不变</strong>；交换不同句子的 Gate 也几乎不影响最终指标。这支持当前 checkpoint 的 Gate 在推理时接近固定缩放系数，但不是严格恒等。</li>
 <li><strong>检查它在调整什么</strong>：少量 Gate 较低的实部通道恰好占据大量 DC 平方能量；模型正在改变各特征通道之间的相对权重。</li>
 <li><strong>检查训练后依赖性</strong>：关闭某些 Gate 或跳过 Projection，会影响训练好的模型，但这不意味着这些部件在重新训练时一定不可替代。</li>
 <li><strong>最后从头训练简化模型</strong>：Mean + 可训练线性 Projection 在 Sprint 三种子中取得了与完整 FLaG 接近或更高的 test AP；即使初始 Projection 权重完全相同，仍没有观察到 FLaG 的 test AP 优势。</li>
