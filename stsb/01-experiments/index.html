@@ -1438,49 +1438,49 @@
 </table>
 <p>E2/E3 使用 <code>center=False</code>，均只生成<strong>一个句级 gate</strong>；E5 <strong>同时改变了窗函数与 center 设置</strong>，不能将变化单独归因于 Hann。</p>
 <h3 id="e1global-hann">E1：Global Hann<a class="headerlink" href="#e1global-hann" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> global FFT 前加 Hann，能否减轻边界影响并改善性能？</p>
-<p><strong>M：</strong> 按<strong>每句话自身有效 token 长度</strong>（包括特殊 token）生成 symmetric Hann，乘到 RoBERTa hidden 上，再执行原 global FFT；padding 仍为零。有效长度 ≤2 时使用全 1 窗口。其他设置与 FLaG 一致，<strong>3 seeds</strong>。</p>
-<p><strong>R：</strong> Spearman <code>0.837019 ± 0.002763</code>，比同 seed FLaG 平均 <strong>−0.004109</strong>。</p>
-<p><strong>C：</strong> 未改善性能，但不能据此排除频谱泄漏，因为加窗同时减弱了边界 token 的输入。</p>
+<p><strong>具体问题：</strong> global FFT 前加 Hann，能否减轻边界影响并改善性能？</p>
+<p><strong>具体做法与参数：</strong> 按<strong>每句话自身有效 token 长度</strong>（包括特殊 token）生成 symmetric Hann，乘到 RoBERTa hidden 上，再执行原 global FFT；padding 仍为零。有效长度 ≤2 时使用全 1 窗口。其他设置与 FLaG 一致，<strong>3 seeds</strong>。</p>
+<p><strong>详细结果：</strong> Spearman <code>0.837019 ± 0.002763</code>，比同 seed FLaG 平均 <strong>−0.004109</strong>。</p>
+<p><strong>结果说明：</strong> 未改善性能，但不能据此排除频谱泄漏，因为加窗同时减弱了边界 token 的输入。</p>
 <h3 id="e2-stft168">E2：首次改为 STFT（16/8）<a class="headerlink" href="#e2-stft168" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 把整句 FFT 换成局部 STFT 是否改善结果？</p>
-<p><strong>M：</strong> rect 窗，<code>win=16,hop=8,center=False</code>，相邻帧重叠 8 token。所有有效帧的频率 token 共同生成一个句级 gate；逐帧逆变换并重建，<strong>3 seeds</strong>。</p>
-<p><strong>R：</strong> Spearman <code>0.842204 ± 0.001824</code>，比 FLaG 平均 <strong>+0.001076</strong>，2/3 seeds 正向。</p>
-<p><strong>C：</strong> 观察到小幅正向结果，继续检查窗口大小。</p>
+<p><strong>具体问题：</strong> 把整句 FFT 换成局部 STFT 是否改善结果？</p>
+<p><strong>具体做法与参数：</strong> rect 窗，<code>win=16,hop=8,center=False</code>，相邻帧重叠 8 token。所有有效帧的频率 token 共同生成一个句级 gate；逐帧逆变换并重建，<strong>3 seeds</strong>。</p>
+<p><strong>详细结果：</strong> Spearman <code>0.842204 ± 0.001824</code>，比 FLaG 平均 <strong>+0.001076</strong>，2/3 seeds 正向。</p>
+<p><strong>结果说明：</strong> 观察到小幅正向结果，继续检查窗口大小。</p>
 <h3 id="e384">E3：缩短窗口（8/4）<a class="headerlink" href="#e384" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 部分短句在 win16 下只有一个有效帧，缩短窗口后效果如何？</p>
-<p><strong>M：</strong> 延续 E2 的做法，改为 <code>win=8,hop=4</code>，其余不变，<strong>3 seeds</strong>。</p>
-<p><strong>R：</strong> Spearman <code>0.843000 ± 0.001047</code>；比 FLaG 平均 <strong>+0.001873</strong>（3/3 正向），比 E2 平均 <strong>+0.000796</strong>。</p>
-<p><strong>C：</strong> 早期观察到小幅改善，因此选择 E3 进行 E6–E8 机制分析；3 seeds 不能证明稳定优势。</p>
+<p><strong>具体问题：</strong> 部分短句在 win16 下只有一个有效帧，缩短窗口后效果如何？</p>
+<p><strong>具体做法与参数：</strong> 延续 E2 的做法，改为 <code>win=8,hop=4</code>，其余不变，<strong>3 seeds</strong>。</p>
+<p><strong>详细结果：</strong> Spearman <code>0.843000 ± 0.001047</code>；比 FLaG 平均 <strong>+0.001873</strong>（3/3 正向），比 E2 平均 <strong>+0.000796</strong>。</p>
+<p><strong>结果说明：</strong> 早期观察到小幅改善，因此选择 E3 进行 E6–E8 机制分析；3 seeds 不能证明稳定优势。</p>
 <h3 id="e4_1">E4：添加帧位置编码<a class="headerlink" href="#e4_1" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 局部帧的位置顺序信息是否有帮助？</p>
-<p><strong>M：</strong> 在 E3 的频率 token 进入 latent attention 前，加 <strong>learned frame positional encoding</strong>；窗长及其他配置不变，重新训练 <strong>3 seeds</strong>。</p>
-<p><strong>R：</strong> Spearman <code>0.842282 ± 0.001834</code>，比 E3 平均 <strong>−0.000718</strong>。</p>
-<p><strong>C：</strong> 这种帧位置编码没有带来改善，后续不采用。</p>
+<p><strong>具体问题：</strong> 局部帧的位置顺序信息是否有帮助？</p>
+<p><strong>具体做法与参数：</strong> 在 E3 的频率 token 进入 latent attention 前，加 <strong>learned frame positional encoding</strong>；窗长及其他配置不变，重新训练 <strong>3 seeds</strong>。</p>
+<p><strong>详细结果：</strong> Spearman <code>0.842282 ± 0.001834</code>，比 E3 平均 <strong>−0.000718</strong>。</p>
+<p><strong>结果说明：</strong> 这种帧位置编码没有带来改善，后续不采用。</p>
 <h3 id="e5-hann">E5：局部 Hann<a class="headerlink" href="#e5-hann" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 给局部帧加窗是否继续改善 E3？</p>
-<p><strong>M：</strong> 在 E3 的 win8/hop4 上，将 rect 换成 <strong>periodic Hann</strong>，并同时设 <code>center=True</code>；重新训练 <strong>3 seeds</strong>。</p>
-<p><strong>R：</strong> Spearman <code>0.843027 ± 0.000593</code>，比 E3 平均 <strong>+0.000027</strong>。</p>
-<p><strong>C：</strong> 基本持平，后续优先使用更简单的 rect 实现。本实验未单独拆分 Hann 与 centering 的作用。</p>
+<p><strong>具体问题：</strong> 给局部帧加窗是否继续改善 E3？</p>
+<p><strong>具体做法与参数：</strong> 在 E3 的 win8/hop4 上，将 rect 换成 <strong>periodic Hann</strong>，并同时设 <code>center=True</code>；重新训练 <strong>3 seeds</strong>。</p>
+<p><strong>详细结果：</strong> Spearman <code>0.843027 ± 0.000593</code>，比 E3 平均 <strong>+0.000027</strong>。</p>
+<p><strong>结果说明：</strong> 基本持平，后续优先使用更简单的 rect 实现。本实验未单独拆分 Hann 与 centering 的作用。</p>
 <hr />
 <h3 id="e6-knockout">E6：频带 Knockout<a class="headerlink" href="#e6-knockout" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> FLaG 与 E3 分别依赖哪些输入频带？</p>
-<p><strong>M：</strong> 固定两组已训练 checkpoint（<strong>seeds 0–2</strong>）。对 RoBERTa <strong>最后一层的内容 token hidden</strong> 沿位置做 DCT-II，按几何比例划分为 <strong>8 个频带 B0–B7</strong>（B0 为最低频）；每次只将一段的系数置零、逆 DCT，再交给原模型预测。特殊 token 不变。只使用<strong>句对两侧均至少有 8 个内容 token</strong> 的 test 子集。</p>
+<p><strong>具体问题：</strong> FLaG 与 E3 分别依赖哪些输入频带？</p>
+<p><strong>具体做法与参数：</strong> 固定两组已训练 checkpoint（<strong>seeds 0–2</strong>）。对 RoBERTa <strong>最后一层的内容 token hidden</strong> 沿位置做 DCT-II，按几何比例划分为 <strong>8 个频带 B0–B7</strong>（B0 为最低频）；每次只将一段的系数置零、逆 DCT，再交给原模型预测。特殊 token 不变。只使用<strong>句对两侧均至少有 8 个内容 token</strong> 的 test 子集。</p>
 <p>频带的重要性用 <strong>Spearman 降幅</strong>衡量：</p>
 <div class="arithmatex">\[
 \Delta\rho_b=\rho_{\mathrm{before}}-\rho_{\mathrm{after},b}.
 \]</div>
-<p><strong>R：</strong> B0 引起的平均 Spearman 降幅最大：FLaG <strong>0.146694</strong>，E3 <strong>0.198943</strong>。</p>
-<p><strong>C：</strong> 两个模型都对最低频敏感；E3 与 FLaG 的相对差异随 seed 变化，不能据此确认 E3 的性能变化由低频造成。</p>
+<p><strong>详细结果：</strong> B0 引起的平均 Spearman 降幅最大：FLaG <strong>0.146694</strong>，E3 <strong>0.198943</strong>。</p>
+<p><strong>结果说明：</strong> 两个模型都对最低频敏感；E3 与 FLaG 的相对差异随 seed 变化，不能据此确认 E3 的性能变化由低频造成。</p>
 <h3 id="e7token-hidden-knockout">E7：Token Hidden Knockout<a class="headerlink" href="#e7token-hidden-knockout" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> E3 是否对特定 token 位置更敏感？</p>
-<p><strong>M：</strong> 固定 FLaG/E3 的 <strong>3-seed checkpoint</strong>。逐个把<strong>内容 token 的最后一层 hidden 向量置零</strong>，其他 token、特殊 token 和 mask 不变，重新计算句对 cosine。</p>
+<p><strong>具体问题：</strong> E3 是否对特定 token 位置更敏感？</p>
+<p><strong>具体做法与参数：</strong> 固定 FLaG/E3 的 <strong>3-seed checkpoint</strong>。逐个把<strong>内容 token 的最后一层 hidden 向量置零</strong>，其他 token、特殊 token 和 mask 不变，重新计算句对 cosine。</p>
 <p>令原预测为 <code>s</code>，扰动后为 <code>s'</code>，标签为 <code>y</code>（原始分数除以 5）。对每个位置计算<strong>绝对平方误差变化</strong>：</p>
 <div class="arithmatex">\[
 R_{\text{token}}=\left|(s'-y)^2-(s-y)^2\right|.
 \]</div>
 <p>先按相同句子、相同 token 位置对齐三个 seed 的响应取平均，再统计句内位置分布。以下数字<strong>不是</strong> Spearman。</p>
-<p><strong>R：</strong> STSB test，3-seed 聚合：</p>
+<p><strong>详细结果：</strong> STSB test，3-seed 聚合：</p>
 <table>
 <thead>
 <tr>
@@ -1507,10 +1507,10 @@ R_{\text{token}}=\left|(s'-y)^2-(s-y)^2\right|.
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 两组的 token 位置响应接近，没有观察到 E3 更强的位置选择性。</p>
+<p><strong>结果说明：</strong> 两组的 token 位置响应接近，没有观察到 E3 更强的位置选择性。</p>
 <h3 id="e8dc-attention">E8：DC Attention 偏好比<a class="headerlink" href="#e8dc-attention" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> E3 是否比 global FLaG 更偏向 DC（零频）？</p>
-<p><strong>M：</strong> 固定 <strong>3-seed checkpoint</strong>，从正常 forward 中读取 latent attention 权重，先在 latent queries（以及需要时的 attention heads）上取平均。FLaG 的全局 <code>k=0</code> 是 DC；E3 将<strong>每个有效局部帧</strong>的 <code>k=0</code> 都计为 DC。</p>
+<p><strong>具体问题：</strong> E3 是否比 global FLaG 更偏向 DC（零频）？</p>
+<p><strong>具体做法与参数：</strong> 固定 <strong>3-seed checkpoint</strong>，从正常 forward 中读取 latent attention 权重，先在 latent queries（以及需要时的 attention heads）上取平均。FLaG 的全局 <code>k=0</code> 是 DC；E3 将<strong>每个有效局部帧</strong>的 <code>k=0</code> 都计为 DC。</p>
 <p>对每句话，分别计算 DC 与非 DC 的<strong>每 token 平均注意力</strong>，再求比值：</p>
 <div class="arithmatex">\[
 r_{\mathrm{DC}}=
@@ -1518,7 +1518,7 @@ r_{\mathrm{DC}}=
 {\left(\sum_{k\in\mathrm{nonDC}}A_k\right)/N_{\mathrm{nonDC}}+10^{-12}}.
 \]</div>
 <p><code>r_DC&gt;1</code> 表示<strong>平均每个 DC token</strong> 的注意力较高。表中的数值为每个 seed 在 <strong>STSB test 句子</strong>上的平均偏好比，不是 DC 能量占比。</p>
-<p><strong>R：</strong></p>
+<p><strong>详细结果：</strong></p>
 <table>
 <thead>
 <tr>
@@ -1545,7 +1545,7 @@ r_{\mathrm{DC}}=
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> E3 在三个 seed 上的 DC attention 偏好比都较低。但 attention 分配与 E6 的 knockout 性能敏感性<strong>不是同一个指标</strong>，不能仅凭偏好比判断 DC 的实际重要性。</p>
+<p><strong>结果说明：</strong> E3 在三个 seed 上的 DC attention 偏好比都较低。但 attention 分配与 E6 的 knockout 性能敏感性<strong>不是同一个指标</strong>，不能仅凭偏好比判断 DC 的实际重要性。</p>
 
 
 
