@@ -1,5 +1,7 @@
 # Sprint：数据集与训练设置
 
+> **快速说明：Sprint 是判断两个问题是否重复的任务，不是问句与答案匹配。** 早期 S1–S5 的 checkpoint 选择和后来的 Projection 比较实验并不相同，见本页最后一节。
+
 SprintDuplicateQuestions 是**判断两句话是否为重复问题**的二分类任务。沿用 STSB 选定的 **E12 结构（STFT 16/16）**，但在 Sprint 上**重新初始化并训练 pooling**，RoBERTa-base 则冻结。
 
 ## 数据与训练
@@ -35,6 +37,14 @@ $
 其中 $P_k$、$R_k$ 是对应位置的 precision、recall。Accuracy 是总体正确率，F1 综合 Precision（查准率）与 Recall（查全率）。
 
 在 **adaptation validation** 上分别选择 Accuracy 阈值、F1 阈值；最终 **test Accuracy 用前者**，**test F1/Precision/Recall 用后者**。两个指标使用的分类阈值不同。
+
+## 各阶段怎样选模型？
+
+- **早期 S1/S2 和当时的推理机制分析**：根据 validation 上校准阈值后的 Accuracy 选择 checkpoint。S1/S2 报告 official test，S3–S5 报告 adaptation validation。
+- **最新 FLaG 与 Mean + Projection 的三种子对照**：两者都根据 validation **AP** 选择 checkpoint，最后报告 official test AP，并对同 seed 的模型差异配对统计。
+- **两种规则不能混合**：即使任务和随机种子相同，选择最优 epoch 的标准不同，测试集结果也不应合并求平均。
+
+具体数据见 [Sprint S1–S5](02-experiments.md) 和 [Gate / Projection 分析](../flag-gate-projection.md)。
 
 ## 配置说明
 
