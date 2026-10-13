@@ -3,22 +3,26 @@ site_description: FLaG / STFT 实验配置、指标与机制分析
 site_url: https://lumoswwr.github.io/FLaG-STFT-Notes/
 
 nav:
-  - 首页: index.md
-  - 实验协议与指标: methods.md
-  - 研究结果综述: findings.md
-  - MTEB数据集三种文本任务观察感受: MTEB.md
-  - DC / 频带机制: dc-frequency.md
-  - Mean-compatible FLaG: mean-compatible-flag.md
-  - FLaG 门控与输出线性投影: flag-gate-projection.md
+  - 首页：从这里开始: index.md
+  - 研究过程与结果总结: findings.md
+  - 实验设置与指标: methods.md
+  - 文本任务与研究假设: MTEB.md
 
-  - STSB:
-      - E1–E8: stsb/01-experiments.md
-      - E9–E14: stsb/02-padding.md
-      - 循环反射与 P1/P2: stsb/03-mechanism.md
+  - 第一阶段：STFT 结构探索（STSB）:
+      - E1–E8：窗口与频率分析: stsb/01-experiments.md
+      - E9–E14：Padding 与配置比较: stsb/02-padding.md
+      - 循环反射、P1/P2 机制: stsb/03-mechanism.md
 
-  - Sprint:
-      - 数据与训练: sprint/01-protocol.md
-      - S1–S5: sprint/02-experiments.md
+  - 第二阶段：Sprint 验证:
+      - 数据集与训练协议: sprint/01-protocol.md
+      - S1–S5：性能与配置对照: sprint/02-experiments.md
+
+  - 第三阶段：频率与 Mean:
+      - DC 与各频带的作用: dc-frequency.md
+      - Mean 与 FLaG 的融合: mean-compatible-flag.md
+
+  - 第四阶段：内部机制:
+      - Gate 与 Projection 的作用: flag-gate-projection.md
 
 theme:
   name: material
