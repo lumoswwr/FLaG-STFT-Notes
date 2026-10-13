@@ -685,6 +685,17 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
+        各阶段怎样选模型？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         配置说明
       
     </span>
@@ -788,6 +799,17 @@
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       
+        各阶段怎样选模型？
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      
         配置说明
       
     </span>
@@ -813,6 +835,9 @@
 
 
 <h1 id="sprint">Sprint：数据集与训练设置<a class="headerlink" href="#sprint" title="Permanent link">&para;</a></h1>
+<blockquote>
+<p><strong>快速说明：Sprint 是判断两个问题是否重复的任务，不是问句与答案匹配。</strong> 早期 S1–S5 的 checkpoint 选择和后来的 Projection 比较实验并不相同，见本页最后一节。</p>
+</blockquote>
 <p>SprintDuplicateQuestions 是<strong>判断两句话是否为重复问题</strong>的二分类任务。沿用 STSB 选定的 <strong>E12 结构（STFT 16/16）</strong>，但在 Sprint 上<strong>重新初始化并训练 pooling</strong>，RoBERTa-base 则冻结。</p>
 <h2 id="_1">数据与训练<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <table>
@@ -880,7 +905,14 @@
 $</p>
 <p>其中 <span class="arithmatex">\(P_k\)</span>、<span class="arithmatex">\(R_k\)</span> 是对应位置的 precision、recall。Accuracy 是总体正确率，F1 综合 Precision（查准率）与 Recall（查全率）。</p>
 <p>在 <strong>adaptation validation</strong> 上分别选择 Accuracy 阈值、F1 阈值；最终 <strong>test Accuracy 用前者</strong>，<strong>test F1/Precision/Recall 用后者</strong>。两个指标使用的分类阈值不同。</p>
-<h2 id="_3">配置说明<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<h2 id="_3">各阶段怎样选模型？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>早期 S1/S2 和当时的推理机制分析</strong>：根据 validation 上校准阈值后的 Accuracy 选择 checkpoint。S1/S2 报告 official test，S3–S5 报告 adaptation validation。</li>
+<li><strong>最新 FLaG 与 Mean + Projection 的三种子对照</strong>：两者都根据 validation <strong>AP</strong> 选择 checkpoint，最后报告 official test AP，并对同 seed 的模型差异配对统计。</li>
+<li><strong>两种规则不能混合</strong>：即使任务和随机种子相同，选择最优 epoch 的标准不同，测试集结果也不应合并求平均。</li>
+</ul>
+<p>具体数据见 <a href="../02-experiments/">Sprint S1–S5</a> 和 <a href="../../flag-gate-projection/">Gate / Projection 分析</a>。</p>
+<h2 id="_4">配置说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>早期 Sprint 实验 <strong>S1/S2</strong>：FLaG 为 <code>dropout=0.1、norm=False</code>，E12 为 <code>dropout=0、norm=True</code>。两种配置不同，不能将它们的 AP 差全部归因于 STFT。</p>
 <p><strong>S3/S4/S5</strong> 只报告 <strong>adaptation validation</strong> 指标；S4 将 FLaG/E12 对齐为 <code>0/True</code>；S5 只对 <strong>global FLaG</strong> 做 dropout × norm 2×2。</p>
 
