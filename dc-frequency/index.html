@@ -1827,12 +1827,8 @@ L11: 0.610
 L12: 0.264
 \]</div>
 <p>也就是<strong>最后一层 DC dependency 明显下降</strong>。这一模式与 AMP 机制实验中“最终层 DC contribution 骤降”的观察方向相似。</p>
-<p>注意到非DC频带</p>
-<blockquote>
-<p>在STSB上 的 B1-B7 <strong>几乎全部是正 drop，所有drop里只有一个负数</strong>，说明这些非 DC 成分虽然不如 B0，但基本都在提供正向信息。</p>
-<p>在Sprint 上<strong>drop正负交替</strong>，每一个频带提供信息抖动，但求和发现带来的整体drop大部分layer上高于STSB任务</p>
-<p>经过平均计算后，发现Sprint上每一层非DC频带的整体平均值大部分高于STSB，且变化程度高，不如STSB上平缓</p>
-</blockquote>
+<p><strong>其他频带在两个任务上的表现也不同。</strong> 以最后一层的逐频带删除实验为例，STSB 的 B1–B7 删除后 Spearman 均有下降，而 Sprint 的部分非 DC 频带删除后 AP 反而略有提高。也就是说，最低频带在两个任务中都是影响最大的一项，但其余频带的贡献并不完全一致。</p>
+<p>这一部分统计的是<strong>从已经训练好的模型中删除某个频带后，整体预测指标改变多少</strong>。不同频带的删除效果并不要求相加等于“同时删除全部非 DC 频带”的效果，所以不要直接把各个频带的降幅加总解释成某种信息总量。</p>
 <p><img alt="Frozen RoBERTa + FLaG 的相对 band-knockout sensitivity" src="../assets/dc/stsb_sprint_knockout_relative_paperstyle.png" /></p>
 <h3 id="4-band-only">4. Band-only：只给一个频带，模型还能做多少？<a class="headerlink" href="#4-band-only" title="Permanent link">&para;</a></h3>
 <p>Band-only 与 knockout 正好相反：</p>
@@ -2153,9 +2149,12 @@ FLaG
 <li>Sprint 在 L11 → L12 出现明显的 DC contribution drop；</li>
 <li>STSB 更像中层达到 DC dependency 高峰，再在高层减弱。</li>
 </ul>
-<p>STSB中非DC频带整体预测能力低，重要性变化大，但重要性求和数值大于Sprint</p>
-<p>Sprint中非DC频带预测能力较高，重要性平缓，不是很大</p>
-<p>就感觉这个结论在打架</p>
+<p><strong>如何理解两类结果的不同？</strong> 需要分开看两个问题：</p>
+<ol>
+<li><strong>Knockout（删除）</strong>回答：模型原来依赖这个频带多少？删除后，其他仍保留的频带可能部分补偿。</li>
+<li><strong>Band-only（只保留）</strong>回答：只留下这个频带，模型还能做到什么程度？此时其他频带无法提供补偿。</li>
+</ol>
+<p>因此，一个非 DC 频带可能在“单独使用”时预测能力较弱，但在“从完整模型中删除”时仍造成性能下降。两项实验测量的不是同一件事，结果不必完全一致。</p>
 <hr />
 <h3 id="7-exact-dc">7. 训练过程中直接删除 / 仅保留 exact DC<a class="headerlink" href="#7-exact-dc" title="Permanent link">&para;</a></h3>
 <h4 id="71">7.1 实验设计<a class="headerlink" href="#71" title="Permanent link">&para;</a></h4>
