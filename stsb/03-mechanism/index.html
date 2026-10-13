@@ -1132,8 +1132,8 @@
 <h2 id="_1">详细实验记录与数据<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>本页在<strong>固定 checkpoint</strong> 下分析预测变化，不重新训练。P1/P2 均使用 <strong>STSB validation、seeds 0–2</strong>；指标“平均绝对预测漂移”指同一句对两种处理方式下 cosine 预测差的绝对值均值，<strong>不是 Spearman 差</strong>。</p>
 <h3 id="_2">循环反射的时域推导<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 为什么只增加右侧零 padding，global FLaG 的预测也会变化？</p>
-<p><strong>M：</strong> 固定某个样本和 hidden 通道。FLaG 的 gate 在各频率位置共享，但对 FFT <strong>实部、虚部</strong>分别使用乘数 <code>a</code>、<code>b</code>：</p>
+<p><strong>具体问题：</strong> 为什么只增加右侧零 padding，global FLaG 的预测也会变化？</p>
+<p><strong>具体做法与参数：</strong> 固定某个样本和 hidden 通道。FLaG 的 gate 在各频率位置共享，但对 FFT <strong>实部、虚部</strong>分别使用乘数 <code>a</code>、<code>b</code>：</p>
 <div class="arithmatex">\[
 Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 \]</div>
@@ -1142,7 +1142,7 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 \boxed{y[t]=\frac{a+b}{2}x[t]+\frac{a-b}{2}x[(-t)\bmod N]}
 \]</div>
 <p>其中 <code>N</code> 为 FFT 长度。第一项是原位置缩放，第二项是<strong>循环反射</strong>。改变 <code>N</code> 就会改变反射位置。</p>
-<p><strong>R：</strong> 取 <code>x=[10,20,30,40]</code>、<code>a=1.8,b=1.2</code>，位置 1 的重建结果：</p>
+<p><strong>详细结果：</strong> 取 <code>x=[10,20,30,40]</code>、<code>a=1.8,b=1.2</code>，位置 1 的重建结果：</p>
 <table>
 <thead>
 <tr>
@@ -1165,10 +1165,10 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 </tbody>
 </table>
 <p>独立 float64 检查 <code>N=1–129</code>，公式和 rFFT/irFFT 的最大误差约 <code>3.55×10^{-15}</code>。</p>
-<p><strong>C：</strong> 给定 gate 时，<strong>实虚不对称门控</strong>会产生随 FFT 长度改变的循环反射；实际 gate 也可能随输入改变，因此做 P1 分离两种来源。</p>
+<p><strong>结果说明：</strong> 给定 gate 时，<strong>实虚不对称门控</strong>会产生随 FFT 长度改变的循环反射；实际 gate 也可能随输入改变，因此做 P1 分离两种来源。</p>
 <h3 id="p1gate">P1：Gate 长度 × 重建长度<a class="headerlink" href="#p1gate" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> padding 导致的预测变化主要来自 gate 变化，还是重建长度变化？</p>
-<p><strong>M：</strong> 使用原始动态 FLaG <strong>3 个 checkpoint</strong>，分别控制生成 gate 的 FFT 长度 <code>Ng</code> 和应用 gate、逆 FFT 的长度 <code>Nr</code>。<code>T</code> 是正常 batch padding 长度。</p>
+<p><strong>具体问题：</strong> padding 导致的预测变化主要来自 gate 变化，还是重建长度变化？</p>
+<p><strong>具体做法与参数：</strong> 使用原始动态 FLaG <strong>3 个 checkpoint</strong>，分别控制生成 gate 的 FFT 长度 <code>Ng</code> 和应用 gate、逆 FFT 的长度 <code>Nr</code>。<code>T</code> 是正常 batch padding 长度。</p>
 <table>
 <thead>
 <tr>
@@ -1200,7 +1200,7 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 </tr>
 </tbody>
 </table>
-<p><strong>R：</strong> STSB validation，<strong>3-seed 相对 TT 的平均绝对 cosine 漂移</strong>：</p>
+<p><strong>详细结果：</strong> STSB validation，<strong>3-seed 相对 TT 的平均绝对 cosine 漂移</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1227,11 +1227,11 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 只改变 gate 输入频谱的长度几乎没有影响，当前 padding 敏感性主要来自<strong>重建长度</strong>。</p>
+<p><strong>结果说明：</strong> 只改变 gate 输入频谱的长度几乎没有影响，当前 padding 敏感性主要来自<strong>重建长度</strong>。</p>
 <h3 id="p1">P1 补充：去掉反射项<a class="headerlink" href="#p1" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 如果强制实、虚 gate 相同，能否重现固定重建长度的预测变化？</p>
-<p><strong>M：</strong> 对同一 checkpoint 令两个实际乘数都等于 <code>(a+b)/2</code>，使反射项系数为零，记为 <strong>SYM</strong>。比较 SYM、TT、T128。</p>
-<p><strong>R：</strong> STSB validation，3-seed 平均绝对 cosine 差：</p>
+<p><strong>具体问题：</strong> 如果强制实、虚 gate 相同，能否重现固定重建长度的预测变化？</p>
+<p><strong>具体做法与参数：</strong> 对同一 checkpoint 令两个实际乘数都等于 <code>(a+b)/2</code>，使反射项系数为零，记为 <strong>SYM</strong>。比较 SYM、TT、T128。</p>
+<p><strong>详细结果：</strong> STSB validation，3-seed 平均绝对 cosine 差：</p>
 <table>
 <thead>
 <tr>
@@ -1254,10 +1254,10 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> SYM 和 T128 的预测变化高度接近，支持<strong>循环反射是当前 padding 漂移的主要来源</strong>。固定到 128 不等于每个有效 token 的反射项都为零：位置 0 始终自反。</p>
+<p><strong>结果说明：</strong> SYM 和 T128 的预测变化高度接近，支持<strong>循环反射是当前 padding 漂移的主要来源</strong>。固定到 128 不等于每个有效 token 的反射项都为零：位置 0 始终自反。</p>
 <h3 id="p2global-local-gate_1">P2：Global / Local 的 Gate 与重建<a class="headerlink" href="#p2global-local-gate_1" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 从 global FLaG 换成 E12，预测差异主要来自 gate 的频谱来源，还是重建路线？</p>
-<p><strong>M：</strong> 分别加载 FLaG-trained 和 E12-trained 的 <strong>3 个 checkpoint</strong>。对<strong>同一个 checkpoint</strong>交叉更换 gate 的生成来源及实际重建路线：</p>
+<p><strong>具体问题：</strong> 从 global FLaG 换成 E12，预测差异主要来自 gate 的频谱来源，还是重建路线？</p>
+<p><strong>具体做法与参数：</strong> 分别加载 FLaG-trained 和 E12-trained 的 <strong>3 个 checkpoint</strong>。对<strong>同一个 checkpoint</strong>交叉更换 gate 的生成来源及实际重建路线：</p>
 <table>
 <thead>
 <tr>
@@ -1290,7 +1290,7 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 </tbody>
 </table>
 <p><strong>GL</strong> 表示 global 频谱<strong>只生成 gate</strong>，随后将 gate 应用于 local 频谱，再进行局部逆变换和帧拼接。此处“重建路线”包含频谱组织、逆变换及局部时域拼接，不只是替换 iFFT 函数。</p>
-<p><strong>R1：</strong> STSB validation，<strong>3-seed 平均绝对 cosine 漂移</strong>：</p>
+<p><strong>预测变化：</strong> STSB validation，<strong>3-seed 平均绝对 cosine 漂移</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1312,7 +1312,7 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 </tr>
 </tbody>
 </table>
-<p><strong>R2：</strong> 同批 validation 的 <strong>3-seed Spearman 均值</strong>：</p>
+<p><strong>对应评价指标：</strong> 同批 validation 的 <strong>3-seed Spearman 均值</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1340,7 +1340,7 @@ Y[k]=a\,\operatorname{Re}X[k]+ib\,\operatorname{Im}X[k].
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 两种频谱生成的句级 gate 几乎相同，global/local 预测差异主要来自<strong>重建路线</strong>。但是，重建路线改变并不代表 Spearman 一定提高。</p>
+<p><strong>结果说明：</strong> 两种频谱生成的句级 gate 几乎相同，global/local 预测差异主要来自<strong>重建路线</strong>。但是，重建路线改变并不代表 Spearman 一定提高。</p>
 <p><strong>区别：</strong> P1 改变 <strong>global 内部的 FFT 长度</strong>；P2 改变 <strong>global/local 的分析与重建方式</strong>。</p>
 
 

@@ -1277,8 +1277,8 @@
 </tbody>
 </table>
 <h3 id="s1">S1：初步性能对比<a class="headerlink" href="#s1" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> E12 结构用于 Sprint 后，与 Mean、早期 FLaG 相比效果如何？</p>
-<p><strong>M：</strong> 冻结 RoBERTa，分别重新训练 pooling/head，<strong>3 seeds（0–2）</strong>。当时的实际模型配置：</p>
+<p><strong>具体问题：</strong> E12 结构用于 Sprint 后，与 Mean、早期 FLaG 相比效果如何？</p>
+<p><strong>具体做法与参数：</strong> 冻结 RoBERTa，分别重新训练 pooling/head，<strong>3 seeds（0–2）</strong>。当时的实际模型配置：</p>
 <table>
 <thead>
 <tr>
@@ -1309,7 +1309,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>R：</strong> <strong>3-seed official-test（mean ± std）</strong>：</p>
+<p><strong>详细结果：</strong> <strong>3-seed official-test（mean ± std）</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1340,11 +1340,11 @@
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> E12 早期配置的 AP 更高，但 FLaG/E12 的 dropout 和 norm <strong>不匹配</strong>，还不能判断是否由 STFT 算子造成。</p>
+<p><strong>结果说明：</strong> E12 早期配置的 AP 更高，但 FLaG/E12 的 dropout 和 norm <strong>不匹配</strong>，还不能判断是否由 STFT 算子造成。</p>
 <h3 id="s2-10-seeds">S2：扩大到 10 Seeds<a class="headerlink" href="#s2-10-seeds" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> S1 的结果是否在更多随机种子下保持？</p>
-<p><strong>M：</strong> 延续 S1 两种实际配置，扩至 <strong>10 seeds（0–9）</strong>，其他协议不变。</p>
-<p><strong>R：</strong> <strong>10-seed official-test（mean ± std）</strong>：</p>
+<p><strong>具体问题：</strong> S1 的结果是否在更多随机种子下保持？</p>
+<p><strong>具体做法与参数：</strong> 延续 S1 两种实际配置，扩至 <strong>10 seeds（0–9）</strong>，其他协议不变。</p>
+<p><strong>详细结果：</strong> <strong>10-seed official-test（mean ± std）</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1382,10 +1382,10 @@
 </tbody>
 </table>
 <p>配对 E12−FLaG 的 AP 差 <strong>+0.048222 ± 0.017641</strong>，<strong>10/10 seeds 正向</strong>。</p>
-<p><strong>C：</strong> 两套<strong>整体配置</strong>之间的 AP 差在 10 seeds 中保持，但仍不能单独归因于局部 STFT。</p>
+<p><strong>结果说明：</strong> 两套<strong>整体配置</strong>之间的 AP 差在 10 seeds 中保持，但仍不能单独归因于局部 STFT。</p>
 <h3 id="s3sprint-p2">S3：Sprint 上复现 P2<a class="headerlink" href="#s3sprint-p2" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 在 Sprint 上，global/local 的输出差异主要来自 gate，还是重建路线？</p>
-<p><strong>M：</strong> 固定早期 FLaG 和 E12 各 <strong>3 个 checkpoint（0–2）</strong>，在 <strong>adaptation validation</strong> 上交叉使用两种 gate 来源和重建路线：</p>
+<p><strong>具体问题：</strong> 在 Sprint 上，global/local 的输出差异主要来自 gate，还是重建路线？</p>
+<p><strong>具体做法与参数：</strong> 固定早期 FLaG 和 E12 各 <strong>3 个 checkpoint（0–2）</strong>，在 <strong>adaptation validation</strong> 上交叉使用两种 gate 来源和重建路线：</p>
 <table>
 <thead>
 <tr>
@@ -1418,7 +1418,7 @@
 </tbody>
 </table>
 <p><strong>GL</strong> 中 global 频谱只用于生成 gate，实际被门控、逆变换的仍是 <strong>local 频谱</strong>。同一训练来源的一行实验共享同一个 checkpoint，不重新训练。</p>
-<p><strong>R：</strong> <strong>3-seed validation 平均绝对 cosine 漂移</strong>：</p>
+<p><strong>详细结果：</strong> <strong>3-seed validation 平均绝对 cosine 漂移</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1468,11 +1468,11 @@
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 与 STSB 的 P2 一致：只换 gate 几乎不改变输出，差异主要来自<strong>重建路线</strong>；直接换成 local 重建并未提高当前模型的 validation AP。</p>
+<p><strong>结果说明：</strong> 与 STSB 的 P2 一致：只换 gate 几乎不改变输出，差异主要来自<strong>重建路线</strong>；直接换成 local 重建并未提高当前模型的 validation AP。</p>
 <h3 id="s4-global-local">S4：对齐配置后比较 Global 与 Local<a class="headerlink" href="#s4-global-local" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 去掉 dropout/norm 的配置差异后，E12 还有稳定的 AP 优势吗？</p>
-<p><strong>M：</strong> FLaG、E12 都使用 <strong>dropout=0、post-pool Norm=True</strong>，其余训练条件一致，比较 <strong>10 seeds（0–9）</strong>。两者主要区别是 global FFT 与 E12 的 STFT 16/16。</p>
-<p><strong>R：</strong> <strong>10-seed adaptation-validation AP</strong>：</p>
+<p><strong>具体问题：</strong> 去掉 dropout/norm 的配置差异后，E12 还有稳定的 AP 优势吗？</p>
+<p><strong>具体做法与参数：</strong> FLaG、E12 都使用 <strong>dropout=0、post-pool Norm=True</strong>，其余训练条件一致，比较 <strong>10 seeds（0–9）</strong>。两者主要区别是 global FFT 与 E12 的 STFT 16/16。</p>
+<p><strong>详细结果：</strong> <strong>10-seed adaptation-validation AP</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1496,11 +1496,11 @@
 </tbody>
 </table>
 <p><strong>4/10 seeds</strong> 的差值为正。</p>
-<p><strong>C：</strong> 在匹配配置下没有观察到稳定的 E12 优势，S1/S2 的差异不能直接归因于 STFT 算子。</p>
+<p><strong>结果说明：</strong> 在匹配配置下没有观察到稳定的 E12 优势，S1/S2 的差异不能直接归因于 STFT 算子。</p>
 <h3 id="s5global-flag-dropout-norm">S5：Global FLaG 的 Dropout × Norm<a class="headerlink" href="#s5global-flag-dropout-norm" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> dropout 与 post-pool Norm 是否影响 Sprint 的 global FLaG？</p>
-<p><strong>M：</strong> <strong>固定 global FFT</strong>，交叉测试 dropout <code>{0,0.1}</code> 和 Norm <code>{无,有}</code> 四种设置；每组 <strong>10 seeds（0–9）</strong>，其余训练条件一致。</p>
-<p><strong>R：</strong> <strong>10-seed adaptation-validation AP</strong>：</p>
+<p><strong>具体问题：</strong> dropout 与 post-pool Norm 是否影响 Sprint 的 global FLaG？</p>
+<p><strong>具体做法与参数：</strong> <strong>固定 global FFT</strong>，交叉测试 dropout <code>{0,0.1}</code> 和 Norm <code>{无,有}</code> 四种设置；每组 <strong>10 seeds（0–9）</strong>，其余训练条件一致。</p>
+<p><strong>详细结果：</strong> <strong>10-seed adaptation-validation AP</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1533,7 +1533,7 @@
 </tbody>
 </table>
 <p>相同 dropout 下<strong>增加 Norm</strong>：dropout=0.1 时 AP 差为 <strong>+0.068220</strong>；dropout=0 时为 <strong>−0.003145</strong>。</p>
-<p><strong>C：</strong> dropout 与 Norm 存在交互，本实验四种 <strong>global FLaG</strong> 配置中 <code>0.1 + 有 Norm</code> 的 validation AP 最高。<strong>本实验没有测试 <code>0.1 + 有 Norm</code> 的 Sprint E12</strong>，不能据此比较这项配置下的 global 与 local。</p>
+<p><strong>结果说明：</strong> dropout 与 Norm 存在交互，本实验四种 <strong>global FLaG</strong> 配置中 <code>0.1 + 有 Norm</code> 的 validation AP 最高。<strong>本实验没有测试 <code>0.1 + 有 Norm</code> 的 Sprint E12</strong>，不能据此比较这项配置下的 global 与 local。</p>
 
 
 

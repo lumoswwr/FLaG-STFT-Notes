@@ -1347,9 +1347,9 @@
 </table>
 <p>除 E14 外，STSB 新训练模型统一 <strong>dropout=0、post-pool Norm=True</strong>。</p>
 <h3 id="e9-padding_1">E9：额外右 Padding 的影响<a class="headerlink" href="#e9-padding_1" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 同一句子只增加右侧零 padding，FLaG 与 E3 的预测是否变化？</p>
-<p><strong>M：</strong> 固定 FLaG/E3 checkpoint，选择有效长度 ≤16 的 STSB 短句。保持 RoBERTa 产生的有效 hidden 不变，分别补零到 16、24、32、64、128，再传入 pooling；计算相对精确有效长度处理的<strong>句对 cosine 绝对差</strong>。</p>
-<p><strong>R：</strong> 补零至 128 时：</p>
+<p><strong>具体问题：</strong> 同一句子只增加右侧零 padding，FLaG 与 E3 的预测是否变化？</p>
+<p><strong>具体做法与参数：</strong> 固定 FLaG/E3 checkpoint，选择有效长度 ≤16 的 STSB 短句。保持 RoBERTa 产生的有效 hidden 不变，分别补零到 16、24、32、64、128，再传入 pooling；计算相对精确有效长度处理的<strong>句对 cosine 绝对差</strong>。</p>
+<p><strong>详细结果：</strong> 补零至 128 时：</p>
 <table>
 <thead>
 <tr>
@@ -1371,11 +1371,11 @@
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 当前 global FLaG 对外部右 padding 敏感；E3 在这项固定 hidden 测试中近似不变。</p>
+<p><strong>结果说明：</strong> 当前 global FLaG 对外部右 padding 敏感；E3 在这项固定 hidden 测试中近似不变。</p>
 <p><em>记录待核对：现有摘要没有给出这张结果表所对应的完整运行命令。探针脚本默认 seed=0、最多 200 对样本，但正式确定实验数量需要检查原始日志。</em></p>
 <h3 id="e10-padding">E10：四种 Padding 推理方式<a class="headerlink" href="#e10-padding" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> E9 的预测变化是否明显影响整个 STSB test 的性能？</p>
-<p><strong>M：</strong> 使用 FLaG/E3 的 <strong>3-seed checkpoint</strong>，每句话只计算一次 RoBERTa hidden，之后采用四种 <strong>pooling 输入长度</strong>，不重新训练：</p>
+<p><strong>具体问题：</strong> E9 的预测变化是否明显影响整个 STSB test 的性能？</p>
+<p><strong>具体做法与参数：</strong> 使用 FLaG/E3 的 <strong>3-seed checkpoint</strong>，每句话只计算一次 RoBERTa hidden，之后采用四种 <strong>pooling 输入长度</strong>，不重新训练：</p>
 <table>
 <thead>
 <tr>
@@ -1402,7 +1402,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>R：</strong> <strong>3-seed mean test Spearman</strong>：</p>
+<p><strong>详细结果：</strong> <strong>3-seed mean test Spearman</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1434,11 +1434,11 @@
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> Padding 会改变 FLaG 的预测和少量 test Spearman，但未能解释全部 FLaG/E3 性能差异。</p>
+<p><strong>结果说明：</strong> Padding 会改变 FLaG 的预测和少量 test Spearman，但未能解释全部 FLaG/E3 性能差异。</p>
 <h3 id="e11e12">E11/E12：窗口大小与重叠<a class="headerlink" href="#e11e12" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> STFT 是否一定需要窗口重叠？</p>
-<p><strong>M：</strong> 比较 win8/win16 与半窗重叠/无重叠，共四种 rect、<code>center=False</code> 的 STFT 配置。沿用 E2/E3，并补充重新训练 E11/E12，<strong>每组 3 seeds（0–2）</strong>，其他参数一致。</p>
-<p><strong>R：</strong> <strong>3-seed test Spearman（mean ± std）</strong>：</p>
+<p><strong>具体问题：</strong> STFT 是否一定需要窗口重叠？</p>
+<p><strong>具体做法与参数：</strong> 比较 win8/win16 与半窗重叠/无重叠，共四种 rect、<code>center=False</code> 的 STFT 配置。沿用 E2/E3，并补充重新训练 E11/E12，<strong>每组 3 seeds（0–2）</strong>，其他参数一致。</p>
+<p><strong>详细结果：</strong> <strong>3-seed test Spearman（mean ± std）</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1460,7 +1460,7 @@
 </tr>
 </tbody>
 </table>
-<p><strong>C：</strong> 重叠没有一致优势。后续固定使用结构简单的 <strong>E12：rect、win16/hop16、center=False</strong>。</p>
+<p><strong>结果说明：</strong> 重叠没有一致优势。后续固定使用结构简单的 <strong>E12：rect、win16/hop16、center=False</strong>。</p>
 <h4 id="e12-10-seed">E12 的 10-seed 稳定性<a class="headerlink" href="#e12-10-seed" title="Permanent link">&para;</a></h4>
 <p>将原匹配设置（FLaG/E12 都为 <strong>dropout=0、Norm=True</strong>）扩至 <strong>10 seeds（0–9）</strong>：</p>
 <table>
@@ -1491,14 +1491,14 @@
 </table>
 <p>Spearman <strong>7/10 seeds</strong> 正向，配对 95% CI 约 <code>[−0.00033, +0.00269]</code>。虽然平均差为正，但不足以说明稳定优势。</p>
 <h3 id="e13-fft">E13：从训练开始固定 FFT 长度<a class="headerlink" href="#e13-fft" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 如果 global FLaG 在训练时就使用固定 FFT 长度，能否改善结果？</p>
-<p><strong>M：</strong> global FLaG 在训练及推理时均设 <code>fixed_fft_length=128</code>；不引入 STFT，其他设置不变，<strong>3 seeds（0–2）</strong>。</p>
-<p><strong>R：</strong> test Spearman <strong>0.841856 ± 0.001000</strong>；相对同 seed 动态 FLaG 的配对差为 <strong>+0.000728 ± 0.003079</strong>，仅 <strong>1/3 正向</strong>。</p>
-<p><strong>C：</strong> 固定 FFT 长度没有带来稳定的性能改善。</p>
+<p><strong>具体问题：</strong> 如果 global FLaG 在训练时就使用固定 FFT 长度，能否改善结果？</p>
+<p><strong>具体做法与参数：</strong> global FLaG 在训练及推理时均设 <code>fixed_fft_length=128</code>；不引入 STFT，其他设置不变，<strong>3 seeds（0–2）</strong>。</p>
+<p><strong>详细结果：</strong> test Spearman <strong>0.841856 ± 0.001000</strong>；相对同 seed 动态 FLaG 的配对差为 <strong>+0.000728 ± 0.003079</strong>，仅 <strong>1/3 正向</strong>。</p>
+<p><strong>结果说明：</strong> 固定 FFT 长度没有带来稳定的性能改善。</p>
 <h3 id="e14-text">E14：统一论文 Text 配置<a class="headerlink" href="#e14-text" title="Permanent link">&para;</a></h3>
-<p><strong>Q：</strong> 在论文 text 配置下，E12 相比 FLaG 的早期性能趋势是否仍存在？</p>
-<p><strong>M：</strong> FLaG 与 E12 都改为 <strong>dropout=0.1、post-pool Norm=True</strong>，其余训练设置匹配，重新训练 <strong>10 seeds（0–9）</strong>。</p>
-<p><strong>R：</strong> <strong>10-seed test</strong>：</p>
+<p><strong>具体问题：</strong> 在论文 text 配置下，E12 相比 FLaG 的早期性能趋势是否仍存在？</p>
+<p><strong>具体做法与参数：</strong> FLaG 与 E12 都改为 <strong>dropout=0.1、post-pool Norm=True</strong>，其余训练设置匹配，重新训练 <strong>10 seeds（0–9）</strong>。</p>
+<p><strong>详细结果：</strong> <strong>10-seed test</strong>：</p>
 <table>
 <thead>
 <tr>
@@ -1526,7 +1526,7 @@
 </tbody>
 </table>
 <p>Spearman <strong>5/10 seeds</strong> 正向。</p>
-<p><strong>C：</strong> 两者基本持平。E12 在 0/有 Norm 下的小幅正向均值没有在这组 0.1/有 Norm 实验中保持。</p>
+<p><strong>结果说明：</strong> 两者基本持平。E12 在 0/有 Norm 下的小幅正向均值没有在这组 0.1/有 Norm 实验中保持。</p>
 
 
 
