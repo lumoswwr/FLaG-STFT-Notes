@@ -1188,31 +1188,27 @@
 
 
 <h1 id="sprint-global-stft">Sprint：换一个任务重新比较 Global 与 STFT<a class="headerlink" href="#sprint-global-stft" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>先看实验概览</strong>：逐项说明实验目的、方法、结果与结论；之后保留详细实验记录、原始指标、公式和数据分析。这里的概览使用你确认的 38 项汇报稿，不与其他实验协议的结果混合比较。</p>
-</blockquote>
 <h2 id="5">本页实验概览（5 项）<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
-<p><strong>对应文件：</strong> <code>docs/sprint/02-experiments.md</code></p>
 <p>把 STFT 应用到判断两句话是否重复的 Sprint 任务，先看性能，再统一训练配置，避免把 dropout 或 LayerNorm 的作用误认成局部 STFT 的优势。</p>
 <h3 id="s1-stft-flag-sprint">实验十八（S1）：把 STFT-FLaG 用到 Sprint，效果怎样？<a class="headerlink" href="#s1-stft-flag-sprint" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 检查 STFT 在 STSB 以外的任务中是否仍然有效。</li>
 <li><strong>实验思路：</strong> 冻结 RoBERTa，在 Sprint 上分别训练直接 Mean、Global FLaG 和 E12，比较三个种子的测试集性能。</li>
 <li><strong>实验结果：</strong> Mean、FLaG、E12 的 Test AP 分别为 0.428907、0.721611、0.765655。</li>
-<li><strong>实验结论：</strong> 这组 Sprint 实验中，E12 所使用的整套配置得到最高 Test AP。由于 Global 与 E12 的 dropout/LayerNorm 同时不同，下一步需要统一配置比较。</li>
+<li><strong>实验结论：</strong> 这组 Sprint 实验中，E12 所使用的整套配置得到最高 Test AP。</li>
 </ul>
 <h3 id="s2stft-sprint">实验十九（S2）：STFT 在 Sprint 上的优势是否稳定？<a class="headerlink" href="#s2stft-sprint" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 将 S1 的 Sprint 对照扩展至十个种子，观察两套配置的差距是否仍存在。</li>
-<li><strong>实验思路：</strong> 保持 S1 的两套配置不变，将 FLaG 和 E12 的实验扩展至十个种子。</li>
+<li><strong>实验思路：</strong> 保持 S1 的两套配置不变，将 FLaG 和 E12 的实验扩展至十个seed。</li>
 <li><strong>实验结果：</strong> FLaG 的平均 Test AP 为 0.713121，E12 为 0.761344。E12 在十个种子中全部领先，平均高 0.048222。</li>
-<li><strong>实验结论：</strong> E12 的原有配置在十个种子中均高于 FLaG 的原有配置，但这项结果比较的是两套完整配置，而不是只改变 FFT 与 STFT。</li>
+<li><strong>实验结论：</strong> E12 的原有配置在十个种子中均高于 FLaG 的原有配置。</li>
 </ul>
 <h3 id="s3-sprint-global-local">实验二十（S3）：在 Sprint 上，Global 和 Local 的预测差异来自哪里？<a class="headerlink" href="#s3-sprint-global-local" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 检查 STSB 上 P2 的机制发现，在 Sprint 上是否仍然成立。</li>
 <li><strong>实验思路：</strong> 固定训练好的模型，分别交换 Gate 来源和频谱重建方式，观察预测变化。</li>
-<li><strong>实验结果：</strong> 只更换 Gate，预测几乎不变；更换频谱重建路径后，平均 cosine 变化约为 0.032 至 0.037。</li>
+<li><strong>实验结果：</strong> 只更换 Gate，预测几乎不变。更换频谱重建路径后，平均 cosine 变化约为 0.032 至 0.037。</li>
 <li><strong>实验结论：</strong> Sprint 与 STSB 的 P2 结果一致：更换 Gate 来源几乎无影响，切换完整的频谱重建路线才会明显改变预测。</li>
 </ul>
 <h3 id="s4stft-global-fft">实验二十一（S4）：统一训练配置后，STFT 还比 Global FFT 好吗？<a class="headerlink" href="#s4stft-global-fft" title="Permanent link">&para;</a></h3>
@@ -1220,16 +1216,15 @@
 <li><strong>实验目的：</strong> 排除 S1/S2 中 dropout 和 LayerNorm 不一致带来的影响。</li>
 <li><strong>实验思路：</strong> 将 FLaG 和 E12 都设置为 dropout=0、启用后池化 LayerNorm，重新进行十个种子比较。</li>
 <li><strong>实验结果：</strong> FLaG 的平均 Validation AP 为 0.795830，E12 为 0.789136，E12 只在四个种子中领先。</li>
-<li><strong>实验结论：</strong> 将 dropout 与 LayerNorm 统一后，E12 的平均 Validation AP 反而低于 FLaG；S1/S2 中观察到的优势不能由 STFT 操作单独解释。</li>
+<li><strong>实验结论：</strong> 将 dropout 与 LayerNorm 统一后，E12 的平均 Validation AP 反而低于 FLaG，模型配置影响大。</li>
 </ul>
 <h3 id="s5dropout-layernorm-flag">实验二十二（S5）：Dropout 和 LayerNorm 到底对 FLaG 有多大影响？<a class="headerlink" href="#s5dropout-layernorm-flag" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 进一步解释为什么同一个 FLaG，在不同训练配置下性能差异明显。</li>
 <li><strong>实验思路：</strong> 固定 Global FLaG，只改变 dropout 是否为 0.1，以及是否启用后池化 LayerNorm，测试四种组合。</li>
-<li><strong>实验结果：</strong> 在十种子 Validation AP 上，dropout=0.1 且启用 LayerNorm 的组合最高，为 0.819156；dropout=0.1 且关闭 LayerNorm 时仅为 0.750936。</li>
-<li><strong>实验结论：</strong> Global FLaG 在 dropout=0.1、启用 LayerNorm 时取得本次四种配置中最高的 Validation AP；两项设置的作用需要结合考虑。</li>
+<li><strong>实验结果：</strong> 在十seed Validation AP 上，dropout=0.1 且启用 LayerNorm 的组合最高，为 0.819156；dropout=0.1 且关闭 LayerNorm 时仅为 0.750936。</li>
+<li><strong>实验结论：</strong> Global FLaG 在 dropout=0.1、启用 LayerNorm 时取得本次四种配置中最高的 Validation AP。两项设置的作用需要结合考虑。</li>
 </ul>
-<p><strong>本篇小结：</strong> E12 的早期配置确实有更高 AP；但统一 dropout 和 LayerNorm 后，E12 的优势消失，说明配置差异对性能影响很大。</p>
 <hr />
 <h2 id="_1">详细实验记录与数据<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>数据集、冻结 RoBERTa、分类 head 和评价指标见<a href="../01-protocol/">Sprint 设置</a>。<strong>S1/S2 报 official test</strong>，<strong>S3–S5 报 adaptation validation</strong>，二者不能直接比较。</p>

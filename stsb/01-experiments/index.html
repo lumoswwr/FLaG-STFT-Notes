@@ -1320,32 +1320,28 @@
 
 
 <h1 id="stsb-fft-stft">STSB：从全局 FFT 改为局部 STFT<a class="headerlink" href="#stsb-fft-stft" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>先看实验概览</strong>：下面逐项说明实验目的、做法、结果和结论。需要复查具体配置、原始指标及计算方法时，再阅读后面的详细实验记录。不同实验的 test、validation 与随机种子信息以详细记录为准。</p>
-</blockquote>
 <h2 id="8">本页实验概览（8 项）<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
-<p><strong>对应文件：</strong> <code>docs/stsb/01-experiments.md</code></p>
 <p>先尝试改变 FFT 的处理方式和窗口，再检查两种模型依赖哪些频率、token 位置以及注意力位置。早期小幅性能提升推动了后续实验，但低频依赖和注意力分配并不等同。</p>
 <h3 id="e1-fft-hann">实验一（E1）：在 FFT 前增加 Hann 窗，能否改善模型性能？<a class="headerlink" href="#e1-fft-hann" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 尝试减小序列两端带来的频谱边界影响，看看能否提高 STSB 的句子相似度预测能力。</li>
-<li><strong>实验思路：</strong> 保留原始 Global FLaG，在 FFT 前对有效 token 特征乘上 Hann 窗函数，再用三个随机种子重新训练。</li>
+<li><strong>实验思路：</strong> 使用  FLaG，在 FFT 前对有效 token 特征乘上 Hann 窗函数，再用三个随机种子重新训练。</li>
 <li><strong>实验结果：</strong> Test Spearman 从 FLaG 的 0.841128 降至 0.837019。</li>
-<li><strong>实验结论：</strong> 在本次 STSB 对照中，全局 Hann 加窗使 Spearman 下降 0.004109；后续不采用这一加窗方案。</li>
+<li><strong>实验结论：</strong> 全局 Hann 加窗使 Spearman 下降 0.004109，后续不采用这一加窗方案。</li>
 </ul>
 <h3 id="e2-fft-fft">实验二（E2）：把整句 FFT 改成分窗口 FFT，性能会怎样？<a class="headerlink" href="#e2-fft-fft" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>实验目的：</strong> 验证 STFT 这种局部频域处理方式，是否比原始整句 FFT 更适合句子表示。</li>
+<li><strong>实验目的：</strong> 验证 STFT 这种局部频域处理方式，是否比 FFT 更适合句子表示。</li>
 <li><strong>实验思路：</strong> 将句子划分为长度 16、步长 8 的窗口，每两个相邻窗口重叠 8 个 token。所有窗口共同生成一个句级 Gate，再分别进行频域处理和重建。</li>
-<li><strong>实验结果：</strong> Test Spearman 为 0.842204，比原始 FLaG 高 0.001076，三个种子中两个更好。</li>
+<li><strong>实验结果：</strong> Test Spearman 为 0.842204，比原始 FLaG 高 0.001076，三seed两个更好。</li>
 <li><strong>实验结论：</strong> 16/8 的局部 FFT 比原始全局 FFT 小幅提高 Spearman，因此继续测试更短的窗口。</li>
 </ul>
 <h3 id="e3">实验三（E3）：把窗口缩短，是否更适合短句？<a class="headerlink" href="#e3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 检查更短的局部窗口是否适合 STSB 中长度有限的句子。</li>
 <li><strong>实验思路：</strong> 将窗口长度改为 8，步长改为 4，其他设置保持一致。</li>
-<li><strong>实验结果：</strong> Test Spearman 达到 0.843000，比原始 FLaG 高 0.001873，三个种子全部正向。</li>
-<li><strong>实验结论：</strong> 8/4 窗口在这组 STSB 实验中取得较高 Spearman，后续以 E3 为局部模型进行机制分析。</li>
+<li><strong>实验结果：</strong> Test Spearman 达到 0.843000，比原始 FLaG 高 0.001873，三seed全正向。</li>
+<li><strong>实验结论：</strong> 8/4 窗口在这组 STSB 实验中取得较高 Spearman，后续先以 E3 为局部模型进行机制分析。</li>
 </ul>
 <h3 id="e4">实验四（E4）：给不同窗口加入位置编码有没有帮助？<a class="headerlink" href="#e4" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1359,11 +1355,11 @@
 <li><strong>实验目的：</strong> 检查局部频域分析中，平滑窗口边界是否能进一步改善效果。</li>
 <li><strong>实验思路：</strong> 在 E3 基础上使用 periodic Hann 窗，并同时将 center 改为 True。</li>
 <li><strong>实验结果：</strong> Test Spearman 为 0.843027，与 E3 的 0.843000 几乎一致。</li>
-<li><strong>实验结论：</strong> 加入局部 Hann 窗并开启 center 后，与 E3 几乎持平；后续继续使用结构更简单的矩形窗。</li>
+<li><strong>实验结论：</strong> 加入局部 Hann 窗并开启 center 后，与 E3 几乎持平，后续继续使用结构更简单的矩形窗。</li>
 </ul>
 <h3 id="e6global-flag-stft-flag">实验六（E6）：Global FLaG 和 STFT-FLaG 分别依赖哪些频率？<a class="headerlink" href="#e6global-flag-stft-flag" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>实验目的：</strong> 想知道局部 FFT 是否改变了模型对低频和高频信息的依赖。</li>
+<li><strong>实验目的：</strong> 探究局部 FFT 是否改变了模型对低频和高频信息的依赖。</li>
 <li><strong>实验思路：</strong> 固定训练好的模型，对 RoBERTa 最后一层内容 token 的特征进行 DCT-II 变换，将频率划成八个频带，每次删除一个频带，观察 Spearman 下降多少。</li>
 <li><strong>实验结果：</strong> 删除最低频带 B0 的影响最大。FLaG 的平均 Spearman 降幅为 0.146694，E3 为 0.198943。</li>
 <li><strong>实验结论：</strong> 删除 B0 对两种模型的影响都最大，其中 E3 的 Spearman 降幅更大，表明它在这项频带删除测试中更依赖最低频部分。</li>
@@ -1379,10 +1375,9 @@
 <ul>
 <li><strong>实验目的：</strong> 比较全局和局部频域模型的注意力，是否更加集中于 DC。</li>
 <li><strong>实验思路：</strong> 读取 latent attention 权重，比较 DC 频率位置与非 DC 频率位置的平均每位置注意力大小。</li>
-<li><strong>实验结果：</strong> 三个种子中，E3 的 DC 注意力偏好比都比 Global FLaG 低。例如 seed 0 为 1.305，对应 FLaG 为 2.602。</li>
-<li><strong>实验结论：</strong> E3 给 DC 位置分配的平均注意力相对更低；这与 E6 中删除低频仍造成较大损失的结果一起说明，注意力大小不能直接当作频带的预测贡献。</li>
+<li><strong>实验结果：</strong> 三个种子中，E3 的 DC 注意力偏好比都比 Global FLaG 低。</li>
+<li><strong>实验结论：</strong> E3 给 DC 位置分配的平均注意力相对更低</li>
 </ul>
-<p><strong>本篇小结：</strong> 局部窗口一度取得略高 Spearman；加入 Hann 窗或帧位置编码没有进一步改善，E3 也没有表现出更强的 token 位置选择性。</p>
 <hr />
 <h2 id="_1">详细实验记录与数据<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>本页使用 <strong>STSB</strong>。E1–E5 重新训练，使用 <strong>seeds 0、1、2</strong>，结果为 <strong>test Spearman / Pearson（mean ± std）</strong>；E6–E8 则使用这些 seed 的<strong>已训练 FLaG/E3 checkpoint</strong> 做分析，不重新训练。共同配置见<a href="../../methods/">实验设置</a>。</p>

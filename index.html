@@ -261,7 +261,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        先看我们到底研究了什么
+        目前研究进展
       
     </span>
   </a>
@@ -272,7 +272,7 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        七篇实验报告，从头到尾怎么读？
+        实验报告
       
     </span>
   </a>
@@ -281,17 +281,6 @@
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        从哪里开始看？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         关于指标和实验设置
@@ -904,7 +893,7 @@
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        先看我们到底研究了什么
+        目前研究进展
       
     </span>
   </a>
@@ -915,7 +904,7 @@
   <a href="#_2" class="md-nav__link">
     <span class="md-ellipsis">
       
-        七篇实验报告，从头到尾怎么读？
+        实验报告
       
     </span>
   </a>
@@ -924,17 +913,6 @@
       
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        从哪里开始看？
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
       
         关于指标和实验设置
@@ -962,15 +940,12 @@
 
 
 <h1 id="flag-stft">FLaG / STFT 研究与实验报告<a class="headerlink" href="#flag-stft" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>阅读建议</strong>：第一次看这项研究，先读下面的“研究做了什么”和“七篇实验报告”；每篇报告开头都有你确认的“实验目的、思路、结果、结论”概览，下面才是完整实验细节。</p>
-</blockquote>
-<h2 id="_1">先看我们到底研究了什么<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
+<h2 id="_1">目前研究进展<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>最初，我们想把 FLaG 的整句 FFT 改成分窗口 STFT，看看局部频率信息能不能改善文本预测。早期一些实验中，STFT 的分数确实略高，但把训练配置统一以后，这个优势没有保留下来。</p>
 <p>为了弄清原因，我们检查了 Padding、Gate 和频谱重建。结果发现，Global FLaG 对 Padding 长度敏感，主要与逆变换时出现的循环反射有关；Global 和 Local 的预测差异也主要来自重建路线，而不是它们生成了明显不同的 Gate。</p>
 <p>随后我们研究频率本身。删除最低频带会明显伤害预测，而只保留 DC 并从头训练，仍然可以获得很好的结果。说明 Mean/DC 中已有大量任务相关信息，关键是后续模型能否把它们利用起来。</p>
-<p>最近的实验继续把 FLaG 拆开：训练后的 Gate 在不同句子间几乎不变，少数低 Gate 值通道对应大量 DC 平方能量。最终在 Sprint 上，直接 Mean 加一个可训练线性层就得到了与 FLaG 接近甚至更高的 Test AP。</p>
-<h2 id="_2">七篇实验报告，从头到尾怎么读？<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>后续的实验继续把 FLaG 拆开：训练后的 Gate 在不同句子间几乎不变，少数低 Gate 值通道对应大量 DC 平方能量。最终在 Sprint 上，直接 Mean 加一个可训练线性层就得到了与 FLaG 接近甚至更高的 Test AP。</p>
+<h2 id="_2">实验报告<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1017,16 +992,8 @@
 </tr>
 </tbody>
 </table>
-<h2 id="_3">从哪里开始看？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<ul>
-<li><strong>只想快速了解我们做了什么：</strong> 先读 <a href="findings/">整个研究的结果总结</a>，再看上表感兴趣的章节。</li>
-<li><strong>想知道实验是否公平、数据如何划分：</strong> 看 <a href="methods/">模型、数据集和指标</a> 与 <a href="sprint/01-protocol/">Sprint 训练及评价方式</a>。</li>
-<li><strong>想了解为什么选择 STSB、Sprint、IMDB：</strong> 看 <a href="MTEB/">三种文本任务的特点与研究假设</a>。</li>
-<li><strong>想核对实验细节：</strong> 进入每篇报告的“详细实验记录与数据”，那里保留了对应公式、训练配置、各项指标及图表。</li>
-</ul>
-<h2 id="_4">关于指标和实验设置<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<h2 id="_3">关于指标和实验设置<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <p>STSB 的主要指标是 <strong>Spearman</strong>（预测相似度排序和真实排序的一致程度）；Sprint 的主要指标是 <strong>AP</strong>（按预测分数排序寻找重复问题的能力）；IMDB 主要看 Accuracy 和 F1。这些分数衡量不同任务，不能直接相互比较。</p>
-<p>早期 Sprint 实验有些模型的 dropout、LayerNorm 配置并不相同；后期的 Projection 对照又采用了另一套 <strong>time pooling=Mean、无 post-pool LayerNorm</strong> 的机制研究配置。因此，各篇报告分别写明本次比较的设置，避免把不同实验的分数放在同一口径下判断。</p>
 <p><strong>完整索引：</strong> <a href="methods/">实验设置</a> · <a href="MTEB/">任务理解</a> · <a href="findings/">总结果</a></p>
 
 

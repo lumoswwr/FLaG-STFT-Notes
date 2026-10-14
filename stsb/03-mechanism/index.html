@@ -1100,17 +1100,13 @@
 
 
 <h1 id="stsb-globallocal">STSB：解释 Global/Local 输出差异<a class="headerlink" href="#stsb-globallocal" title="Permanent link">&para;</a></h1>
-<blockquote>
-<p><strong>先看实验概览</strong>：下面逐项说明实验目的、做法、结果和结论。需要复查具体配置、原始指标及计算方法时，再阅读后面的详细实验记录。不同实验的 test、validation 与随机种子信息以详细记录为准。</p>
-</blockquote>
 <h2 id="3">本页实验概览（3 项）<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
-<p><strong>对应文件：</strong> <code>docs/stsb/03-mechanism.md</code></p>
 <p>前面的 Padding 实验发现 Global FLaG 的输出会变化。这一组不再重新训练，而是逐步控制 FFT 长度、Gate 来源和逆变换方式，找出变化究竟来自哪里。</p>
 <h3 id="padding">实验十五：通过数学推导解释 Padding 为什么会改变结果<a class="headerlink" href="#padding" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 找到即使 Gate 不变，仅仅改变 FFT 长度也会影响模型输出的原因。</li>
 <li><strong>实验思路：</strong> 根据 FLaG 对频谱实部和虚部分别乘不同 Gate 系数的操作，推导它对应的时域变换，并用数值计算验证。</li>
-<li><strong>实验结果：</strong> 发现输出不仅包含原位置的 token 特征，还包含循环反转位置的特征。当 FFT 长度改变时，反转位置也会改变。公式在 float64 检查中的最大误差约为 <span class="arithmatex">\(3.55\times10^{-15}\)</span>。</li>
+<li><strong>实验结果：</strong> 发现输出不仅包含原位置的 token 特征，还包含循环反转位置的特征。当 FFT 长度改变时，反转位置也会改变。</li>
 <li><strong>实验结论：</strong> 实部和虚部采用不同 Gate 系数时，逆 FFT 会引入循环反射项；改变 FFT 长度会改变反射对应的位置，从而改变输出。</li>
 </ul>
 <h3 id="p1padding-gate">实验十六（P1）：Padding 的影响到底来自 Gate，还是频谱重建？<a class="headerlink" href="#p1padding-gate" title="Permanent link">&para;</a></h3>
@@ -1118,7 +1114,7 @@
 <li><strong>实验目的：</strong> 分清 Padding 导致预测变化的真正来源。</li>
 <li><strong>实验思路：</strong> 分别控制“生成 Gate 时采用的 FFT 长度”和“应用 Gate、逆 FFT 时采用的长度”，只改变其中一个。 补充实验中，再把实部与虚部 Gate 设为相同，去掉循环反射项。</li>
 <li><strong>实验结果：</strong> STSB validation 上，只改变 Gate 生成长度，平均 cosine 预测变化约 <span class="arithmatex">\(4.8\times10^{-7}\)</span>；只改变逆变换长度，变化约 0.005520。 去掉循环反射后的输出与固定长度 128 的输出平均 cosine 差约为 0.000295。</li>
-<li><strong>实验结论：</strong> Padding 引起的预测差异主要来自应用 Gate 后的逆变换长度，而不是 Gate 的生成长度；取消循环反射后，也得到与固定重建长度相近的预测。</li>
+<li><strong>实验结论：</strong> Padding 引起的预测差异主要来自应用 Gate 后的逆变换长度，而不是 Gate 的生成长度。取消循环反射后，也得到与固定重建长度相近的预测。</li>
 </ul>
 <h3 id="p2global-local-gate">实验十七（P2）：Global 和 Local 的差异来自 Gate，还是重建方式？<a class="headerlink" href="#p2global-local-gate" title="Permanent link">&para;</a></h3>
 <ul>
@@ -1127,7 +1123,6 @@
 <li><strong>实验结果：</strong> 只换 Gate 来源时，预测变化约为 <span class="arithmatex">\(10^{-7}\)</span>；更换重建路径后，平均 cosine 变化约为 0.0058 至 0.0060。</li>
 <li><strong>实验结论：</strong> 在相同 checkpoint 下，Global 与 Local 的 Gate 来源互换几乎不改变预测，真正产生明显差异的是频谱处理和重建路线。</li>
 </ul>
-<p><strong>本篇小结：</strong> 实虚部 Gate 不同会产生循环反射；Padding 与 Global/Local 的预测变化主要由重建路线引起，而不是 Gate 来源。</p>
 <hr />
 <h2 id="_1">详细实验记录与数据<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>本页在<strong>固定 checkpoint</strong> 下分析预测变化，不重新训练。P1/P2 均使用 <strong>STSB validation、seeds 0–2</strong>；指标“平均绝对预测漂移”指同一句对两种处理方式下 cosine 预测差的绝对值均值，<strong>不是 Spearman 差</strong>。</p>

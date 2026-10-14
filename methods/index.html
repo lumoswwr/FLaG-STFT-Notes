@@ -314,17 +314,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        先看懂我们比较了哪些东西
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -953,17 +942,6 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        先看懂我们比较了哪些东西
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#1" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1064,7 +1042,6 @@
 
 
 <h1 id="_1">实验设置与指标<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<h2 id="_2">先看懂我们比较了哪些东西<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <p>本项目最开始比较 <strong>Global FLaG（对整句话做 FFT）</strong> 与 <strong>STFT-FLaG（把句子分成小窗口做 FFT）</strong>。随后为了解释预测差异，分析了 Padding、重建、Gate、DC 频带和可训练输出线性层，并尝试把 Mean 与 FLaG 结合起来。</p>
 <p>不同阶段的实验不一定采用同一套模型参数。阅读结果时，尤其需要看清三件事：</p>
 <ol>
@@ -1072,7 +1049,6 @@
 <li><strong>报告的是 Validation 还是 Test</strong>：Validation 用来选择模型或配置，Test 用来报告选定模型在测试数据上的效果。</li>
 <li><strong>FLaG 最后采用 Max 还是 Mean，以及是否开启后池化 LayerNorm</strong>：这些改变可能明显影响性能，不能把不同配置的数字直接混在一起比较。</li>
 </ol>
-<p>各篇报告开头的“本页实验概览”先用普通语言给出每项实验的目的、思路、结果和结论；下面的详细记录用于核对完整设置。</p>
 <h2 id="1">1. 模型<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
 <p>原始 FLaG：<code>RoBERTa hidden → Global rFFT → latent attention → gate → irFFT → masked max pooling</code>。</p>
 <p>STFT-FLaG：将 global FFT 换成<strong>逐帧局部 FFT</strong>。全部有效帧的频率 token 共同生成<strong>一个句级 gate</strong>，然后分别门控局部频谱、逐帧逆变换并拼接。</p>
