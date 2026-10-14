@@ -13,23 +13,11 @@
 
 ## 实验详细论述 {#detail}
 
-**数据与可比性**：frozen RoBERTa-base + trainable FLaG，已有记录以 seed 0 为主。STSB 报 Spearman，Sprint 报 AP。Band knockout 启用 norm restoration；band-only 未启用，两类干预不能互作同一量。
+### 1. 比较对象与解释口径
 
-我们希望区分三个不同的问题：
+本实验将 DCT-II 的 B0–B7 频带分别置零或单独保留，观测 frozen RoBERTa + FLaG 的任务指标变化。**B0 是最低频带，并非一定等于 exact DC。**
 
-1. **DC readability**：直接读取 DC / global-mean 成分，能得到多少任务信息？
-2. **Band-only sufficiency**：只保留某一频带，完整模型还能恢复多少性能？
-3. **Band-knockout dependency**：删除某一频带，完整模型性能会下降多少？
-
-这三者不能混为一谈：
-
-- **band-only** 更接近“这一频带单独够不够用”；
-- **knockout** 更接近“模型实际依不依赖这一频带”；
-- 二者同时成立时，证据最强。
-
----
-
----
+### 2. 统一实验设置
 
 | 项目 | STSB | SprintDuplicateQuestions |
 | --- | --- | --- |
@@ -49,7 +37,7 @@ Frozen STSB FLaG 的 seed-0 test 结果：
 
 ---
 
----
+### 3. Band knockout：删除哪个频带最伤模型？
 
 定义：
 
@@ -141,17 +129,10 @@ L12: 0.264
 
 也就是**最后一层 DC dependency 明显下降**。这一模式与 AMP 机制实验中“最终层 DC contribution 骤降”的观察方向相似。
 
-注意到非DC频带
 
-> 在STSB上 的 B1-B7 **几乎全部是正 drop，所有drop里只有一个负数**，说明这些非 DC 成分虽然不如 B0，但基本都在提供正向信息。
+![Frozen RoBERTa + FLaG 的相对 band-knockout sensitivity](../assets/dc/stsb_sprint_knockout_relative_paperstyle.png)
 
-> 在Sprint 上**drop正负交替**，每一个频带提供信息抖动，但求和发现带来的整体drop大部分layer上高于STSB任务
-
-> 经过平均计算后，发现Sprint上每一层非DC频带的整体平均值大部分高于STSB，且变化程度高，不如STSB上平缓
-
-![Frozen RoBERTa + FLaG 的相对 band-knockout sensitivity](assets/dc/stsb_sprint_knockout_relative_paperstyle.png)
-
----
+### 4. Band-only：只给一个频带，模型还能做多少？
 
 Band-only 与 knockout 正好相反：
 
@@ -210,25 +191,18 @@ Sprint L12：
 
 这说明 B0/DC 不只是“删掉以后很重要”，而且**单独留下 B0 就已经接近完整模型性能**。
 
-注意到非DC频带
 
-> STSB集上虽然 B0 仍然是绝对主导，但非 DC 频带中仍然分散着更多可用的任务信息。
-
-> Sprint据集上它高度依赖 B0，而且除了 B0 之外，单个非 DC 频带几乎都没有很强的独立预测能力。
+![STSB layer × band-only](../assets/dc/stsb_layer_band_only.png)
 
 
 
-![STSB layer × band-only](assets/dc/stsb_layer_band_only.png)
-
-
-
-![Sprint layer × band-only](assets/dc/sprint_layer_band_only.png)
+![Sprint layer × band-only](../assets/dc/sprint_layer_band_only.png)
 
 ---
 
----
+### 5. B0-only 随深度变化
 
-### STSB
+#### STSB
 
 | Layer | B0-only / baseline |
 | ---: | ---: |
@@ -245,7 +219,7 @@ Sprint L12：
 | L11 | 103.7% |
 | L12 | 96.4% |
 
-### Sprint
+#### Sprint
 
 | Layer | B0-only / baseline |
 | ---: | ---: |
@@ -262,13 +236,7 @@ Sprint L12：
 | L11 | 100.4% |
 | L12 | 91.4% |
 
-一个非常明显的共同趋势是：
-
-> **随着 RoBERTa 加深，单独依靠 B0 恢复任务性能的能力迅速增强。**
-
-特别是 Sprint，从 L1 的 1.8% 增长到 L11 的 100.4%，表现得像一个逐层把 task-relevant global information 汇入 B0 的“信息漏斗”。
-
----
+在当前 seed-0 曲线中，Sprint B0-only / baseline 从 L1 的 1.8% 增加至 L11 的 100.4%，L12 为 91.4%；STSB L12 为 96.4%。这是当前层级干预下的指标比例。
 
 ### 证据解释的范围
 

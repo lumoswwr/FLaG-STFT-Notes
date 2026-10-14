@@ -13,7 +13,7 @@
 
 ## 实验详细论述 {#detail}
 
-**专用协议**：Global FLaG、masked Mean time pooling、post-pool Norm 关闭、dropout=0；含 seed-0 高精度复核。
+### 3. 第二步：观察训练后的 Gate 实际在做什么
 
 #### 3.1 不同句子的 Gate 是否不同？
 

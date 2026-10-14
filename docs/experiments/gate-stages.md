@@ -13,7 +13,7 @@
 
 ## 实验详细论述 {#detail}
 
-**专用协议**：Global FLaG、masked Mean time pooling、无 post-pool LayerNorm、dropout=0。不同于前述 STSB E1–E14 的 masked max 配置。
+### 1. 从一个疑问开始：直接 Mean 为什么有时不如 FLaG？
 
 对一句话，RoBERTa 输出 $T$ 个 token 的特征矩阵：
 
@@ -46,6 +46,8 @@ $$
 此前实验有一个值得追问的现象：**在 STSB 上直接 Mean 有时好于 FLaG，而在 Sprint 上 FLaG 又明显强于直接 Mean**。于是我们首先尝试将 FLaG 最后的 Max pooling 改成 Mean pooling。它在不同任务上改变了表现，却没有完全解释差异。
 
 这使我们意识到，应该把 FLaG 的复杂路径拆开看：即使最后做 Mean，**Gate 和最后的线性层仍然会改变向量**。
+
+### 2. 第一步：找到 Mean 向量在哪里被改变
 
 #### 2.1 DC 与 Mean 究竟是什么关系？
 
@@ -95,7 +97,6 @@ B2、seed 0、完成第一个 epoch 后：
 
 还有一个数学约束：原始 FLaG 的 Gate 位于 $(1,2)$，对 DC 做逐通道正缩放所能造成的最大角度约为 $19.47^\circ$；B2 位于 $(0,2)$，允许部分通道接近零，角度就能接近 $90^\circ$。因此，B2 比原始 FLaG 转得远，部分原因是两种 Gate **允许的缩放范围不同**，不能直接判断模型优劣。
 
-**接下来的问题**：Gate 为什么这样缩放？它真的根据每句话改变吗？
 
 ### 证据解释的范围
 

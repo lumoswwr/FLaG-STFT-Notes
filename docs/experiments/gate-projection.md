@@ -13,7 +13,7 @@
 
 ## 实验详细论述 {#detail}
 
-**专用协议**：Sprint frozen RoBERTa；此阶段改用 validation AP 选 checkpoint，与之前使用 validation Accuracy 选 checkpoint 的实验不可混合统计。
+### 5. 第四步：不使用 FFT 和 latent attention，重新训练简单模型
 
 #### 5.1 为什么首先想到 Mean + 一个可训练线性层？
 
@@ -46,7 +46,7 @@ $$
 
 这里的 **Static（静态）只意味着同一套 Gate 用于不同句子**，不是 Gate 永远不学习。它的参数仍在训练中更新。
 
-StaticReIm 依据的是网站 [P1](stsb/03-mechanism.md) 已经证明的时域等价公式：
+StaticReIm 依据的是网站 [P1](../stsb/03-mechanism.md) 已经证明的时域等价公式：
 
 $$
 y_t=\frac{g_R+g_I}{2}x_t+\frac{g_R-g_I}{2}x_{(-t)\bmod N}.
@@ -69,9 +69,11 @@ Seed 0，official test：
 
 **这个结果使我们提出新问题**：过去 Sprint 直接 Mean 的 AP 约为 0.4289，是不是不能说明 DC 中缺乏任务信息，而主要说明“直接 Mean + cosine”缺少合适的可训练变换？
 
-这一判断也与此前 [DC-only 机制实验](dc-frequency.md) 相呼应：即使只保留 DC，只要训练合适的后续处理，仍然可以得到很强的 Sprint 结果。
+这一判断也与此前 [DC-only 机制实验](../dc-frequency.md) 相呼应：即使只保留 DC，只要训练合适的后续处理，仍然可以得到很强的 Sprint 结果。
 
 但是单个种子不足以给出稳定结论，于是我们把对照扩大到三个种子。
+
+### 6. 第五步：排除 Projection 初始化差异后再比较
 
 #### 6.1 先比较随机初始化和单位矩阵初始化
 
