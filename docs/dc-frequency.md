@@ -1,10 +1,6 @@
 # DC 与频带：哪些信息真正能支撑预测？
 
-> **先看实验概览**：逐项说明实验目的、方法、结果与结论；之后保留详细实验记录、原始指标、公式和数据分析。这里的概览使用你确认的 38 项汇报稿，不与其他实验协议的结果混合比较。
-
 ## 本页实验概览（4 项）
-
-**对应文件：** `docs/dc-frequency.md`
 
 这里不再比较 Global 和 Local，而是删除、保留不同频率，并让模型在训练时只看到 DC，分析低频成分究竟包含多少可用的任务信息。
 
@@ -34,9 +30,7 @@
 - **实验目的：** 前面研究的是训练完成后删除频率。现在进一步判断：如果从训练开始就只让模型看到 DC，是否还能学到有效预测？
 - **实验思路：** 从头分别训练 Full FLaG、No-DC FLaG（去掉 DC）和 DC-only FLaG（仅保留 DC）。三种模型使用相同结构，只改变训练期间可见的频率。
 - **实验结果：** Seed 0 的 Sprint Test AP 分别为 0.724596、0.534044、0.894565。STSB Test Spearman 分别为 0.710535、0.646152、0.746003。
-- **实验结论：** 从训练开始只使用 exact DC，STSB 和 Sprint 的 seed-0 结果都高于 Full FLaG；这说明 DC 中的任务信息可以经可训练模型有效读取，而直接 Mean + cosine 未能充分利用它。
-
-**本篇小结：** 最低频带的作用最突出；仅使用 DC 训练的模型在本次 seed-0 结果中超过完整模型，说明直接 Mean + cosine 的效果无法反映 DC 全部可利用的信息。
+- **实验结论：** 从训练开始只使用 exact DC，STSB 和 Sprint 的 seed-0 结果都高于 Full FLaG。这说明 DC 中的任务信息可以经可训练模型有效读取，而直接 Mean + cosine 未能充分利用它。
 
 ---
 
@@ -44,7 +38,7 @@
 
 本页记录一组专门回答 **“DC 分量到底承载了什么，以及模型是否真的依赖 DC”** 的机制实验。使用 **frozen RoBERTa-base + trainable FLaG** 设置。
 
-> 当前页面使用 seed 0 的 frozen-backbone 控制实验。STSB 指标为 **Spearman**，Sprint 指标为 **Average Precision (AP)**。两者指标不同，因此跨任务比较时优先看相对变化，而不是直接比较绝对数值。
+> 当前页面使用 seed 0 的 frozen-backbone 控制实验。STSB 指标为 **Spearman**，Sprint 指标为 **Average Precision (AP)**。
 
 ---
 

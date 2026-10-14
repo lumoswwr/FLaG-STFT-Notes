@@ -1,7 +1,5 @@
 # 实验结果总结
 
-> 这一页让第一次接触研究的人先了解**我们做了什么、为什么改变方向、最后有什么发现**。详细的 38 项实验目的、方法和数据，分别放在七篇实验报告的开头。
-
 ## 整个研究过程
 
 最初，我们想把 FLaG 的整句 FFT 改成分窗口 STFT，看看局部频率信息能不能改善文本预测。早期一些实验中，STFT 的分数确实略高，但把训练配置统一以后，这个优势没有保留下来。
@@ -10,7 +8,7 @@
 
 随后我们研究频率本身。删除最低频带会明显伤害预测，而只保留 DC 并从头训练，仍然可以获得很好的结果。说明 Mean/DC 中已有大量任务相关信息，关键是后续模型能否把它们利用起来。
 
-最近的实验继续把 FLaG 拆开：训练后的 Gate 在不同句子间几乎不变，少数低 Gate 值通道对应大量 DC 平方能量。最终在 Sprint 上，直接 Mean 加一个可训练线性层就得到了与 FLaG 接近甚至更高的 Test AP。
+后续的实验继续把 FLaG 拆开：训练后的 Gate 在不同句子间几乎不变，少数低 Gate 值通道对应大量 DC 平方能量。最终在 Sprint 上，直接 Mean 加一个可训练线性层就得到了与 FLaG 接近甚至更高的 Test AP。
 
 ## 七个阶段分别得到了什么结果？
 
@@ -34,7 +32,7 @@
 | **STSB test Spearman**，0.1 dropout / 有 norm，10 seeds | 0.839065 ± 0.004154 | 0.838944 ± 0.001882 | −0.000121 ± 0.004039（5/10 正向） |
 | **Sprint validation AP**，两者均 0 dropout / 有 norm，10 seeds | 0.795830 ± 0.017156 | 0.789136 ± 0.014094 | −0.006693 ± 0.017279（4/10 正向） |
 
-作为参照，STSB Mean pooling 在相同早期协议下的 10-seed test Spearman 为 **0.851201 ± 0.002000**。STSB 上 E12 的小幅正向趋势未在不同配置下稳定出现。Sprint 早期 E12 的 **official-test AP** 高于早期 FLaG，但当时 dropout/norm 不匹配，不能据此认定算子带来增益。
+
 
 ### 机制
 
@@ -47,12 +45,11 @@
 
 ### 后续：FLaG Gate 与 Projection 的作用（Mean-pooling 对照）
 
-[新增机制章节](flag-gate-projection.md) 在**Global FLaG、time pooling=Mean、关闭 post-pool LayerNorm、dropout=0** 的单独配置下，继续分析了 Gate 与输出线性层的实际作用。与本页 Global/Local STFT 结论属于不同实验协议，不能直接混合数值。
+[机制章节](flag-gate-projection.md) 在**Global FLaG、time pooling=Mean、关闭 post-pool LayerNorm、dropout=0** 的单独配置下，继续分析了 Gate 与输出线性层的实际作用。
 
-- **Gate 输出及高精度复核**：训练后的 Gate 高度饱和；用训练集平均 Gate 或其他句子的 Gate 替换时，STSB 和 Sprint 指标在六位小数精度下不变。高精度 validation 统计进一步发现，Sigmoid 前的 Gate logits 仍随句子变化（Sprint FLaG 的平均跨句子通道标准差约 **0.4394**），而实际 Gate 相对训练集平均值的平均绝对差仅约 **7.58×10⁻¹⁴**。因此结论是**实际 Gate 的输入相关变化极小**，不是证明 Gate 严格不变；极小方差的数值计算也可能受浮点精度影响。
+- **Gate 输出及高精度复核**：训练后的 Gate 高度饱和；用训练集平均 Gate 或其他句子的 Gate 替换时，STSB 和 Sprint 指标在六位小数精度下不变。高精度 validation 统计进一步发现，Sigmoid 前的 Gate logits 仍随句子变化（Sprint FLaG 的平均跨句子通道标准差约 **0.4394**），而实际 Gate 相对训练集平均值的平均绝对差仅约 **7.58×10⁻¹⁴**。因此结论是**实际 Gate 的输入相关变化极小。
 - **DC 通道权重**：Sprint seed0 中，约 2.21%（FLaG）/3.78%（B2）的低 Gate 值实部通道，承载原始 DC 平方能量约 93.72%/95.49%。
 - **从头训练的对照**：Sprint 采用验证集 AP 选 checkpoint，且强制对齐初始 Projection 的 3-seed test AP：FLaG **0.830539 ± 0.016711**，Mean + 随机初始化、可训练 Projection **0.841386 ± 0.008833**。配对 FLaG−MeanProjRand 为 **−0.010847 ± 0.014922**，0/3 个种子为正。验证集 AP 均值则为 FLaG 0.853535、MeanProjRand 0.851664，顺序相反。
 
-因此，目前可以说在这个专门控制设置下**没有观察到复杂 FLaG 相对 Mean+Linear 的额外 test AP 优势**。它并不证明 FFT 和 latent attention 在训练中必然无用，也不能推广到 Max-pooling 原配置。
-
+因此，目前可以说在这个专门控制设置下**没有观察到复杂 FLaG 相对 Mean+Linear 的额外 test AP 优势**。
 

@@ -1,7 +1,5 @@
 # Sprint：数据集与训练设置
 
-> **快速说明：Sprint 是判断两个问题是否重复的任务，不是问句与答案匹配。** 早期 S1–S5 的 checkpoint 选择和后来的 Projection 比较实验并不相同，见本页最后一节。
-
 SprintDuplicateQuestions 是**判断两句话是否为重复问题**的二分类任务。沿用 STSB 选定的 **E12 结构（STFT 16/16）**，但在 Sprint 上**重新初始化并训练 pooling**，RoBERTa-base 则冻结。
 
 ## 数据与训练
@@ -30,9 +28,7 @@ $$
 
 主要指标 **AP（Average Precision）** 衡量重复问题的排序质量，**不需要分类阈值**。按预测分数由高到低排列，计算各召回率增加位置的 precision：
 
-$
-\mathrm{AP}=\sum_k(R_k-R_{k-1})P_k.
-$
+$\mathrm{AP}=\sum_k(R_k-R_{k-1})P_k.$
 
 其中 $P_k$、$R_k$ 是对应位置的 precision、recall。Accuracy 是总体正确率，F1 综合 Precision（查准率）与 Recall（查全率）。
 
@@ -41,13 +37,10 @@ $
 ## 各阶段怎样选模型？
 
 - **早期 S1/S2 和当时的推理机制分析**：根据 validation 上校准阈值后的 Accuracy 选择 checkpoint。S1/S2 报告 official test，S3–S5 报告 adaptation validation。
-- **最新 FLaG 与 Mean + Projection 的三种子对照**：两者都根据 validation **AP** 选择 checkpoint，最后报告 official test AP，并对同 seed 的模型差异配对统计。
-- **两种规则不能混合**：即使任务和随机种子相同，选择最优 epoch 的标准不同，测试集结果也不应合并求平均。
-
-具体数据见 [Sprint S1–S5](02-experiments.md) 和 [Gate / Projection 分析](../flag-gate-projection.md)。
+- **最新 FLaG 与 Mean + Projection 的三seed对照**：两者都根据 validation **AP** 选择 checkpoint，最后报告 official test AP，并对同 seed 的模型差异配对统计。
 
 ## 配置说明
 
-早期 Sprint 实验 **S1/S2**：FLaG 为 `dropout=0.1、norm=False`，E12 为 `dropout=0、norm=True`。两种配置不同，不能将它们的 AP 差全部归因于 STFT。
+早期 Sprint 实验 **S1/S2**：FLaG 为 `dropout=0.1、norm=False`，E12 为 `dropout=0、norm=True`。**后期全部对其FLaG原文配置**
 
 **S3/S4/S5** 只报告 **adaptation validation** 指标；S4 将 FLaG/E12 对齐为 `0/True`；S5 只对 **global FLaG** 做 dropout × norm 2×2。

@@ -1,10 +1,6 @@
 # Mean 与 FLaG 融合：保留各自的长处
 
-> **先看实验概览**：逐项说明实验目的、方法、结果与结论；之后保留详细实验记录、原始指标、公式和数据分析。这里的概览使用你确认的 38 项汇报稿，不与其他实验协议的结果混合比较。
-
 ## 本页实验概览（5 项）
-
-**对应文件：** `docs/mean-compatible-flag.md`
 
 STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表示开始，再研究它们之间的方向关系，改进融合方法。
 
@@ -13,7 +9,7 @@ STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表�
 - **实验目的：** 让模型可以在 Mean 与 FLaG 之间选择，而不是始终只能使用 FLaG。
 - **实验思路：** 同时计算 Mean 和 FLaG 表示，再学习一个权重 \(\alpha\)，决定两者在最终结果中的比例。
 - **实验结果：** Seed 0 中 STSB Spearman 为 0.850597，Sprint AP 为 0.878625。学到的 \(\alpha\) 在两个任务中均接近 0.5。
-- **实验结论：** 直接融合 Mean 和 FLaG 改善了本次 STSB、Sprint 结果，说明保留 Mean 路径有帮助；随后需要更细致地区分两种表示如何组合。
+- **实验结论：** 直接融合 Mean 和 FLaG 改善了本次 STSB、Sprint 结果，说明保留 Mean 路径有帮助。
 
 ### 实验二十八：只让 FLaG 补充 Mean 没有的信息，是否更好？
 
@@ -34,16 +30,14 @@ STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表�
 - **实验目的：** 解释为什么 Sprint 需要很大的 \(\beta\)，而 STSB 不需要。
 - **实验思路：** 计算 Mean 与 FLaG 句向量的夹角，并测量 FLaG 与 Mean 正交的部分有多大。
 - **实验结果：** 在当时的实验中，STSB 的 Mean 与 FLaG 夹角约 90.7°，Sprint 约 160.3°。也就是说，Sprint 中两者近乎反向。
-- **实验结论：** Sprint 的 FLaG 与 Mean 接近反方向，大部分 FLaG 表示位于 Mean 轴上；直接删除共线部分会丢掉模型原本能够利用的表示。
+- **实验结论：** Sprint 的 FLaG 与 Mean 接近反方向，大部分 FLaG 表示位于 Mean 轴上。直接删除共线部分会丢掉模型原本能够利用的表示。
 
 ### 实验三十一：根据 Mean 与 FLaG 的方向关系进行融合
 
 - **实验目的：** 同时保留 Mean 的优势和 FLaG 的补充信息，避免上一种方法删除重要的共线部分。
 - **实验思路：** 设计 Alignment-aware 方法，根据两个向量的 cosine alignment 调整 Mean 的权重，再添加 FLaG 与 Mean 正交的部分。
 - **实验结果：** 早期 seed 0 的 STSB Spearman 为 0.858201，Sprint AP 为 0.880862。进一步按照原文本实验配置完成五种子对照，Alignment-aware 在 IMDB、STSB、Sprint 上的平均结果分别为 Accuracy 0.9526、Spearman 0.8536、AP 0.6989。
-- **实验结论：** Alignment-aware 在五种子对照中提高了 STSB 的 Spearman 和 Sprint 的 AP，IMDB 与 Mean 基本持平；按两种表示的方向关系融合，比只保留正交部分更有效。
-
-**本篇小结：** 简单加权已能改善表现；只保留正交部分会损失 Sprint 所需的信息。Alignment-aware 同时保留两者的方向关系后，在五种子对照中改善了 STSB 和 Sprint。
+- **实验结论：** Alignment-aware 在五种子对照中提高了 STSB 的 Spearman 和 Sprint 的 AP，IMDB 与 Mean 基本持平。按两种表示的方向关系融合，比只保留正交部分更有效。
 
 ---
 

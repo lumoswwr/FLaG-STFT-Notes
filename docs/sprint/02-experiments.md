@@ -1,10 +1,6 @@
 # Sprint：换一个任务重新比较 Global 与 STFT
 
-> **先看实验概览**：逐项说明实验目的、方法、结果与结论；之后保留详细实验记录、原始指标、公式和数据分析。这里的概览使用你确认的 38 项汇报稿，不与其他实验协议的结果混合比较。
-
 ## 本页实验概览（5 项）
-
-**对应文件：** `docs/sprint/02-experiments.md`
 
 把 STFT 应用到判断两句话是否重复的 Sprint 任务，先看性能，再统一训练配置，避免把 dropout 或 LayerNorm 的作用误认成局部 STFT 的优势。
 
@@ -13,20 +9,20 @@
 - **实验目的：** 检查 STFT 在 STSB 以外的任务中是否仍然有效。
 - **实验思路：** 冻结 RoBERTa，在 Sprint 上分别训练直接 Mean、Global FLaG 和 E12，比较三个种子的测试集性能。
 - **实验结果：** Mean、FLaG、E12 的 Test AP 分别为 0.428907、0.721611、0.765655。
-- **实验结论：** 这组 Sprint 实验中，E12 所使用的整套配置得到最高 Test AP。由于 Global 与 E12 的 dropout/LayerNorm 同时不同，下一步需要统一配置比较。
+- **实验结论：** 这组 Sprint 实验中，E12 所使用的整套配置得到最高 Test AP。
 
 ### 实验十九（S2）：STFT 在 Sprint 上的优势是否稳定？
 
 - **实验目的：** 将 S1 的 Sprint 对照扩展至十个种子，观察两套配置的差距是否仍存在。
-- **实验思路：** 保持 S1 的两套配置不变，将 FLaG 和 E12 的实验扩展至十个种子。
+- **实验思路：** 保持 S1 的两套配置不变，将 FLaG 和 E12 的实验扩展至十个seed。
 - **实验结果：** FLaG 的平均 Test AP 为 0.713121，E12 为 0.761344。E12 在十个种子中全部领先，平均高 0.048222。
-- **实验结论：** E12 的原有配置在十个种子中均高于 FLaG 的原有配置，但这项结果比较的是两套完整配置，而不是只改变 FFT 与 STFT。
+- **实验结论：** E12 的原有配置在十个种子中均高于 FLaG 的原有配置。
 
 ### 实验二十（S3）：在 Sprint 上，Global 和 Local 的预测差异来自哪里？
 
 - **实验目的：** 检查 STSB 上 P2 的机制发现，在 Sprint 上是否仍然成立。
 - **实验思路：** 固定训练好的模型，分别交换 Gate 来源和频谱重建方式，观察预测变化。
-- **实验结果：** 只更换 Gate，预测几乎不变；更换频谱重建路径后，平均 cosine 变化约为 0.032 至 0.037。
+- **实验结果：** 只更换 Gate，预测几乎不变。更换频谱重建路径后，平均 cosine 变化约为 0.032 至 0.037。
 - **实验结论：** Sprint 与 STSB 的 P2 结果一致：更换 Gate 来源几乎无影响，切换完整的频谱重建路线才会明显改变预测。
 
 ### 实验二十一（S4）：统一训练配置后，STFT 还比 Global FFT 好吗？
@@ -34,16 +30,14 @@
 - **实验目的：** 排除 S1/S2 中 dropout 和 LayerNorm 不一致带来的影响。
 - **实验思路：** 将 FLaG 和 E12 都设置为 dropout=0、启用后池化 LayerNorm，重新进行十个种子比较。
 - **实验结果：** FLaG 的平均 Validation AP 为 0.795830，E12 为 0.789136，E12 只在四个种子中领先。
-- **实验结论：** 将 dropout 与 LayerNorm 统一后，E12 的平均 Validation AP 反而低于 FLaG；S1/S2 中观察到的优势不能由 STFT 操作单独解释。
+- **实验结论：** 将 dropout 与 LayerNorm 统一后，E12 的平均 Validation AP 反而低于 FLaG，模型配置影响大。
 
 ### 实验二十二（S5）：Dropout 和 LayerNorm 到底对 FLaG 有多大影响？
 
 - **实验目的：** 进一步解释为什么同一个 FLaG，在不同训练配置下性能差异明显。
 - **实验思路：** 固定 Global FLaG，只改变 dropout 是否为 0.1，以及是否启用后池化 LayerNorm，测试四种组合。
-- **实验结果：** 在十种子 Validation AP 上，dropout=0.1 且启用 LayerNorm 的组合最高，为 0.819156；dropout=0.1 且关闭 LayerNorm 时仅为 0.750936。
-- **实验结论：** Global FLaG 在 dropout=0.1、启用 LayerNorm 时取得本次四种配置中最高的 Validation AP；两项设置的作用需要结合考虑。
-
-**本篇小结：** E12 的早期配置确实有更高 AP；但统一 dropout 和 LayerNorm 后，E12 的优势消失，说明配置差异对性能影响很大。
+- **实验结果：** 在十seed Validation AP 上，dropout=0.1 且启用 LayerNorm 的组合最高，为 0.819156；dropout=0.1 且关闭 LayerNorm 时仅为 0.750936。
+- **实验结论：** Global FLaG 在 dropout=0.1、启用 LayerNorm 时取得本次四种配置中最高的 Validation AP。两项设置的作用需要结合考虑。
 
 ---
 
