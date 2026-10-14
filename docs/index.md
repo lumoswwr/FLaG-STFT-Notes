@@ -8,11 +8,11 @@
 
 | 阶段 | 原始问题 | 已有记录范围 | 浏览入口 |
 | --- | --- | --- | --- |
-| STSB 结构试验 | Global FFT 与 STFT 的窗口、重叠、位置编码差别 | E1–E5、E11–E14 | [实验目录](experiments/index.md#stsb-e1e14) |
-| STSB 机制分析 | 频带、token、padding、循环反射 | E6–E10、P1/P2 | [实验目录](experiments/index.md#p1p2-与机制) |
-| Sprint 跨任务 | 早期对比是否可归因于算子，配置影响有多大 | S1–S5 | [实验目录](experiments/index.md#sprint-s1s5) |
-| DC / Gate / Projection | 低频是否有可读信息，Gate 和输出层分别做什么 | 冻结 backbone 与干预对照 | [实验目录](experiments/index.md#dc-与频带) |
-| Mean-compatible | 融合方式能否保留 Mean endpoint | 插值、正交、Alignment-aware、5-seed | [实验目录](experiments/index.md#mean-compatible-与-alignment-aware) |
+| STSB 结构试验 | Global FFT 与 STFT 的窗口、重叠、位置编码差别 | E1–E5、E11–E14 | [实验目录](experiments/index.md) |
+| STSB 机制分析 | 频带、token、padding、循环反射 | E6–E10、P1/P2 | [实验目录](experiments/index.md) |
+| Sprint 跨任务 | 早期对比是否可归因于算子，配置影响有多大 | S1–S5 | [实验目录](experiments/index.md) |
+| DC / Gate / Projection | 低频是否有可读信息，Gate 和输出层分别做什么 | 冻结 backbone 与干预对照 | [实验目录](experiments/index.md) |
+| Mean-compatible | 融合方式能否保留 Mean endpoint | 插值、正交、Alignment-aware、5-seed | [实验目录](experiments/index.md) |
 
 ## 核心区分
 

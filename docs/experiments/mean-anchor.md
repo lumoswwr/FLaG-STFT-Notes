@@ -13,6 +13,8 @@
 
 ## 实验详细论述 {#detail}
 
+### 3. 第二步：Mean-anchor 与正交残差
+
 将归一化后的 FLaG 表示分解为 Mean 方向上的分量和与 Mean 正交的分量。
 
 首先计算二者的 cosine alignment：
@@ -114,6 +116,8 @@ Sprint AP 从 0.638 提升到 0.810，但 \(\beta\) 被放大到约 13。
 
 ---
 
+### 4. Mean 与 FLaG 的几何关系
+
 为了理解为什么 Sprint 需要极大的 \(\beta\)，进一步测量 Mean 与 FLaG 表示之间的几何关系。
 
 | Task   | \(\cos(\hat{m},\hat{f})\) |  Angle | \(\|r_{\perp}\|\) |
@@ -123,7 +127,7 @@ Sprint AP 从 0.638 提升到 0.810，但 \(\beta\) 被放大到约 13。
 
 两种任务呈现出完全不同的几何状态。
 
-### STS-B
+#### STS-B
 
 STS-B 中：
 
@@ -148,7 +152,7 @@ Mean 与 FLaG 几乎正交，因此：
 
 此时以 Mean 为 anchor，再加入少量正交 FLaG 信息是比较自然的。
 
-### Sprint
+#### Sprint
 
 Sprint 中：
 
@@ -188,7 +192,7 @@ a\hat{m}
 
 被完全删除，只剩下较小的 \(r_{\perp}\)。
 
-这就解释了为什么 Sprint 中需要：
+在这组训练中，Sprint 学得的参数为：
 
 \[
 \beta\approx13

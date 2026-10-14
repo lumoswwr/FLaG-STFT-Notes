@@ -8,30 +8,30 @@ nav:
   - 事实结果索引: findings.md
   - 逐项实验导航: experiments/index.md
   - STSB E1–E14:
-      - 'e01 Global Hann': experiments/stsb-e01.md
-      - 'e02 STFT 16/8（初次局部变换）': experiments/stsb-e02.md
-      - 'e03 STFT 8/4（缩短窗口）': experiments/stsb-e03.md
-      - 'e04 Learned frame position': experiments/stsb-e04.md
-      - 'e05 局部 Hann 与 centering': experiments/stsb-e05.md
-      - 'e06 最终层频带 Knockout': experiments/stsb-e06.md
-      - 'e07 Token hidden knockout': experiments/stsb-e07.md
-      - 'e08 DC attention 偏好比': experiments/stsb-e08.md
-      - 'e09 右侧额外 Padding 与输出漂移': experiments/stsb-e09.md
-      - 'e10 四种 Padding 推理方式': experiments/stsb-e10.md
-      - 'e11 无重叠 STFT 8/8': experiments/stsb-e11.md
-      - 'e12 无重叠 STFT 16/16 与十种子复核': experiments/stsb-e12.md
-      - 'e13 固定全局 FFT 长度': experiments/stsb-e13.md
-      - 'e14 论文 Text 设置下的十种子对照': experiments/stsb-e14.md
+      - 'E01 Global Hann': experiments/stsb-e01.md
+      - 'E02 STFT 16/8（初次局部变换）': experiments/stsb-e02.md
+      - 'E03 STFT 8/4（缩短窗口）': experiments/stsb-e03.md
+      - 'E04 Learned frame position': experiments/stsb-e04.md
+      - 'E05 局部 Hann 与 centering': experiments/stsb-e05.md
+      - 'E06 最终层频带 Knockout': experiments/stsb-e06.md
+      - 'E07 Token hidden knockout': experiments/stsb-e07.md
+      - 'E08 DC attention 偏好比': experiments/stsb-e08.md
+      - 'E09 右侧额外 Padding 与输出漂移': experiments/stsb-e09.md
+      - 'E10 四种 Padding 推理方式': experiments/stsb-e10.md
+      - 'E11 无重叠 STFT 8/8': experiments/stsb-e11.md
+      - 'E12 无重叠 STFT 16/16 与十种子复核': experiments/stsb-e12.md
+      - 'E13 固定全局 FFT 长度': experiments/stsb-e13.md
+      - 'E14 论文 Text 设置下的十种子对照': experiments/stsb-e14.md
   - Sprint S1–S5:
-      - 's01 Sprint 早期三种子基线': experiments/sprint-s01.md
-      - 's02 Sprint 十种子扩展': experiments/sprint-s02.md
-      - 's03 Sprint Global/Local Gate × Reconstruction': experiments/sprint-s03.md
-      - 's04 匹配配置的 Global / Local 对照': experiments/sprint-s04.md
-      - 's05 Global FLaG 的 Dropout × Norm 因子实验': experiments/sprint-s05.md
+      - 'S01 Sprint 早期三种子基线': experiments/sprint-s01.md
+      - 'S02 Sprint 十种子扩展': experiments/sprint-s02.md
+      - 'S03 Sprint Global/Local Gate × Reconstruction': experiments/sprint-s03.md
+      - 'S04 匹配配置的 Global / Local 对照': experiments/sprint-s04.md
+      - 'S05 Global FLaG 的 Dropout × Norm 因子实验': experiments/sprint-s05.md
   - P1/P2 与机制:
-      - 'mech-reflection 实虚门控的循环反射恒等式': experiments/mech-reflection.md
-      - 'mech-p1 FFT Gate 长度与重建长度分离': experiments/mech-p1.md
-      - 'mech-p2 STSB Global/Local Gate × Reconstruction': experiments/mech-p2.md
+      - 'Reflection 实虚门控的循环反射恒等式': experiments/mech-reflection.md
+      - 'P1 FFT Gate 长度与重建长度分离': experiments/mech-p1.md
+      - 'P2 STSB Global/Local Gate × Reconstruction': experiments/mech-p2.md
   - DC 与频带:
       - 'dc-band DCT 频带 Knockout、Band-only 与层深变化': experiments/dc-band.md
       - 'dc-exact 训练时删除或仅保留 exact DC': experiments/dc-exact.md
@@ -44,7 +44,7 @@ nav:
       - 'mean-residual Mean/FLaG 直接残差插值': experiments/mean-residual.md
       - 'mean-anchor 正交 Mean-anchor 与无界 Beta': experiments/mean-anchor.md
       - 'mean-alignment Alignment-aware 结构与 StopGrad 消融': experiments/mean-alignment.md
-      - 'mean-final 三项文本任务的统一 5-seed 对照': experiments/mean-final.md
+      - '5-seed 三项文本任务的统一 5-seed 对照': experiments/mean-final.md
 
 theme:
   name: material

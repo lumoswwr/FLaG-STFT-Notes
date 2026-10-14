@@ -13,6 +13,8 @@
 
 ## 实验详细论述 {#detail}
 
+### 2. 第一步：直接加入 Mean residual
+
 先将 Mean 和 FLaG 的输出分别归一化：
 
 \[
@@ -55,7 +57,7 @@ z=\hat{f}
 
 即恢复原始 FLaG。
 
-### 探索结果（seed 0）
+#### 探索结果（seed 0）
 
 | Method        | STS-B Spearman | Sprint AP | learned \(\alpha\) |
 | ------------- | -------------: | --------: | -----------------: |
@@ -72,7 +74,7 @@ z=\hat{f}
 - STS-B validation 上较优区域约为 \(\alpha=0.35\)；
 - Sprint validation 上较优区域约为 \(\alpha=0.50\)。
 
-这一结果说明，**显式加入 Mean 路径确实有效**。尤其在 Sprint 上，Mean-residual 相比原始 FLaG 还有明显提升。
+本次 seed-0 Sprint official test AP 为 Mean-residual 0.878625，原始 FLaG 0.724596；STSB Spearman 为 Mean-residual 0.850597，Mean 0.854182。
 
 但这种方法仍然比较粗糙：
 

@@ -13,6 +13,8 @@
 
 ## 实验详细论述 {#detail}
 
+### 5. 第三步：Alignment-aware Mean anchor
+
 从 FLaG 的几何分解出发：
 
 \[
@@ -73,7 +75,7 @@ a\hat{m}
 - \(a\) 控制 Mean 与 FLaG 在共享方向上的关系；
 - \(\beta\) 控制 FLaG 中正交补充信息的强度。
 
-### 特殊情况
+#### 特殊情况
 
 当：
 
@@ -171,6 +173,8 @@ Mean 轴上的系数：
 
 ---
 
+### 6. Alignment-aware 初步验证
+
 在前期 seed 0 实验中：
 
 | Method                            | STS-B Spearman |    Sprint AP | learned \(\beta\) |
@@ -191,11 +195,11 @@ a
 
 但阻断通过 \(a\) 返回 Mean / FLaG branch 的梯度。
 
-Sprint 上普通版本与 StopGrad 版本结果接近，说明主要收益确实来自 Alignment-aware 的前向几何结构。
+Sprint seed-0 中普通版与 StopGrad 版 AP 分别为 0.880862 和 0.876518。
 
-STS-B 上普通版本更高，则说明允许 Mean/FLaG representation 与 alignment 共同优化还能进一步带来收益。
+STS-B seed-0 中普通版与 StopGrad 版 Spearman 分别为 0.858201 和 0.855621。单种子对照不足以独立确认梯度路径的因果作用。
 
-因此后续主方法采用普通 Alignment-aware，而 StopGrad 作为机制验证。
+后续统一协议比较采用普通 Alignment-aware，StopGrad 仅为此处的单种子消融。
 
 ---
 

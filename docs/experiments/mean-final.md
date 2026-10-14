@@ -13,6 +13,8 @@
 
 ## 实验详细论述 {#detail}
 
+### 7. 对齐 FLaG 文本实验配置的 5-seed 验证
+
 前面的实验用于一步步确定最终公式。
 
 确定 Alignment-aware 后，重新按照 FLaG 文本实验配置，在三个文本任务上统一进行 5-seed 实验：
@@ -27,7 +29,7 @@
 0,\ 1,\ 2,\ 3,\ 4
 \]
 
-### 共同配置
+#### 共同配置
 
 - backbone：RoBERTa-base
 - FLaG latent queries：8
@@ -40,7 +42,7 @@
 - weight decay：0
 - scheduler：无
 
-### 三个任务的具体配置
+#### 三个任务的具体配置
 
 | Setting        | IMDB               | STS-B              | Sprint             |
 | -------------- | ------------------ | ------------------ | ------------------ |
@@ -61,6 +63,8 @@ STS-B 使用官方 development split 作为 validation。
 Sprint 使用冻结 RoBERTa 的 adaptation protocol，official test 在 checkpoint 选定后评估。
 
 ---
+
+### 8. 最终性能
 
 结果均为：
 
@@ -86,7 +90,7 @@ Alignment-aware 最终学习到的 \(\beta\)：
 
 三个任务呈现出不同的使用模式。
 
-### IMDB
+#### IMDB
 
 \[
 \beta
@@ -106,7 +110,7 @@ Alignment-aware 几乎关闭 FLaG 的正交 residual，最终接近 Mean endpoin
 
 Mean、FLaG 和 Alignment-aware 在 IMDB 上总体接近。
 
-### STS-B
+#### STS-B
 
 原始 FLaG：
 
@@ -128,7 +132,7 @@ Alignment-aware 最终达到：
 
 说明在 FLaG 本身不适合该任务时，显式 Mean anchor 能够避免原始 FLaG 对 Mean 信息的破坏，同时保留少量有用的补充信息。
 
-### Sprint
+#### Sprint
 
 Sprint 上 FLaG 本身已经优于 Mean：
 
