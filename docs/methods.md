@@ -1,5 +1,7 @@
 # 实验设置与指标
 
+本页仅整理各阶段已经采用过的协议；**不同研究阶段的 frozen / unfrozen、dropout、LayerNorm 与验证集规则并不完全相同。** 具体优先以对应实验页列出的口径为准。
+
 ## 1. 模型
 
 原始 FLaG：`RoBERTa hidden → Global rFFT → latent attention → gate → irFFT → masked max pooling`。
@@ -48,3 +50,11 @@ Sprint 分别在 validation 选择 **Accuracy 阈值**与 **F1 阈值**：最终
 | Sprint S5 | **仅 global FLaG**：dropout 0/0.1 × norm 有/无 | 未执行 |
 
 **Sprint S1/S2 的两种模型配置并不匹配**，不能把整套配置的性能差全部归因于 STFT。**S4/S5 目前只报告 adaptation validation AP**，不与 S1/S2 的 official-test AP 直接比较。
+
+
+## 各阶段特殊提醒
+
+- STSB E1–E14 的早期对照使用 3 或 10 seeds；E14 使用 0.1 dropout、Norm=True 的匹配设置。
+- Sprint S1/S2 中 FLaG 与 E12 的 dropout/Norm **不匹配**；S4 是匹配设置的 validation 对照，S5 只针对 Global FLaG。
+- 后续频带、Mean 融合、Gate/Projection 研究有 seed-0、五种子、三种子等独立实验，不应自动套用早期 STSB 或 Sprint 协议。
+- 具体数据仍以单篇详细页中标出的指标划分、训练状态与种子数量为准。

@@ -1,25 +1,57 @@
 site_name: FLaG / STFT Mechanism Experiments
-site_description: FLaG / STFT 实验配置、指标与机制分析
+site_description: 以 38 项已完成实验为索引的 FLaG / STFT 机制报告
 site_url: https://lumoswwr.github.io/FLaG-STFT-Notes/
-
 nav:
   - 首页: index.md
   - 实验协议与指标: methods.md
-  - 研究结果综述: findings.md
-  - MTEB数据集三种文本任务观察感受: MTEB.md
-  - DC / 频带机制: dc-frequency.md
-  - Mean-compatible FLaG: mean-compatible-flag.md
-  - FLaG 门控与输出线性投影: flag-gate-projection.md
-
-  - STSB:
-      - E1–E8: stsb/01-experiments.md
-      - E9–E14: stsb/02-padding.md
-      - 循环反射与 P1/P2: stsb/03-mechanism.md
-
-  - Sprint:
-      - 数据与训练: sprint/01-protocol.md
-      - S1–S5: sprint/02-experiments.md
-
+  - 关键观测索引: findings.md
+  - STSB：早期局部频域设计:
+      - "实验一（E1）：在 FFT 前增加 Hann 窗，能否改善模型性能？": experiments/01.md
+      - "实验二（E2）：把整句 FFT 改成分窗口 FFT，性能会怎样？": experiments/02.md
+      - "实验三（E3）：把窗口缩短，是否更适合短句？": experiments/03.md
+      - "实验四（E4）：给不同窗口加入位置编码有没有帮助？": experiments/04.md
+      - "实验五（E5）：在局部 FFT 中增加 Hann 窗是否有用？": experiments/05.md
+  - STSB：频率与 token 探针:
+      - "实验六（E6）：Global FLaG 和 STFT-FLaG 分别依赖哪些频率？": experiments/06.md
+      - "实验七（E7）：局部 FFT 是否让模型更关注某些 token？": experiments/07.md
+      - "实验八（E8）：局部 FFT 是否更关注零频率？": experiments/08.md
+  - STSB：Padding 行为:
+      - "实验九（E9）：只增加 Padding，为什么预测会变化？": experiments/09.md
+      - "实验十（E10）：Padding 的变化会影响整个测试集的预测性能吗？": experiments/10.md
+  - STSB：窗口与稳定性:
+      - "实验十一（E11/E12）：STFT 的窗口重叠探究": experiments/11.md
+      - "实验十二（E12 扩展）：E12 十seed稳定性": experiments/12.md
+      - "实验十三（E13）：固定 Global FFT 长度能否改善模型？": experiments/13.md
+      - "实验十四（E14）：换成论文文本配置后，STFT 的优势还能保持吗？": experiments/14.md
+  - STSB：循环反射与重建机制:
+      - "实验十五：通过数学推导解释 Padding 为什么会改变结果": experiments/15.md
+      - "实验十六（P1）：Padding 的影响到底来自 Gate，还是频谱重建？": experiments/16.md
+      - "实验十七（P2）：Global 和 Local 的差异来自 Gate，还是重建方式？": experiments/17.md
+  - Sprint：跨任务与配置对照:
+      - "实验十八（S1）：把 STFT-FLaG 用到 Sprint，效果怎样？": experiments/18.md
+      - "实验十九（S2）：STFT 在 Sprint 上的优势是否稳定？": experiments/19.md
+      - "实验二十（S3）：在 Sprint 上，Global 和 Local 的预测差异来自哪里？": experiments/20.md
+      - "实验二十一（S4）：统一训练配置后，STFT 还比 Global FFT 好吗？": experiments/21.md
+      - "实验二十二（S5）：Dropout 和 LayerNorm 到底对 FLaG 有多大影响？": experiments/22.md
+  - DC：频带信息与训练干预:
+      - "实验二十三：删除不同频带，看看模型最依赖哪一部分": experiments/23.md
+      - "实验二十四：如果只保留一个频带，模型还能预测好吗？": experiments/24.md
+      - "实验二十五：不同 Transformer 层中的低频信息会怎样变化？": experiments/25.md
+      - "实验二十六：训练时只使用 DC，模型还能取得高性能吗？": experiments/26.md
+  - Mean：兼容性与融合:
+      - "实验二十七：直接将 Mean 与 FLaG 的句向量加权融合": experiments/27.md
+      - "实验二十八：只让 FLaG 补充 Mean 没有的信息，是否更好？": experiments/28.md
+      - "实验二十九：放开补充信息的权重限制，会怎样？": experiments/29.md
+      - "实验三十：为什么只保留与 Mean 垂直的部分，会损失信息？": experiments/30.md
+      - "实验三十一：根据 Mean 与 FLaG 的方向关系进行融合": experiments/31.md
+  - Gate / Projection：机制与简化对照:
+      - "实验三十二：FLaG 在哪一步改变了 Mean 向量？": experiments/32.md
+      - "实验三十三：Gate 是否真的会根据不同句子产生不同权重？": experiments/33.md
+      - "实验三十四：Gate 主要在调整哪些特征通道？": experiments/34.md
+      - "实验三十五：训练好的 FLaG 究竟依赖 Gate 的哪一部分？": experiments/35.md
+      - "实验三十六：如果去掉 FFT 和 Attention，简单模型能否达到相近性能？": experiments/36.md
+      - "实验三十七：Projection 的初始化方式会影响结果吗？": experiments/37.md
+      - "实验三十八：在相同初始 Projection 下，完整 FLaG 还有额外优势吗？": experiments/38.md
 theme:
   name: material
   language: zh
@@ -29,7 +61,6 @@ theme:
     - navigation.indexes
     - toc.follow
     - content.code.copy
-
 markdown_extensions:
   - tables
   - attr_list
@@ -40,7 +71,6 @@ markdown_extensions:
       generic: true
   - toc:
       permalink: true
-
 extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
