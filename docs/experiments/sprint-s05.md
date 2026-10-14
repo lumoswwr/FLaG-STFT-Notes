@@ -13,13 +13,13 @@
 
 ## 实验详细论述 {#detail}
 
-#### 1. 问题与比较对象
+### 1. 问题与比较对象
  dropout 与 post-pool Norm 是否影响 Sprint 的 global FLaG？
 
-#### 2. 实验设计与控制条件
+### 2. 实验设计与控制条件
  **固定 global FFT**，交叉测试 dropout `{0,0.1}` 和 Norm `{无,有}` 四种设置；每组 **10 seeds（0–9）**，其余训练条件一致。
 
-#### 3. 观测结果
+### 3. 观测结果
  **10-seed adaptation-validation AP**：
 
 | Dropout | Norm | AP（mean ± std） |
@@ -31,7 +31,7 @@
 
 相同 dropout 下**增加 Norm**：dropout=0.1 时 AP 差为 **+0.068220**；dropout=0 时为 **−0.003145**。
 
-#### 4. 基于本次结果的判断
+### 4. 基于本次结果的判断
  dropout 与 Norm 存在交互，本实验四种 **global FLaG** 配置中 `0.1 + 有 Norm` 的 validation AP 最高。**本实验没有测试 `0.1 + 有 Norm` 的 Sprint E12**，不能据此比较这项配置下的 global 与 local。
 
 ### 证据解释的范围
