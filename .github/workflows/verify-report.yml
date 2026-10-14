@@ -1,0 +1,26 @@
+name: Check MkDocs report
+
+on:
+  push:
+    branches:
+      - report-refactor-38-experiments
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+      - name: Verify summaries and links
+        run: python scripts/verify_report.py
+      - name: Build MkDocs without warnings
+        run: mkdocs build --strict

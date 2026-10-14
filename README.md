@@ -1,28 +1,19 @@
 # FLaG-STFT-Notes
 
-38 项已完成实验的 MkDocs Material 重构版。
+FLaG / STFT-FLaG 实验报告，使用 MkDocs Material 编写。
 
-- 本版每项实验独立 Markdown，起始部分原样保留提交的实验总结。
-- 实验页支持“总结 → 详细论述 → 返回总结”的双向导航。
-- 原文档完整归档在仓库根目录 `archive/legacy/`。
-- 实验代码核对仓库：[AMPCliff / FLaG-STFT-mechanism](https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism)。
+报告正文按研究问题合并为 **8 个章节，保留 38 项已完成实验的原始总结**。各章依次呈现总结与详细实验论述，提供双向跳转；旧版内容保存在仓库的 `archive/legacy/` 中，不进入网站导航。
 
-## 本地浏览
+## 本地预览
 
 ```bash
-python3 -m venv .venv
-source .venv/bin/activate
 python3 -m pip install -r requirements.txt
+python3 scripts/verify_report.py
 mkdocs serve
 ```
 
-浏览器打开命令行显示的本地地址。使用 `mkdocs build --strict` 检查站点构建。
-
-## 校验原始总结
-
-`source/abstract.md` 保存了用户提供的 38 条总结原文；运行下列命令校验各实验文件开头、双向跳转与目录：
+## 构建检查
 
 ```bash
-python3 scripts/verify_report.py
+mkdocs build --strict
 ```
-
