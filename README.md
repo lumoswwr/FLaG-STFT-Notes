@@ -17,3 +17,12 @@ mkdocs serve
 ```
 
 浏览器打开命令行显示的本地地址。使用 `mkdocs build --strict` 检查站点构建。
+
+## 校验原始总结
+
+`source/abstract.md` 保存了用户提供的 38 条总结原文；运行下列命令校验各实验文件开头、双向跳转与目录：
+
+```bash
+python3 scripts/verify_report.py
+```
+
