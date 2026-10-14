@@ -1,17 +1,23 @@
-# FLaG / STFT 实验报告
+# FLaG / STFT 研究记录
 
-研究目标：在原始 **FLaG（Global FFT）** 的基础上尝试 **STFT 局部频域池化**，比较性能，并分析 global/local 的实际结构差异。
+这个站点按**协议 → 逐项实验 → 事实结论**组织。每项实验单独成页，详细论述使用已有报告与代码仓库的可核对记录。各页顶部保留“实验目的/实验思路/实验结果/实验结论”四字段，待粘贴作者正式总结，**不会自动改写原文**。
 
-| 内容 | 说明 |
-| --- | --- |
-| [实验设置与指标](methods.md) | 模型、数据集、训练配置、评价指标 |
-| [STSB E1–E8](stsb/01-experiments.md) | Hann、STFT、窗长、频带和 token 分析 |
-| [STSB E9–E14](stsb/02-padding.md) | Padding、窗口重叠、固定 FFT、10-seed 配置对照 |
-| [循环反射与 P1/P2](stsb/03-mechanism.md) | 分析 padding 和 global/local 预测差异的来源 |
-| [Sprint 设置](sprint/01-protocol.md) | 冻结 RoBERTa 后的分类训练和指标 |
-| [Sprint S1–S5](sprint/02-experiments.md) | 跨任务性能、机制验证及配置控制 |
-| [结果总结](findings.md) | 整体实验结论 |
-| [DC / 频带机制](dc-frequency.md) | Frozen RoBERTa 下的 DC readability、band-only 与 band-knockout 机制分析 |
-| [FLaG 门控与输出线性投影](flag-gate-projection.md) | 逐阶段转角、Gate 输入依赖性、高能通道、简化模型与严格 Projection 匹配的三种子实验 |
+[进入实验逐项导航](experiments/index.md) · [查看对照协议](methods.md) · [查看结果索引](findings.md)
 
-**阅读说明**：早期实验多采用 **Q（问题）/ M（方法）/ R（结果）/ C（结论）** 形式；新增的 Gate 与 Projection 章节则按研究过程连续讲述，先交代问题、再解释实验和结果。性能表会标明 **test** 或 **validation**、随机种子数量以及模型配置；机制实验的“预测漂移”不等于性能提高。
+## 实验主线
+
+| 阶段 | 原始问题 | 已有记录范围 | 浏览入口 |
+| --- | --- | --- | --- |
+| STSB 结构试验 | Global FFT 与 STFT 的窗口、重叠、位置编码差别 | E1–E5、E11–E14 | [实验目录](experiments/index.md#stsb-e1e14) |
+| STSB 机制分析 | 频带、token、padding、循环反射 | E6–E10、P1/P2 | [实验目录](experiments/index.md#p1p2-与机制) |
+| Sprint 跨任务 | 早期对比是否可归因于算子，配置影响有多大 | S1–S5 | [实验目录](experiments/index.md#sprint-s1s5) |
+| DC / Gate / Projection | 低频是否有可读信息，Gate 和输出层分别做什么 | 冻结 backbone 与干预对照 | [实验目录](experiments/index.md#dc-与频带) |
+| Mean-compatible | 融合方式能否保留 Mean endpoint | 插值、正交、Alignment-aware、5-seed | [实验目录](experiments/index.md#mean-compatible-与-alignment-aware) |
+
+## 核心区分
+
+- **性能比较**：只比较同一 split、相同评价指标及明确控制条件下的数值。
+- **前向机制**：固定 checkpoint 下的输出漂移说明算子改变了什么，不直接说明重新训练后的性能归因。
+- **探索与复核**：3-seed/seed-0、10-seed、单独更换 checkpoint 规则的实验分开记载。
+
+[代码与实验日志索引](https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism/text_repro)；旧版 Markdown 保留在仓库中供溯源，但不再作为主导航入口。

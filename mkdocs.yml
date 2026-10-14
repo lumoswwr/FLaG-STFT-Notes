@@ -1,24 +1,50 @@
 site_name: FLaG / STFT Mechanism Experiments
-site_description: FLaG / STFT 实验配置、指标与机制分析
+site_description: 按实验事实与协议重构的 FLaG / STFT 研究记录
 site_url: https://lumoswwr.github.io/FLaG-STFT-Notes/
 
 nav:
   - 首页: index.md
-  - 实验协议与指标: methods.md
-  - 研究结果综述: findings.md
-  - MTEB数据集三种文本任务观察感受: MTEB.md
-  - DC / 频带机制: dc-frequency.md
-  - Mean-compatible FLaG: mean-compatible-flag.md
-  - FLaG 门控与输出线性投影: flag-gate-projection.md
-
-  - STSB:
-      - E1–E8: stsb/01-experiments.md
-      - E9–E14: stsb/02-padding.md
-      - 循环反射与 P1/P2: stsb/03-mechanism.md
-
-  - Sprint:
-      - 数据与训练: sprint/01-protocol.md
-      - S1–S5: sprint/02-experiments.md
+  - 实验设置和指标: methods.md
+  - 事实结果索引: findings.md
+  - 逐项实验导航: experiments/index.md
+  - STSB E1–E14:
+      - 'e01 Global Hann': experiments/stsb-e01.md
+      - 'e02 STFT 16/8（初次局部变换）': experiments/stsb-e02.md
+      - 'e03 STFT 8/4（缩短窗口）': experiments/stsb-e03.md
+      - 'e04 Learned frame position': experiments/stsb-e04.md
+      - 'e05 局部 Hann 与 centering': experiments/stsb-e05.md
+      - 'e06 最终层频带 Knockout': experiments/stsb-e06.md
+      - 'e07 Token hidden knockout': experiments/stsb-e07.md
+      - 'e08 DC attention 偏好比': experiments/stsb-e08.md
+      - 'e09 右侧额外 Padding 与输出漂移': experiments/stsb-e09.md
+      - 'e10 四种 Padding 推理方式': experiments/stsb-e10.md
+      - 'e11 无重叠 STFT 8/8': experiments/stsb-e11.md
+      - 'e12 无重叠 STFT 16/16 与十种子复核': experiments/stsb-e12.md
+      - 'e13 固定全局 FFT 长度': experiments/stsb-e13.md
+      - 'e14 论文 Text 设置下的十种子对照': experiments/stsb-e14.md
+  - Sprint S1–S5:
+      - 's01 Sprint 早期三种子基线': experiments/sprint-s01.md
+      - 's02 Sprint 十种子扩展': experiments/sprint-s02.md
+      - 's03 Sprint Global/Local Gate × Reconstruction': experiments/sprint-s03.md
+      - 's04 匹配配置的 Global / Local 对照': experiments/sprint-s04.md
+      - 's05 Global FLaG 的 Dropout × Norm 因子实验': experiments/sprint-s05.md
+  - P1/P2 与机制:
+      - 'mech-reflection 实虚门控的循环反射恒等式': experiments/mech-reflection.md
+      - 'mech-p1 FFT Gate 长度与重建长度分离': experiments/mech-p1.md
+      - 'mech-p2 STSB Global/Local Gate × Reconstruction': experiments/mech-p2.md
+  - DC 与频带:
+      - 'dc-band DCT 频带 Knockout、Band-only 与层深变化': experiments/dc-band.md
+      - 'dc-exact 训练时删除或仅保留 exact DC': experiments/dc-exact.md
+  - Gate 与 Projection:
+      - 'gate-stages DC、Gate 和 Projection 的向量方向变化': experiments/gate-stages.md
+      - 'gate-input 跨句 Gate 变化与 Sigmoid 饱和': experiments/gate-input.md
+      - 'gate-counterfactual 训练后关闭 DC/AC Gate 与 Projection': experiments/gate-counterfactual.md
+      - 'gate-projection 从头训练 Mean + Projection 与严格同初始化对照': experiments/gate-projection.md
+  - Mean-compatible 与 Alignment-aware:
+      - 'mean-residual Mean/FLaG 直接残差插值': experiments/mean-residual.md
+      - 'mean-anchor 正交 Mean-anchor 与无界 Beta': experiments/mean-anchor.md
+      - 'mean-alignment Alignment-aware 结构与 StopGrad 消融': experiments/mean-alignment.md
+      - 'mean-final 三项文本任务的统一 5-seed 对照': experiments/mean-final.md
 
 theme:
   name: material
@@ -26,7 +52,6 @@ theme:
   features:
     - navigation.sections
     - navigation.top
-    - navigation.indexes
     - toc.follow
     - content.code.copy
 
