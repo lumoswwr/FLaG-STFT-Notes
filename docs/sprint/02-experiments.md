@@ -4,12 +4,21 @@
 
 把 STFT 应用到判断两句话是否重复的 Sprint 任务，先看性能，再统一训练配置，避免把 dropout 或 LayerNorm 的作用误认成局部 STFT 的优势。
 
+<a id="exp-18-summary"></a>
+
+
 ### 实验十八（S1）：把 STFT-FLaG 用到 Sprint，效果怎样？
 
 - **实验目的：** 检查 STFT 在 STSB 以外的任务中是否仍然有效。
 - **实验思路：** 冻结 RoBERTa，在 Sprint 上分别训练直接 Mean、Global FLaG 和 E12，比较三个种子的测试集性能。
 - **实验结果：** Mean、FLaG、E12 的 Test AP 分别为 0.428907、0.721611、0.765655。
 - **实验结论：** 这组 Sprint 实验中，E12 所使用的整套配置得到最高 Test AP。
+
+**[↓ 查看详细实验](#exp-18-detail)**
+
+
+<a id="exp-19-summary"></a>
+
 
 ### 实验十九（S2）：STFT 在 Sprint 上的优势是否稳定？
 
@@ -18,6 +27,12 @@
 - **实验结果：** FLaG 的平均 Test AP 为 0.713121，E12 为 0.761344。E12 在十个种子中全部领先，平均高 0.048222。
 - **实验结论：** E12 的原有配置在十个种子中均高于 FLaG 的原有配置。
 
+**[↓ 查看详细实验](#exp-19-detail)**
+
+
+<a id="exp-20-summary"></a>
+
+
 ### 实验二十（S3）：在 Sprint 上，Global 和 Local 的预测差异来自哪里？
 
 - **实验目的：** 检查 STSB 上 P2 的机制发现，在 Sprint 上是否仍然成立。
@@ -25,12 +40,24 @@
 - **实验结果：** 只更换 Gate，预测几乎不变。更换频谱重建路径后，平均 cosine 变化约为 0.032 至 0.037。
 - **实验结论：** Sprint 与 STSB 的 P2 结果一致：更换 Gate 来源几乎无影响，切换完整的频谱重建路线才会明显改变预测。
 
+**[↓ 查看详细实验](#exp-20-detail)**
+
+
+<a id="exp-21-summary"></a>
+
+
 ### 实验二十一（S4）：统一训练配置后，STFT 还比 Global FFT 好吗？
 
 - **实验目的：** 排除 S1/S2 中 dropout 和 LayerNorm 不一致带来的影响。
 - **实验思路：** 将 FLaG 和 E12 都设置为 dropout=0、启用后池化 LayerNorm，重新进行十个种子比较。
 - **实验结果：** FLaG 的平均 Validation AP 为 0.795830，E12 为 0.789136，E12 只在四个种子中领先。
 - **实验结论：** 将 dropout 与 LayerNorm 统一后，E12 的平均 Validation AP 反而低于 FLaG，模型配置影响大。
+
+**[↓ 查看详细实验](#exp-21-detail)**
+
+
+<a id="exp-22-summary"></a>
+
 
 ### 实验二十二（S5）：Dropout 和 LayerNorm 到底对 FLaG 有多大影响？
 
@@ -40,6 +67,9 @@
 - **实验结论：** Global FLaG 在 dropout=0.1、启用 LayerNorm 时取得本次四种配置中最高的 Validation AP。两项设置的作用需要结合考虑。
 
 ---
+
+**[↓ 查看详细实验](#exp-22-detail)**
+
 
 ## 详细实验记录与数据
 
@@ -54,6 +84,9 @@
 | S3 | 固定 checkpoint，做 GG/LG/GL/LL | 0–2（3） | validation cosine 漂移、AP |
 | S4 | FLaG 与 E12 均设 dropout=0、Norm=True | 0–9（10） | validation AP |
 | S5 | **只对 global FLaG** 做 dropout × Norm 2×2 | 0–9（10） | validation AP |
+
+<a id="exp-18-detail"></a>
+
 
 ### S1：初步性能对比
 
@@ -77,6 +110,12 @@
 
 **结果说明：** E12 早期配置的 AP 更高，但 FLaG/E12 的 dropout 和 norm **不匹配**，还不能判断是否由 STFT 算子造成。
 
+**[↑ 返回实验总结](#exp-18-summary)**
+
+
+<a id="exp-19-detail"></a>
+
+
 ### S2：扩大到 10 Seeds
 
 **具体问题：** S1 的结果是否在更多随机种子下保持？
@@ -96,6 +135,12 @@
 配对 E12−FLaG 的 AP 差 **+0.048222 ± 0.017641**，**10/10 seeds 正向**。
 
 **结果说明：** 两套**整体配置**之间的 AP 差在 10 seeds 中保持，但仍不能单独归因于局部 STFT。
+
+**[↑ 返回实验总结](#exp-19-summary)**
+
+
+<a id="exp-20-detail"></a>
+
 
 ### S3：Sprint 上复现 P2
 
@@ -128,6 +173,12 @@
 
 **结果说明：** 与 STSB 的 P2 一致：只换 gate 几乎不改变输出，差异主要来自**重建路线**；直接换成 local 重建并未提高当前模型的 validation AP。
 
+**[↑ 返回实验总结](#exp-20-summary)**
+
+
+<a id="exp-21-detail"></a>
+
+
 ### S4：对齐配置后比较 Global 与 Local
 
 **具体问题：** 去掉 dropout/norm 的配置差异后，E12 还有稳定的 AP 优势吗？
@@ -145,6 +196,12 @@
 **4/10 seeds** 的差值为正。
 
 **结果说明：** 在匹配配置下没有观察到稳定的 E12 优势，S1/S2 的差异不能直接归因于 STFT 算子。
+
+**[↑ 返回实验总结](#exp-21-summary)**
+
+
+<a id="exp-22-detail"></a>
+
 
 ### S5：Global FLaG 的 Dropout × Norm
 
@@ -164,3 +221,6 @@
 相同 dropout 下**增加 Norm**：dropout=0.1 时 AP 差为 **+0.068220**；dropout=0 时为 **−0.003145**。
 
 **结果说明：** dropout 与 Norm 存在交互，本实验四种 **global FLaG** 配置中 `0.1 + 有 Norm` 的 validation AP 最高。**本实验没有测试 `0.1 + 有 Norm` 的 Sprint E12**，不能据此比较这项配置下的 global 与 local。
+
+**[↑ 返回实验总结](#exp-22-summary)**
+
