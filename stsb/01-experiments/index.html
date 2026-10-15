@@ -1322,6 +1322,7 @@
 <h1 id="stsb-fft-stft">STSB：从全局 FFT 改为局部 STFT<a class="headerlink" href="#stsb-fft-stft" title="Permanent link">&para;</a></h1>
 <h2 id="8">本页实验概览（8 项）<a class="headerlink" href="#8" title="Permanent link">&para;</a></h2>
 <p>先尝试改变 FFT 的处理方式和窗口，再检查两种模型依赖哪些频率、token 位置以及注意力位置。早期小幅性能提升推动了后续实验，但低频依赖和注意力分配并不等同。</p>
+<p><a id="exp-01-summary"></a></p>
 <h3 id="e1-fft-hann">实验一（E1）：在 FFT 前增加 Hann 窗，能否改善模型性能？<a class="headerlink" href="#e1-fft-hann" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 尝试减小序列两端带来的频谱边界影响，看看能否提高 STSB 的句子相似度预测能力。</li>
@@ -1329,6 +1330,8 @@
 <li><strong>实验结果：</strong> Test Spearman 从 FLaG 的 0.841128 降至 0.837019。</li>
 <li><strong>实验结论：</strong> 全局 Hann 加窗使 Spearman 下降 0.004109，后续不采用这一加窗方案。</li>
 </ul>
+<p><strong><a href="#exp-01-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-02-summary"></a></p>
 <h3 id="e2-fft-fft">实验二（E2）：把整句 FFT 改成分窗口 FFT，性能会怎样？<a class="headerlink" href="#e2-fft-fft" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 验证 STFT 这种局部频域处理方式，是否比 FFT 更适合句子表示。</li>
@@ -1336,6 +1339,8 @@
 <li><strong>实验结果：</strong> Test Spearman 为 0.842204，比原始 FLaG 高 0.001076，三seed两个更好。</li>
 <li><strong>实验结论：</strong> 16/8 的局部 FFT 比原始全局 FFT 小幅提高 Spearman，因此继续测试更短的窗口。</li>
 </ul>
+<p><strong><a href="#exp-02-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-03-summary"></a></p>
 <h3 id="e3">实验三（E3）：把窗口缩短，是否更适合短句？<a class="headerlink" href="#e3" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 检查更短的局部窗口是否适合 STSB 中长度有限的句子。</li>
@@ -1343,6 +1348,8 @@
 <li><strong>实验结果：</strong> Test Spearman 达到 0.843000，比原始 FLaG 高 0.001873，三seed全正向。</li>
 <li><strong>实验结论：</strong> 8/4 窗口在这组 STSB 实验中取得较高 Spearman，后续先以 E3 为局部模型进行机制分析。</li>
 </ul>
+<p><strong><a href="#exp-03-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-04-summary"></a></p>
 <h3 id="e4">实验四（E4）：给不同窗口加入位置编码有没有帮助？<a class="headerlink" href="#e4" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> STFT 将句子拆成多个窗口，想验证显式告诉模型“每个窗口位于句子的什么位置”是否有价值。</li>
@@ -1350,6 +1357,8 @@
 <li><strong>实验结果：</strong> Test Spearman 为 0.842282，低于 E3 的 0.843000。</li>
 <li><strong>实验结论：</strong> 加入帧位置编码后，Spearman 比 E3 下降 0.000718，因此不保留这一组件。</li>
 </ul>
+<p><strong><a href="#exp-04-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-05-summary"></a></p>
 <h3 id="e5-fft-hann">实验五（E5）：在局部 FFT 中增加 Hann 窗是否有用？<a class="headerlink" href="#e5-fft-hann" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 检查局部频域分析中，平滑窗口边界是否能进一步改善效果。</li>
@@ -1357,6 +1366,8 @@
 <li><strong>实验结果：</strong> Test Spearman 为 0.843027，与 E3 的 0.843000 几乎一致。</li>
 <li><strong>实验结论：</strong> 加入局部 Hann 窗并开启 center 后，与 E3 几乎持平，后续继续使用结构更简单的矩形窗。</li>
 </ul>
+<p><strong><a href="#exp-05-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-06-summary"></a></p>
 <h3 id="e6global-flag-stft-flag">实验六（E6）：Global FLaG 和 STFT-FLaG 分别依赖哪些频率？<a class="headerlink" href="#e6global-flag-stft-flag" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 探究局部 FFT 是否改变了模型对低频和高频信息的依赖。</li>
@@ -1364,6 +1375,8 @@
 <li><strong>实验结果：</strong> 删除最低频带 B0 的影响最大。FLaG 的平均 Spearman 降幅为 0.146694，E3 为 0.198943。</li>
 <li><strong>实验结论：</strong> 删除 B0 对两种模型的影响都最大，其中 E3 的 Spearman 降幅更大，表明它在这项频带删除测试中更依赖最低频部分。</li>
 </ul>
+<p><strong><a href="#exp-06-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-07-summary"></a></p>
 <h3 id="e7-fft-token">实验七（E7）：局部 FFT 是否让模型更关注某些 token？<a class="headerlink" href="#e7-fft-token" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 验证 STFT-FLaG 是否比全局 FLaG 更重视句子中的特定位置。</li>
@@ -1371,6 +1384,8 @@
 <li><strong>实验结果：</strong> 两种模型的 token 扰动响应非常接近，句内平均响应分别约为 0.003248 和 0.003155。</li>
 <li><strong>实验结论：</strong> Global FLaG 与 E3 对 token 位置置零的响应接近，没有观察到局部 FFT 带来更强的特定位置依赖。</li>
 </ul>
+<p><strong><a href="#exp-07-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-08-summary"></a></p>
 <h3 id="e8-fft">实验八（E8）：局部 FFT 是否更关注零频率？<a class="headerlink" href="#e8-fft" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 比较全局和局部频域模型的注意力，是否更加集中于 DC。</li>
@@ -1379,6 +1394,7 @@
 <li><strong>实验结论：</strong> E3 给 DC 位置分配的平均注意力相对更低</li>
 </ul>
 <hr />
+<p><strong><a href="#exp-08-detail">↓ 查看详细实验</a></strong></p>
 <h2 id="_1">详细实验记录与数据<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>本页使用 <strong>STSB</strong>。E1–E5 重新训练，使用 <strong>seeds 0、1、2</strong>，结果为 <strong>test Spearman / Pearson（mean ± std）</strong>；E6–E8 则使用这些 seed 的<strong>已训练 FLaG/E3 checkpoint</strong> 做分析，不重新训练。共同配置见<a href="../../methods/">实验设置</a>。</p>
 <h3 id="e1e5">E1–E5 配置及结果对照<a class="headerlink" href="#e1e5" title="Permanent link">&para;</a></h3>
@@ -1432,32 +1448,43 @@
 </tbody>
 </table>
 <p>E2/E3 使用 <code>center=False</code>，均只生成<strong>一个句级 gate</strong>；E5 <strong>同时改变了窗函数与 center 设置</strong>，不能将变化单独归因于 Hann。</p>
+<p><a id="exp-01-detail"></a></p>
 <h3 id="e1global-hann">E1：Global Hann<a class="headerlink" href="#e1global-hann" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> global FFT 前加 Hann，能否减轻边界影响并改善性能？</p>
 <p><strong>具体做法与参数：</strong> 按<strong>每句话自身有效 token 长度</strong>（包括特殊 token）生成 symmetric Hann，乘到 RoBERTa hidden 上，再执行原 global FFT；padding 仍为零。有效长度 ≤2 时使用全 1 窗口。其他设置与 FLaG 一致，<strong>3 seeds</strong>。</p>
 <p><strong>详细结果：</strong> Spearman <code>0.837019 ± 0.002763</code>，比同 seed FLaG 平均 <strong>−0.004109</strong>。</p>
 <p><strong>结果说明：</strong> 未改善性能，但不能据此排除频谱泄漏，因为加窗同时减弱了边界 token 的输入。</p>
+<p><strong><a href="#exp-01-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-02-detail"></a></p>
 <h3 id="e2-stft168">E2：首次改为 STFT（16/8）<a class="headerlink" href="#e2-stft168" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> 把整句 FFT 换成局部 STFT 是否改善结果？</p>
 <p><strong>具体做法与参数：</strong> rect 窗，<code>win=16,hop=8,center=False</code>，相邻帧重叠 8 token。所有有效帧的频率 token 共同生成一个句级 gate；逐帧逆变换并重建，<strong>3 seeds</strong>。</p>
 <p><strong>详细结果：</strong> Spearman <code>0.842204 ± 0.001824</code>，比 FLaG 平均 <strong>+0.001076</strong>，2/3 seeds 正向。</p>
 <p><strong>结果说明：</strong> 观察到小幅正向结果，继续检查窗口大小。</p>
+<p><strong><a href="#exp-02-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-03-detail"></a></p>
 <h3 id="e384">E3：缩短窗口（8/4）<a class="headerlink" href="#e384" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> 部分短句在 win16 下只有一个有效帧，缩短窗口后效果如何？</p>
 <p><strong>具体做法与参数：</strong> 延续 E2 的做法，改为 <code>win=8,hop=4</code>，其余不变，<strong>3 seeds</strong>。</p>
 <p><strong>详细结果：</strong> Spearman <code>0.843000 ± 0.001047</code>；比 FLaG 平均 <strong>+0.001873</strong>（3/3 正向），比 E2 平均 <strong>+0.000796</strong>。</p>
 <p><strong>结果说明：</strong> 早期观察到小幅改善，因此选择 E3 进行 E6–E8 机制分析；3 seeds 不能证明稳定优势。</p>
+<p><strong><a href="#exp-03-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-04-detail"></a></p>
 <h3 id="e4_1">E4：添加帧位置编码<a class="headerlink" href="#e4_1" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> 局部帧的位置顺序信息是否有帮助？</p>
 <p><strong>具体做法与参数：</strong> 在 E3 的频率 token 进入 latent attention 前，加 <strong>learned frame positional encoding</strong>；窗长及其他配置不变，重新训练 <strong>3 seeds</strong>。</p>
 <p><strong>详细结果：</strong> Spearman <code>0.842282 ± 0.001834</code>，比 E3 平均 <strong>−0.000718</strong>。</p>
 <p><strong>结果说明：</strong> 这种帧位置编码没有带来改善，后续不采用。</p>
+<p><strong><a href="#exp-04-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-05-detail"></a></p>
 <h3 id="e5-hann">E5：局部 Hann<a class="headerlink" href="#e5-hann" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> 给局部帧加窗是否继续改善 E3？</p>
 <p><strong>具体做法与参数：</strong> 在 E3 的 win8/hop4 上，将 rect 换成 <strong>periodic Hann</strong>，并同时设 <code>center=True</code>；重新训练 <strong>3 seeds</strong>。</p>
 <p><strong>详细结果：</strong> Spearman <code>0.843027 ± 0.000593</code>，比 E3 平均 <strong>+0.000027</strong>。</p>
 <p><strong>结果说明：</strong> 基本持平，后续优先使用更简单的 rect 实现。本实验未单独拆分 Hann 与 centering 的作用。</p>
 <hr />
+<p><strong><a href="#exp-05-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-06-detail"></a></p>
 <h3 id="e6-knockout">E6：频带 Knockout<a class="headerlink" href="#e6-knockout" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> FLaG 与 E3 分别依赖哪些输入频带？</p>
 <p><strong>具体做法与参数：</strong> 固定两组已训练 checkpoint（<strong>seeds 0–2</strong>）。对 RoBERTa <strong>最后一层的内容 token hidden</strong> 沿位置做 DCT-II，按几何比例划分为 <strong>8 个频带 B0–B7</strong>（B0 为最低频）；每次只将一段的系数置零、逆 DCT，再交给原模型预测。特殊 token 不变。只使用<strong>句对两侧均至少有 8 个内容 token</strong> 的 test 子集。</p>
@@ -1467,6 +1494,8 @@
 \]</div>
 <p><strong>详细结果：</strong> B0 引起的平均 Spearman 降幅最大：FLaG <strong>0.146694</strong>，E3 <strong>0.198943</strong>。</p>
 <p><strong>结果说明：</strong> 两个模型都对最低频敏感；E3 与 FLaG 的相对差异随 seed 变化，不能据此确认 E3 的性能变化由低频造成。</p>
+<p><strong><a href="#exp-06-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-07-detail"></a></p>
 <h3 id="e7token-hidden-knockout">E7：Token Hidden Knockout<a class="headerlink" href="#e7token-hidden-knockout" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> E3 是否对特定 token 位置更敏感？</p>
 <p><strong>具体做法与参数：</strong> 固定 FLaG/E3 的 <strong>3-seed checkpoint</strong>。逐个把<strong>内容 token 的最后一层 hidden 向量置零</strong>，其他 token、特殊 token 和 mask 不变，重新计算句对 cosine。</p>
@@ -1503,6 +1532,8 @@ R_{\text{token}}=\left|(s'-y)^2-(s-y)^2\right|.
 </tbody>
 </table>
 <p><strong>结果说明：</strong> 两组的 token 位置响应接近，没有观察到 E3 更强的位置选择性。</p>
+<p><strong><a href="#exp-07-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-08-detail"></a></p>
 <h3 id="e8dc-attention">E8：DC Attention 偏好比<a class="headerlink" href="#e8dc-attention" title="Permanent link">&para;</a></h3>
 <p><strong>具体问题：</strong> E3 是否比 global FLaG 更偏向 DC（零频）？</p>
 <p><strong>具体做法与参数：</strong> 固定 <strong>3-seed checkpoint</strong>，从正常 forward 中读取 latent attention 权重，先在 latent queries（以及需要时的 attention heads）上取平均。FLaG 的全局 <code>k=0</code> 是 DC；E3 将<strong>每个有效局部帧</strong>的 <code>k=0</code> 都计为 DC。</p>
@@ -1541,6 +1572,7 @@ r_{\mathrm{DC}}=
 </tbody>
 </table>
 <p><strong>结果说明：</strong> E3 在三个 seed 上的 DC attention 偏好比都较低。但 attention 分配与 E6 的 knockout 性能敏感性<strong>不是同一个指标</strong>，不能仅凭偏好比判断 DC 的实际重要性。</p>
+<p><strong><a href="#exp-08-summary">↑ 返回实验总结</a></strong></p>
 
 
 
