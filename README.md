@@ -4,18 +4,17 @@
 
 ## 怎么读报告？
 
-网站首页先用几段普通语言解释研究脉络；七篇实验报告的开头都列出了**实验目的、思路、结果和结论**，共 38 项。需要复查原始配置、公式和数据时，再阅读每篇下面的“详细实验记录与数据”。
+网站首页先用几段普通语言解释研究脉络；六篇实验报告的开头都列出了**实验目的、思路、结果和结论**，共 31 项。需要复查原始配置、公式和数据时，再阅读每篇下面的“详细实验记录与数据”。
 
 主要路径：
 
-- `docs/index.md`：研究首页及七篇实验报告的阅读顺序。
+- `docs/index.md`：研究首页及六篇实验报告的阅读顺序。
 - `docs/findings.md`：阶段性结果总结及关键数值。
 - `docs/methods.md`：统一实验设置和不同阶段的配置差异。
 - `docs/stsb/`：STSB 上的 STFT 结构、Padding 与 Global/Local 机制分析。
 - `docs/sprint/`：Sprint 的训练协议与 Global/Local 性能对照。
 - `docs/dc-frequency.md`：DC 和频带对预测的作用。
 - `docs/mean-compatible-flag.md`：Mean 与 FLaG 的融合方法。
-- `docs/flag-gate-projection.md`：Gate 和可训练线性层的作用分析。
 
 ## 在本地运行（macOS / Linux）
 
