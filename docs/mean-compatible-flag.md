@@ -4,12 +4,21 @@
 
 STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表示开始，再研究它们之间的方向关系，改进融合方法。
 
+<a id="exp-27-summary"></a>
+
+
 ### 实验二十七：直接将 Mean 与 FLaG 的句向量加权融合
 
 - **实验目的：** 让模型可以在 Mean 与 FLaG 之间选择，而不是始终只能使用 FLaG。
 - **实验思路：** 同时计算 Mean 和 FLaG 表示，再学习一个权重 \(\alpha\)，决定两者在最终结果中的比例。
 - **实验结果：** Seed 0 中 STSB Spearman 为 0.850597，Sprint AP 为 0.878625。学到的 \(\alpha\) 在两个任务中均接近 0.5。
 - **实验结论：** 直接融合 Mean 和 FLaG 改善了本次 STSB、Sprint 结果，说明保留 Mean 路径有帮助。
+
+**[↓ 查看详细实验](#exp-27-detail)**
+
+
+<a id="exp-28-summary"></a>
+
 
 ### 实验二十八：只让 FLaG 补充 Mean 没有的信息，是否更好？
 
@@ -18,6 +27,12 @@ STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表�
 - **实验结果：** Seed 0 中 STSB Spearman 为 0.855106，但 Sprint AP 只有 0.638445，且 \(\beta\) 达到上界 1。
 - **实验结论：** 只使用 FLaG 相对 Mean 的正交部分使 STSB 提高、Sprint 明显下降，表明这种删去共线分量的方式不适合 Sprint。
 
+**[↓ 查看详细实验](#exp-28-detail)**
+
+
+<a id="exp-29-summary"></a>
+
+
 ### 实验二十九：放开补充信息的权重限制，会怎样？
 
 - **实验目的：** 判断 Sprint 表现差是否只是因为 \(\beta\) 的取值上限过小。
@@ -25,12 +40,24 @@ STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表�
 - **实验结果：** Sprint AP 提高到 0.809582，但 \(\beta\) 增大到约 13.124。
 - **实验结论：** 允许 β 超过 1 后 Sprint AP 回升，但 β 增至约 13，说明模型需要大幅放大被保留的正交部分。
 
+**[↓ 查看详细实验](#exp-29-detail)**
+
+
+<a id="exp-30-summary"></a>
+
+
 ### 实验三十：为什么只保留与 Mean 垂直的部分，会损失信息？
 
 - **实验目的：** 解释为什么 Sprint 需要很大的 \(\beta\)，而 STSB 不需要。
 - **实验思路：** 计算 Mean 与 FLaG 句向量的夹角，并测量 FLaG 与 Mean 正交的部分有多大。
 - **实验结果：** 在当时的实验中，STSB 的 Mean 与 FLaG 夹角约 90.7°，Sprint 约 160.3°。也就是说，Sprint 中两者近乎反向。
 - **实验结论：** Sprint 的 FLaG 与 Mean 接近反方向，大部分 FLaG 表示位于 Mean 轴上。直接删除共线部分会丢掉模型原本能够利用的表示。
+
+**[↓ 查看详细实验](#exp-30-detail)**
+
+
+<a id="exp-31-summary"></a>
+
 
 ### 实验三十一：根据 Mean 与 FLaG 的方向关系进行融合
 
@@ -40,6 +67,9 @@ STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表�
 - **实验结论：** Alignment-aware 在五种子对照中提高了 STSB 的 Spearman 和 Sprint 的 AP，IMDB 与 Mean 基本持平。按两种表示的方向关系融合，比只保留正交部分更有效。
 
 ---
+
+**[↓ 查看详细实验](#exp-31-detail)**
+
 
 ## 详细实验记录与数据
 
@@ -79,6 +109,9 @@ STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表�
 > **给 FLaG 加入一个显式的 Mean endpoint，使模型在 FLaG 无益时能够退化为 Mean，在 FLaG 有益时继续利用其补充信息。**
 
 ---
+
+<a id="exp-27-detail"></a>
+
 
 ### 2. 第一步：直接加入 Mean residual
 
@@ -150,6 +183,9 @@ z=\hat{f}
 因此下一步不再直接混合完整的 FLaG 表示，而是分析 Mean 与 FLaG 之间的几何关系。
 
 ---
+
+**[↑ 返回实验总结](#exp-27-summary)**
+
 
 ### 3. 第二步：Mean-anchor 与正交残差
 
@@ -224,6 +260,9 @@ z=\hat{m}
 
 所以这一结构同样具有严格的 Mean endpoint。
 
+<a id="exp-28-detail"></a>
+
+
 #### 3.1 有界 \(\beta\)
 
 最初将 \(\beta\) 限制在有界范围内。
@@ -240,6 +279,12 @@ STS-B 上已经略高于 Mean。
 
 > Sprint 上并不是“不需要 FLaG”，而是当前结构对 FLaG 信息的利用受到了限制。
 
+**[↑ 返回实验总结](#exp-28-summary)**
+
+
+<a id="exp-29-detail"></a>
+
+
 #### 3.2 放开 \(\beta\) 上界
 
 随后改为直接学习无界 \(\beta\)。
@@ -253,6 +298,12 @@ Sprint AP 从 0.638 提升到 0.810，但 \(\beta\) 被放大到约 13。
 这说明问题并不是简单的“\(\beta\) 上限太小”，而是当前分解方式本身可能丢掉了 Sprint 所需要的信息。
 
 ---
+
+**[↑ 返回实验总结](#exp-29-summary)**
+
+
+<a id="exp-30-detail"></a>
+
 
 ### 4. Mean 与 FLaG 的几何关系
 
@@ -343,6 +394,12 @@ a\hat{m}
 > **不能简单删除 FLaG 与 Mean 共线的部分。共线部分本身也可能包含任务相关信息，只是它应该根据 Mean 与 FLaG 的对齐关系进入最终表示。**
 
 ---
+
+**[↑ 返回实验总结](#exp-30-summary)**
+
+
+<a id="exp-31-detail"></a>
+
 
 ### 5. 第三步：Alignment-aware Mean anchor
 
@@ -684,6 +741,9 @@ Alignment-aware 进一步达到：
 说明 Sprint 需要较强的 FLaG 补充信息，而不是退化回 Mean。
 
 ---
+
+**[↑ 返回实验总结](#exp-31-summary)**
+
 
 ### 9. 当前结论
 
