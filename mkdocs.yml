@@ -21,8 +21,6 @@ nav:
       - DC 与各频带的作用: dc-frequency.md
       - Mean 与 FLaG 的融合: mean-compatible-flag.md
 
-  - 第四阶段：内部机制:
-      - Gate 与 Projection 的作用: flag-gate-projection.md
 
 theme:
   name: material
