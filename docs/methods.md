@@ -1,6 +1,6 @@
 # 实验设置与指标
 
-本项目最开始比较 **Global FLaG（对整句话做 FFT）** 与 **STFT-FLaG（把句子分成小窗口做 FFT）**。随后为了解释预测差异，分析了 Padding、重建、Gate、DC 频带和可训练输出线性层，并尝试把 Mean 与 FLaG 结合起来。
+本项目最开始比较 **Global FLaG（对整句话做 FFT）** 与 **STFT-FLaG（把句子分成小窗口做 FFT）**。随后为了解释预测差异，分析了 Padding、重建、Gate 来源和 DC 频带，并尝试把 Mean 与 FLaG 结合起来。
 
 不同阶段的实验不一定采用同一套模型参数。阅读结果时，尤其需要看清三件事：
 
@@ -65,13 +65,7 @@ Sprint 分别在 validation 选择 **Accuracy 阈值**与 **F1 阈值**：最终
 | [Sprint 早期 S1–S5](sprint/02-experiments.md) | 冻结 RoBERTa；S1/S2 的 Global/Local dropout 和 norm 不匹配；S4 匹配到 dropout=0、norm=True | 结构差异与训练配置效应 |
 | [DC 和频带机制](dc-frequency.md) | STSB、Sprint 都采用 **冻结 RoBERTa** 的控制实验；后续 FLaG 仍可训练 | 删除、只保留和从训练开始限定频率 |
 | [Mean 与 FLaG 融合](mean-compatible-flag.md) | 五种子版本使用 masked Max、启用后池化 LayerNorm；STSB/IMDB 微调 RoBERTa，Sprint 冻结 | 在不同任务里组合 Mean 与 FLaG |
-| [Gate 和 Projection 机制](flag-gate-projection.md) | Global FFT、**time pooling=masked Mean、关闭 post-pool LayerNorm、dropout=0**；STSB 微调，Sprint 冻结 | Gate 在哪里改变表示、是否可以使用简单线性模型替代 |
 
-### 最新 Sprint Projection 对照的 checkpoint 选择
-
-早期 Sprint S1/S2 和一部分机制实验按照 **validation Accuracy** 选择 checkpoint；后期专门比较 FLaG 与 Mean + Projection 的多种子实验，则统一按 **validation AP** 选择 checkpoint。前者和后者不能作为同一组对照直接汇总。
-
-最新严格配对实验还使两个模型具有**完全相同的初始 Projection 权重和偏置**，以便判断加入完整频域 Gate 后 Test AP 如何变化。详见 [Gate 和 Projection 的作用](flag-gate-projection.md)。
 
 ### B0 与 exact DC 不是同一个概念
 
