@@ -1544,6 +1544,7 @@
 <h1 id="flag-gate">FLaG 内部机制：Gate 与线性层各起什么作用？<a class="headerlink" href="#flag-gate" title="Permanent link">&para;</a></h1>
 <h2 id="7">本页实验概览（7 项）<a class="headerlink" href="#7" title="Permanent link">&para;</a></h2>
 <p>最后回到 FLaG 本身：Gate 是否针对每句话变化？它在调整哪些通道？若去掉 FFT 和 Attention，只训练 Mean 后面的线性层，会得到什么结果？</p>
+<p><a id="exp-32-summary"></a></p>
 <h3 id="flag-mean">实验三十二：FLaG 在哪一步改变了 Mean 向量？<a class="headerlink" href="#flag-mean" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 找出 FLaG 为什么不能自动保持 Mean 的表示，以及具体是哪一部分改变了句向量方向。</li>
@@ -1551,6 +1552,8 @@
 <li><strong>实验结果：</strong> B2 在第一个 epoch 后，Gate 使 STSB 和 Sprint 的 DC 平均转角分别达到约 64.7° 和 77.9°。最后的 Projection 还会进一步改变方向。</li>
 <li><strong>实验结论：</strong> FLaG 的 DC 与直接 Mean 原本同方向；。本次逐阶段测量表明，主要是 Gate 缩放和最终 Projection 改变了向量方向。</li>
 </ul>
+<p><strong><a href="#exp-32-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-33-summary"></a></p>
 <h3 id="gate">实验三十三：Gate 是否真的会根据不同句子产生不同权重？<a class="headerlink" href="#gate" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> FLaG 通过 FFT 和 latent attention 为每句话生成 Gate，想知道这种针对不同输入的调整是否真的明显存在。</li>
@@ -1558,6 +1561,8 @@
 <li><strong>实验结果：</strong> 更换 Gate 后，STSB 和 Sprint 的指标在六位小数精度下保持不变。高精度检查发现，Sprint FLaG 的 Sigmoid 前输出仍存在明显变化，平均跨句子标准差为 0.439389，但最终 Gate 与训练集平均 Gate 的平均绝对差仅约 <span class="arithmatex">\(7.58\times10^{-14}\)</span>。</li>
 <li><strong>实验结论：</strong> Gate 网络对不同句子的 Sigmoid 前输出有明显变化，但最终 Gate 几乎一致。高度饱和的 Sigmoid 大幅压缩了输入带来的差异。</li>
 </ul>
+<p><strong><a href="#exp-33-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-34-summary"></a></p>
 <h3 id="gate_1">实验三十四：Gate 主要在调整哪些特征通道？<a class="headerlink" href="#gate_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 解释为什么只有少量通道的 Gate 较低，却能够明显改变 DC 向量的方向。</li>
@@ -1565,6 +1570,8 @@
 <li><strong>实验结果：</strong> Sprint 中，原始 FLaG 约 2.21% 的低 Gate 值实部通道，承载了原始 DC 约 93.72% 的平方能量。B2 中相应比例为 3.78% 和 95.49%。</li>
 <li><strong>实验结论：</strong> 少量低 Gate 值通道承载了大部分原始 DC 平方能量，Gate 通过改变这些通道的相对权重影响向量方向。</li>
 </ul>
+<p><strong><a href="#exp-34-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-35-summary"></a></p>
 <h3 id="flag-gate_1">实验三十五：训练好的 FLaG 究竟依赖 Gate 的哪一部分？<a class="headerlink" href="#flag-gate_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 判断频谱中 DC、其他频率的 Gate，以及最终 Projection，分别会怎样影响预测。</li>
@@ -1572,6 +1579,8 @@
 <li><strong>实验结果：</strong> Sprint B2 的 Test AP 为 0.833946；关闭 DC Gate 后下降至 0.678850；绕过 Projection 后下降至 0.494782。而只关闭非 DC Gate，AP 基本不变。</li>
 <li><strong>实验结论：</strong> 当前已训练 B2 的 Sprint 预测对 DC Gate 和输出 Projection 较敏感，而关闭非 DC Gate 基本不改变 AP。</li>
 </ul>
+<p><strong><a href="#exp-35-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-36-summary"></a></p>
 <h3 id="fft-attention">实验三十六：如果去掉 FFT 和 Attention，简单模型能否达到相近性能？<a class="headerlink" href="#fft-attention" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 判断完整的频域门控是否真的必要，还是只要在 Mean 向量之后加入一个可训练的线性层就够了。</li>
@@ -1579,6 +1588,8 @@
 <li><strong>实验结果：</strong> Seed 0 的 Sprint Test AP 中，B2 为 0.834217，直接 Mean + Projection 为 0.833765，仅差 0.000452。</li>
 <li><strong>实验结论：</strong> 在本次 Sprint 的 seed-0 对照中，Mean + 可训练 Projection 几乎恢复了 B2 的 AP，说明复杂的 FFT/Attention/Gate 不是达到这一结果所必需的训练结构。</li>
 </ul>
+<p><strong><a href="#exp-36-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-37-summary"></a></p>
 <h3 id="projection">实验三十七：Projection 的初始化方式会影响结果吗？<a class="headerlink" href="#projection" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 进一步理解为什么简单的 Mean + Projection 表现不差，并排除不同初始化方式造成的比较偏差。</li>
@@ -1586,6 +1597,8 @@
 <li><strong>实验结果：</strong> 随机初始化 Mean + Projection 的平均 Sprint Test AP 为 0.840923，单位矩阵初始化为 0.818806。前者在三个seed中都更高。</li>
 <li><strong>实验结论：</strong> 随机初始化的 Mean + Projection 比单位矩阵初始化高 0.022117 AP，表明输出线性层的初始化会显著影响本次训练结果。</li>
 </ul>
+<p><strong><a href="#exp-37-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-38-summary"></a></p>
 <h3 id="projection-flag">实验三十八：在相同初始 Projection 下，完整 FLaG 还有额外优势吗？<a class="headerlink" href="#projection-flag" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 令 FLaG 与 Mean + Projection 使用完全相同的初始线性层，直接比较加入完整频域门控前后的 Sprint 预测性能。</li>
@@ -1594,6 +1607,7 @@
 <li><strong>实验结论：</strong> 在严格统一初始 Projection 后，Mean + 可训练线性层的 Sprint Test AP 为 0.841386，高于完整 FLaG 的 0.830539，三个seed结果方向一致:完整频域门控没有在这次对照中带来额外测试集收益。</li>
 </ul>
 <hr />
+<p><strong><a href="#exp-38-detail">↓ 查看详细实验</a></strong></p>
 <h2 id="_1">详细实验记录与数据<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <h3 id="1-mean-flag">1. 从一个疑问开始：直接 Mean 为什么有时不如 FLaG？<a class="headerlink" href="#1-mean-flag" title="Permanent link">&para;</a></h3>
 <p>对一句话，RoBERTa 输出 <span class="arithmatex">\(T\)</span> 个 token 的特征矩阵：</p>
@@ -1618,6 +1632,7 @@ H
 <p>其中 Gate 不是固定写死的系数：模型会先用 **latent attention（可学习查询注意力）**汇集频谱信息，再通过多层感知机生成每个隐藏特征通道的缩放系数。</p>
 <p>此前实验有一个值得追问的现象：<strong>在 STSB 上直接 Mean 有时好于 FLaG，而在 Sprint 上 FLaG 又明显强于直接 Mean</strong>。于是我们首先尝试将 FLaG 最后的 Max pooling 改成 Mean pooling。它在不同任务上改变了表现，却没有完全解释差异。</p>
 <p>这使我们意识到，应该把 FLaG 的复杂路径拆开看：即使最后做 Mean，<strong>Gate 和最后的线性层仍然会改变向量</strong>。</p>
+<p><a id="exp-32-detail"></a></p>
 <h3 id="2-mean">2. 第一步：找到 Mean 向量在哪里被改变<a class="headerlink" href="#2-mean" title="Permanent link">&para;</a></h3>
 <h4 id="21-dc-mean">2.1 DC 与 Mean 究竟是什么关系？<a class="headerlink" href="#21-dc-mean" title="Permanent link">&para;</a></h4>
 <p>rFFT 是沿 token 序列这个维度进行的。输出第一个频率位置称为 <strong>DC（零频率分量）</strong>。</p>
@@ -1704,7 +1719,9 @@ X_0=\sum_{t\in\mathrm{valid}}h_t=Lm.
 <p>但这并不是说“大角度导致性能下降”。如果所有句向量被一个共同正交变换旋转，每个句子相对于原来的方向可能变化很大，句子之间的余弦相似度却可以保持不变。</p>
 <p>还有一个数学约束：原始 FLaG 的 Gate 位于 <span class="arithmatex">\((1,2)\)</span>，对 DC 做逐通道正缩放所能造成的最大角度约为 <span class="arithmatex">\(19.47^\circ\)</span>；B2 位于 <span class="arithmatex">\((0,2)\)</span>，允许部分通道接近零，角度就能接近 <span class="arithmatex">\(90^\circ\)</span>。因此，B2 比原始 FLaG 转得远，部分原因是两种 Gate <strong>允许的缩放范围不同</strong>，不能直接判断模型优劣。</p>
 <p><strong>接下来的问题</strong>：Gate 为什么这样缩放？它真的根据每句话改变吗？</p>
+<p><strong><a href="#exp-32-summary">↑ 返回实验总结</a></strong></p>
 <h3 id="3-gate">3. 第二步：观察训练后的 Gate 实际在做什么<a class="headerlink" href="#3-gate" title="Permanent link">&para;</a></h3>
+<p><a id="exp-33-detail"></a></p>
 <h4 id="31-gate">3.1 不同句子的 Gate 是否不同？<a class="headerlink" href="#31-gate" title="Permanent link">&para;</a></h4>
 <p>按照 FLaG 的设计，每个句子经过 FFT、latent attention 和 Gate MLP，会计算出自己的 Gate。为检验“每句话都需要自己那套 Gate”是否真的影响预测，我们固定一个已经训练好的模型，不重新训练，只在推理时换 Gate：</p>
 <table>
@@ -1850,6 +1867,8 @@ X_0=\sum_{t\in\mathrm{valid}}h_t=Lm.
 <p>这里第二列<strong>不是所有样本的全局最大值</strong>，而是先计算每个句子的最大通道差异，再对这些最大值求平均。尤其在 STSB FLaG 中，仍能测到少数非零变化，所以不能写成“Gate 严格恒定”。</p>
 <p><strong>数值精度说明：</strong> Sprint FLaG 的“Gate 跨句子标准差”在输出中显示为 0，但直接逐元素比较仍发现非零的极小差异。这是因为当前程序通过 <span class="arithmatex">\(E[g^2]-E[g]^2\)</span> 计算方差；当 Gate 几乎不变时，两个接近的量相减可能发生浮点精度损失。因此，“标准差为 0”<strong>不能解释为数学上完全相同</strong>。</p>
 <p><strong>本次更新后的结论：</strong> Gate 网络在 Sigmoid 前对不同输入仍然有响应；高度饱和的 Sigmoid 与最后 Gate 几乎不变的现象一致，说明输入引起的变化在最终缩放系数上被强烈压缩。结合前一节的 Gate 互换实验，<strong>当前训练好的模型在推理时几乎不依赖明显的逐句 Gate 差异</strong>。但这并不能证明 latent attention 在训练阶段没有作用。</p>
+<p><strong><a href="#exp-33-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-34-detail"></a></p>
 <h4 id="33-gate">3.3 那些 Gate 较小的通道，原本有什么特点？<a class="headerlink" href="#33-gate" title="Permanent link">&para;</a></h4>
 <p>这里需要把“通道”说清楚。</p>
 <p>设一条句子的原始 DC 实部为：</p>
@@ -1897,6 +1916,8 @@ x=(x_1,x_2,\ldots,x_{768}).
 <p><strong>重要观察</strong>：少量低 Gate 值通道恰好承载了原始 DC 的大量平方能量。原始 FLaG 将这些通道乘以约 1、其他许多通道乘以约 2，所以它是在<strong>相对减弱</strong>这些高能通道，而不是将其删除。B2 的相应 Gate 则可接近 0，抑制更强。</p>
 <p>因此我们现在能够解释：<strong>较少的通道被赋予不同的权重，也足以造成很大的 DC 方向变化。</strong></p>
 <p>但不能仅凭这些统计认定高能通道是“无用信息”或“噪声”；也不能把坐标通道能量集中直接等同于某个已识别的语义主成分。</p>
+<p><strong><a href="#exp-34-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-35-detail"></a></p>
 <h3 id="4">4. 第三步：这些操作对预测性能真的有用吗？<a class="headerlink" href="#4" title="Permanent link">&para;</a></h3>
 <p>前面说明了 Gate 怎么改变向量。接着我们想知道：<strong>如果临时关闭某部分 Gate，训练好的 FLaG 还能正常预测吗？</strong></p>
 <p>我们固定原 checkpoint，不再训练，分别把 DC 的 Gate 改为 1、把非 DC 的 Gate 改为 1、全部改为 1，或者直接跳过输出线性层。</p>
@@ -1945,6 +1966,8 @@ x=(x_1,x_2,\ldots,x_{768}).
 </ul>
 <p>这里尤其要区分两件事：训练完成后把 Projection 删除，模型当然可能崩，因为前面各层已与它共同适应；这并不表示“如果从一开始就不用复杂 Gate，模型就学不到好结果”。</p>
 <p>因此，真正有必要做的是：<strong>从一开始就训练一个不含复杂频域模块的简单模型</strong>，而不是继续在现有 checkpoint 中删除组件。</p>
+<p><strong><a href="#exp-35-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-36-detail"></a></p>
 <h3 id="5-fft-latent-attention">5. 第四步：不使用 FFT 和 latent attention，重新训练简单模型<a class="headerlink" href="#5-fft-latent-attention" title="Permanent link">&para;</a></h3>
 <h4 id="51-mean">5.1 为什么首先想到 Mean + 一个可训练线性层？<a class="headerlink" href="#51-mean" title="Permanent link">&para;</a></h4>
 <p>直接 Mean 与 FLaG 不仅差在频域门控，还差在 <strong>Projection</strong>：</p>
@@ -2033,7 +2056,9 @@ y_t=\frac{g_R+g_I}{2}x_t+\frac{g_R-g_I}{2}x_{(-t)\bmod N}.
 <p><strong>这个结果使我们提出新问题</strong>：过去 Sprint 直接 Mean 的 AP 约为 0.4289，是不是不能说明 DC 中缺乏任务信息，而主要说明“直接 Mean + cosine”缺少合适的可训练变换？</p>
 <p>这一判断也与此前 <a href="../dc-frequency/">DC-only 机制实验</a> 相呼应：即使只保留 DC，只要训练合适的后续处理，仍然可以得到很强的 Sprint 结果。</p>
 <p>但是单个种子不足以给出稳定结论，于是我们把对照扩大到三个种子。</p>
+<p><strong><a href="#exp-36-summary">↑ 返回实验总结</a></strong></p>
 <h3 id="6-projection">6. 第五步：排除 Projection 初始化差异后再比较<a class="headerlink" href="#6-projection" title="Permanent link">&para;</a></h3>
+<p><a id="exp-37-detail"></a></p>
 <h4 id="61">6.1 先比较随机初始化和单位矩阵初始化<a class="headerlink" href="#61" title="Permanent link">&para;</a></h4>
 <p>原始 FLaG 的 Projection 是随机初始化，B2 与上面的 MeanProjection 是单位矩阵初始化。为了公平比较，我们增加另一种简单模型：</p>
 <p><strong>MeanProjRand = 直接 Mean + 随机初始化、随后正常训练的线性 Projection。</strong></p>
@@ -2068,6 +2093,8 @@ y_t=\frac{g_R+g_I}{2}x_t+\frac{g_R-g_I}{2}x_{(-t)\bmod N}.
 <p>两种 Mean + Projection 只差在<strong>初始矩阵</strong>，随机初始化的 test AP 平均高 <span class="arithmatex">\(0.022117\)</span>，三个种子都更高。这说明初始化与训练结果有关，不能忽略。</p>
 <p>而随机初始化的 Mean + Projection 平均比原始 FLaG 高 <span class="arithmatex">\(0.011110\)</span> AP，三个种子都高。</p>
 <p>不过，相同 seed 在两个不同结构中，并不保证一开始的 Projection 矩阵逐元素相同：初始化 Gate、latent attention 等其他参数会消耗随机数。因此我们又增加最后一个对照。</p>
+<p><strong><a href="#exp-37-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-38-detail"></a></p>
 <h4 id="62-projection">6.2 最后一次严格控制：两个模型从相同 Projection 权重开始<a class="headerlink" href="#62-projection" title="Permanent link">&para;</a></h4>
 <p>这一次比较只保留：</p>
 <ul>
@@ -2137,6 +2164,7 @@ y_t=\frac{g_R+g_I}{2}x_t+\frac{g_R-g_I}{2}x_{(-t)\bmod N}.
 <p class="admonition-title">什么是“严格对齐 Projection”？</p>
 <p>我们只把<strong>初始输出线性层</strong>的矩阵和偏置设为一致，并不是让两个网络所有参数都一致：FLaG 额外包含 FFT 后的 latent attention 和 Gate，Mean + Projection 没有这些模块。实验目的正是让两者在这个关键的共同部件上公平起跑。</p>
 </div>
+<p><strong><a href="#exp-38-summary">↑ 返回实验总结</a></strong></p>
 <h3 id="7_1">7. 这些实验综合说明了什么？<a class="headerlink" href="#7_1" title="Permanent link">&para;</a></h3>
 <p>把上面五步连起来看：</p>
 <ol>
