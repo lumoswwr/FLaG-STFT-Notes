@@ -23,7 +23,6 @@ Mean pooling 将有效 token 的向量平均。FFT 的零频率 DC 与 Mean 成�
 
 两个问题可能共享许多词或讨论相近话题，却并不是同一个问题。我们最初推测频域变换也许可以提供额外的判别信息。
 
-但后续 [Gate 与 Projection 实验](flag-gate-projection.md) 显示，**Mean 后加一个可训练线性层**也能在 Sprint 上获得很高的 AP。因此，“直接 Mean 表现差”并不能单独证明频域信息是改进的主要原因。
 
 ### IMDB：长评论可能需要与短句不同的信息汇总方式
 
@@ -32,7 +31,7 @@ IMDB 常包含比 STSB 更长的文本，需要汇总跨越多个 token 的情�
 ## 3. 后续实验实际观察到了什么？
 
 - STSB 中直接 Mean 在部分匹配协议下优于原始 FLaG；[Alignment-aware](mean-compatible-flag.md) 将 Mean 显式引入后改善了相似度结果。
-- Sprint 中，原始直接 Mean + cosine 的 AP 较低；但 [仅保留 DC](dc-frequency.md) 从头训练以及 [Mean + 可训练 Projection](flag-gate-projection.md) 都说明可以从 Mean/DC 中读取更多任务信息。
+- Sprint 中，原始直接 Mean + cosine 的 AP 较低；而 [只保留 DC](dc-frequency.md) 训练的 FLaG 能获得更高的 AP，说明 DC 中的任务信息能否被利用与后续模型有关。
 - IMDB 的五种子实验里，Mean、FLaG 和 Alignment-aware Accuracy 接近，分别约为 0.9525、0.9521、0.9526。
 
 这三种任务帮助我们区分：**句向量本身包含什么信息**，以及**后续使用什么方式把这些信息变成预测**，是两个不同问题。
