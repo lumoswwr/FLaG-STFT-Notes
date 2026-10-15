@@ -8,7 +8,6 @@
 
 随后我们研究频率本身。删除最低频带会明显伤害预测，而只保留 DC 并从头训练，仍然可以获得很好的结果。说明 Mean/DC 中已有大量任务相关信息，关键是后续模型能否把它们利用起来。
 
-后续的实验继续把 FLaG 拆开：训练后的 Gate 在不同句子间几乎不变，少数低 Gate 值通道对应大量 DC 平方能量。最终在 Sprint 上，直接 Mean 加一个可训练线性层就得到了与 FLaG 接近甚至更高的 Test AP。
 
 ## 实验报告
 
@@ -20,7 +19,6 @@
 | 4. 换任务验证 | [Sprint：S1–S5](sprint/02-experiments.md) | 早期 E12 AP 较高，统一训练配置后不再领先 |
 | 5. 分析频率信息 | [DC / 频带机制](dc-frequency.md) | 最低频带很重要；只保留精确 DC 训练仍得到很高的预测成绩 |
 | 6. 设计融合方法 | [Mean 与 FLaG 融合](mean-compatible-flag.md) | 保留 Mean 路径并补充 FLaG 信息，改进了 STSB 和 Sprint 的表现 |
-| 7. 拆解内部结构 | [Gate 和 Projection 的作用](flag-gate-projection.md) | Gate 训练后几乎不随句子变化；Mean + 可训练线性层达到很高的 Sprint AP |
 
 ## 关于指标和实验设置
 
