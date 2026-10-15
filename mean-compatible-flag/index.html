@@ -1570,6 +1570,7 @@
 <h1 id="mean-flag">Mean 与 FLaG 融合：保留各自的长处<a class="headerlink" href="#mean-flag" title="Permanent link">&para;</a></h1>
 <h2 id="5">本页实验概览（5 项）<a class="headerlink" href="#5" title="Permanent link">&para;</a></h2>
 <p>STSB 中 Mean 较强，Sprint 中 FLaG 较强。于是从直接混合两种表示开始，再研究它们之间的方向关系，改进融合方法。</p>
+<p><a id="exp-27-summary"></a></p>
 <h3 id="mean-flag_1">实验二十七：直接将 Mean 与 FLaG 的句向量加权融合<a class="headerlink" href="#mean-flag_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 让模型可以在 Mean 与 FLaG 之间选择，而不是始终只能使用 FLaG。</li>
@@ -1577,6 +1578,8 @@
 <li><strong>实验结果：</strong> Seed 0 中 STSB Spearman 为 0.850597，Sprint AP 为 0.878625。学到的 <span class="arithmatex">\(\alpha\)</span> 在两个任务中均接近 0.5。</li>
 <li><strong>实验结论：</strong> 直接融合 Mean 和 FLaG 改善了本次 STSB、Sprint 结果，说明保留 Mean 路径有帮助。</li>
 </ul>
+<p><strong><a href="#exp-27-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-28-summary"></a></p>
 <h3 id="flag-mean">实验二十八：只让 FLaG 补充 Mean 没有的信息，是否更好？<a class="headerlink" href="#flag-mean" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 尝试避免重复使用 Mean 已经包含的内容，只补充 FLaG 与 Mean 不同方向上的信息。</li>
@@ -1584,6 +1587,8 @@
 <li><strong>实验结果：</strong> Seed 0 中 STSB Spearman 为 0.855106，但 Sprint AP 只有 0.638445，且 <span class="arithmatex">\(\beta\)</span> 达到上界 1。</li>
 <li><strong>实验结论：</strong> 只使用 FLaG 相对 Mean 的正交部分使 STSB 提高、Sprint 明显下降，表明这种删去共线分量的方式不适合 Sprint。</li>
 </ul>
+<p><strong><a href="#exp-28-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-29-summary"></a></p>
 <h3 id="_1">实验二十九：放开补充信息的权重限制，会怎样？<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 判断 Sprint 表现差是否只是因为 <span class="arithmatex">\(\beta\)</span> 的取值上限过小。</li>
@@ -1591,6 +1596,8 @@
 <li><strong>实验结果：</strong> Sprint AP 提高到 0.809582，但 <span class="arithmatex">\(\beta\)</span> 增大到约 13.124。</li>
 <li><strong>实验结论：</strong> 允许 β 超过 1 后 Sprint AP 回升，但 β 增至约 13，说明模型需要大幅放大被保留的正交部分。</li>
 </ul>
+<p><strong><a href="#exp-29-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-30-summary"></a></p>
 <h3 id="mean">实验三十：为什么只保留与 Mean 垂直的部分，会损失信息？<a class="headerlink" href="#mean" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 解释为什么 Sprint 需要很大的 <span class="arithmatex">\(\beta\)</span>，而 STSB 不需要。</li>
@@ -1598,6 +1605,8 @@
 <li><strong>实验结果：</strong> 在当时的实验中，STSB 的 Mean 与 FLaG 夹角约 90.7°，Sprint 约 160.3°。也就是说，Sprint 中两者近乎反向。</li>
 <li><strong>实验结论：</strong> Sprint 的 FLaG 与 Mean 接近反方向，大部分 FLaG 表示位于 Mean 轴上。直接删除共线部分会丢掉模型原本能够利用的表示。</li>
 </ul>
+<p><strong><a href="#exp-30-detail">↓ 查看详细实验</a></strong></p>
+<p><a id="exp-31-summary"></a></p>
 <h3 id="mean-flag_2">实验三十一：根据 Mean 与 FLaG 的方向关系进行融合<a class="headerlink" href="#mean-flag_2" title="Permanent link">&para;</a></h3>
 <ul>
 <li><strong>实验目的：</strong> 同时保留 Mean 的优势和 FLaG 的补充信息，避免上一种方法删除重要的共线部分。</li>
@@ -1606,6 +1615,7 @@
 <li><strong>实验结论：</strong> Alignment-aware 在五种子对照中提高了 STSB 的 Spearman 和 Sprint 的 AP，IMDB 与 Mean 基本持平。按两种表示的方向关系融合，比只保留正交部分更有效。</li>
 </ul>
 <hr />
+<p><strong><a href="#exp-31-detail">↓ 查看详细实验</a></strong></p>
 <h2 id="_2">详细实验记录与数据<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <h3 id="1">1. 问题<a class="headerlink" href="#1" title="Permanent link">&para;</a></h3>
 <p>这一阶段围绕一个核心问题展开：</p>
@@ -1638,6 +1648,7 @@
 <p><strong>给 FLaG 加入一个显式的 Mean endpoint，使模型在 FLaG 无益时能够退化为 Mean，在 FLaG 有益时继续利用其补充信息。</strong></p>
 </blockquote>
 <hr />
+<p><a id="exp-27-detail"></a></p>
 <h3 id="2-mean-residual">2. 第一步：直接加入 Mean residual<a class="headerlink" href="#2-mean-residual" title="Permanent link">&para;</a></h3>
 <p>先将 Mean 和 FLaG 的输出分别归一化：</p>
 <div class="arithmatex">\[
@@ -1717,6 +1728,7 @@ z=\hat{f}
 </blockquote>
 <p>因此下一步不再直接混合完整的 FLaG 表示，而是分析 Mean 与 FLaG 之间的几何关系。</p>
 <hr />
+<p><strong><a href="#exp-27-summary">↑ 返回实验总结</a></strong></p>
 <h3 id="3-mean-anchor">3. 第二步：Mean-anchor 与正交残差<a class="headerlink" href="#3-mean-anchor" title="Permanent link">&para;</a></h3>
 <p>将归一化后的 FLaG 表示分解为 Mean 方向上的分量和与 Mean 正交的分量。</p>
 <p>首先计算二者的 cosine alignment：</p>
@@ -1775,6 +1787,7 @@ z
 z=\hat{m}
 \]</div>
 <p>所以这一结构同样具有严格的 Mean endpoint。</p>
+<p><a id="exp-28-detail"></a></p>
 <h4 id="31-beta">3.1 有界 <span class="arithmatex">\(\beta\)</span><a class="headerlink" href="#31-beta" title="Permanent link">&para;</a></h4>
 <p>最初将 <span class="arithmatex">\(\beta\)</span> 限制在有界范围内。</p>
 <table>
@@ -1801,6 +1814,8 @@ z=\hat{m}
 <blockquote>
 <p>Sprint 上并不是“不需要 FLaG”，而是当前结构对 FLaG 信息的利用受到了限制。</p>
 </blockquote>
+<p><strong><a href="#exp-28-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-29-detail"></a></p>
 <h4 id="32-beta">3.2 放开 <span class="arithmatex">\(\beta\)</span> 上界<a class="headerlink" href="#32-beta" title="Permanent link">&para;</a></h4>
 <p>随后改为直接学习无界 <span class="arithmatex">\(\beta\)</span>。</p>
 <table>
@@ -1824,6 +1839,8 @@ z=\hat{m}
 <p>Sprint AP 从 0.638 提升到 0.810，但 <span class="arithmatex">\(\beta\)</span> 被放大到约 13。</p>
 <p>这说明问题并不是简单的“<span class="arithmatex">\(\beta\)</span> 上限太小”，而是当前分解方式本身可能丢掉了 Sprint 所需要的信息。</p>
 <hr />
+<p><strong><a href="#exp-29-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-30-detail"></a></p>
 <h3 id="4-mean-flag">4. Mean 与 FLaG 的几何关系<a class="headerlink" href="#4-mean-flag" title="Permanent link">&para;</a></h3>
 <p>为了理解为什么 Sprint 需要极大的 <span class="arithmatex">\(\beta\)</span>，进一步测量 Mean 与 FLaG 表示之间的几何关系。</p>
 <table>
@@ -1906,6 +1923,8 @@ a\hat{m}
 <p><strong>不能简单删除 FLaG 与 Mean 共线的部分。共线部分本身也可能包含任务相关信息，只是它应该根据 Mean 与 FLaG 的对齐关系进入最终表示。</strong></p>
 </blockquote>
 <hr />
+<p><strong><a href="#exp-30-summary">↑ 返回实验总结</a></strong></p>
+<p><a id="exp-31-detail"></a></p>
 <h3 id="5-alignment-aware-mean-anchor">5. 第三步：Alignment-aware Mean anchor<a class="headerlink" href="#5-alignment-aware-mean-anchor" title="Permanent link">&para;</a></h3>
 <p>从 FLaG 的几何分解出发：</p>
 <div class="arithmatex">\[
@@ -2294,6 +2313,7 @@ a
 \]</div>
 <p>说明 Sprint 需要较强的 FLaG 补充信息，而不是退化回 Mean。</p>
 <hr />
+<p><strong><a href="#exp-31-summary">↑ 返回实验总结</a></strong></p>
 <h3 id="9">9. 当前结论<a class="headerlink" href="#9" title="Permanent link">&para;</a></h3>
 <p>这一系列实验把最初的问题：</p>
 <blockquote>
