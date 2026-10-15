@@ -370,17 +370,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#sprint-projection-checkpoint" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        最新 Sprint Projection 对照的 checkpoint 选择
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#b0-exact-dc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -998,17 +987,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#sprint-projection-checkpoint" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        最新 Sprint Projection 对照的 checkpoint 选择
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#b0-exact-dc" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1042,7 +1020,7 @@
 
 
 <h1 id="_1">实验设置与指标<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h1>
-<p>本项目最开始比较 <strong>Global FLaG（对整句话做 FFT）</strong> 与 <strong>STFT-FLaG（把句子分成小窗口做 FFT）</strong>。随后为了解释预测差异，分析了 Padding、重建、Gate、DC 频带和可训练输出线性层，并尝试把 Mean 与 FLaG 结合起来。</p>
+<p>本项目最开始比较 <strong>Global FLaG（对整句话做 FFT）</strong> 与 <strong>STFT-FLaG（把句子分成小窗口做 FFT）</strong>。随后为了解释预测差异，分析了 Padding、重建、Gate 来源和 DC 频带，并尝试把 Mean 与 FLaG 结合起来。</p>
 <p>不同阶段的实验不一定采用同一套模型参数。阅读结果时，尤其需要看清三件事：</p>
 <ol>
 <li><strong>是否重新训练</strong>：改变训练结构，与在已训练模型上临时关闭某个模块，是两个不同实验。</li>
@@ -1189,16 +1167,8 @@
 <td>五种子版本使用 masked Max、启用后池化 LayerNorm；STSB/IMDB 微调 RoBERTa，Sprint 冻结</td>
 <td>在不同任务里组合 Mean 与 FLaG</td>
 </tr>
-<tr>
-<td><a href="../flag-gate-projection/">Gate 和 Projection 机制</a></td>
-<td>Global FFT、<strong>time pooling=masked Mean、关闭 post-pool LayerNorm、dropout=0</strong>；STSB 微调，Sprint 冻结</td>
-<td>Gate 在哪里改变表示、是否可以使用简单线性模型替代</td>
-</tr>
 </tbody>
 </table>
-<h3 id="sprint-projection-checkpoint">最新 Sprint Projection 对照的 checkpoint 选择<a class="headerlink" href="#sprint-projection-checkpoint" title="Permanent link">&para;</a></h3>
-<p>早期 Sprint S1/S2 和一部分机制实验按照 <strong>validation Accuracy</strong> 选择 checkpoint；后期专门比较 FLaG 与 Mean + Projection 的多种子实验，则统一按 <strong>validation AP</strong> 选择 checkpoint。前者和后者不能作为同一组对照直接汇总。</p>
-<p>最新严格配对实验还使两个模型具有<strong>完全相同的初始 Projection 权重和偏置</strong>，以便判断加入完整频域 Gate 后 Test AP 如何变化。详见 <a href="../flag-gate-projection/">Gate 和 Projection 的作用</a>。</p>
 <h3 id="b0-exact-dc">B0 与 exact DC 不是同一个概念<a class="headerlink" href="#b0-exact-dc" title="Permanent link">&para;</a></h3>
 <p><a href="../stsb/01-experiments/">STSB E6</a> 与频带分析中会把 DCT 频谱分为 B0–B7，<strong>B0 是最低频带</strong>；后面的 <a href="../dc-frequency/">exact DC 实验</a> 则只保留 rFFT 的 <span class="arithmatex">\(k=0\)</span>，即<strong>严格的零频率分量</strong>。两类频域操作和实验问题不同，报告分别写明。</p>
 

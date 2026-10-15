@@ -944,7 +944,6 @@
 <p>最初，我们想把 FLaG 的整句 FFT 改成分窗口 STFT，看看局部频率信息能不能改善文本预测。早期一些实验中，STFT 的分数确实略高，但把训练配置统一以后，这个优势没有保留下来。</p>
 <p>为了弄清原因，我们检查了 Padding、Gate 和频谱重建。结果发现，Global FLaG 对 Padding 长度敏感，主要与逆变换时出现的循环反射有关；Global 和 Local 的预测差异也主要来自重建路线，而不是它们生成了明显不同的 Gate。</p>
 <p>随后我们研究频率本身。删除最低频带会明显伤害预测，而只保留 DC 并从头训练，仍然可以获得很好的结果。说明 Mean/DC 中已有大量任务相关信息，关键是后续模型能否把它们利用起来。</p>
-<p>后续的实验继续把 FLaG 拆开：训练后的 Gate 在不同句子间几乎不变，少数低 Gate 值通道对应大量 DC 平方能量。最终在 Sprint 上，直接 Mean 加一个可训练线性层就得到了与 FLaG 接近甚至更高的 Test AP。</p>
 <h2 id="_2">实验报告<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -984,11 +983,6 @@
 <td>6. 设计融合方法</td>
 <td><a href="mean-compatible-flag/">Mean 与 FLaG 融合</a></td>
 <td>保留 Mean 路径并补充 FLaG 信息，改进了 STSB 和 Sprint 的表现</td>
-</tr>
-<tr>
-<td>7. 拆解内部结构</td>
-<td><a href="flag-gate-projection/">Gate 和 Projection 的作用</a></td>
-<td>Gate 训练后几乎不随句子变化；Mean + 可训练线性层达到很高的 Sprint AP</td>
 </tr>
 </tbody>
 </table>

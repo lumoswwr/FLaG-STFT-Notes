@@ -1034,7 +1034,6 @@
 <h2 id="_3">各阶段怎样选模型？<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <ul>
 <li><strong>早期 S1/S2 和当时的推理机制分析</strong>：根据 validation 上校准阈值后的 Accuracy 选择 checkpoint。S1/S2 报告 official test，S3–S5 报告 adaptation validation。</li>
-<li><strong>最新 FLaG 与 Mean + Projection 的三seed对照</strong>：两者都根据 validation <strong>AP</strong> 选择 checkpoint，最后报告 official test AP，并对同 seed 的模型差异配对统计。</li>
 </ul>
 <h2 id="_4">配置说明<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <p>早期 Sprint 实验 <strong>S1/S2</strong>：FLaG 为 <code>dropout=0.1、norm=False</code>，E12 为 <code>dropout=0、norm=True</code>。<strong>后期全部对其FLaG原文配置</strong></p>

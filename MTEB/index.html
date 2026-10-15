@@ -1056,13 +1056,12 @@
 <p>Mean pooling 将有效 token 的向量平均。FFT 的零频率 DC 与 Mean 成正比，因此我们猜测 DC 对 STSB 可能很重要，而复杂的 FLaG 变换也可能改变原有的语义表示。</p>
 <h3 id="sprint-mean">Sprint：仅靠直接 Mean 的余弦相似度，可能不足以区分重复问题<a class="headerlink" href="#sprint-mean" title="Permanent link">&para;</a></h3>
 <p>两个问题可能共享许多词或讨论相近话题，却并不是同一个问题。我们最初推测频域变换也许可以提供额外的判别信息。</p>
-<p>但后续 <a href="../flag-gate-projection/">Gate 与 Projection 实验</a> 显示，<strong>Mean 后加一个可训练线性层</strong>也能在 Sprint 上获得很高的 AP。因此，“直接 Mean 表现差”并不能单独证明频域信息是改进的主要原因。</p>
 <h3 id="imdb">IMDB：长评论可能需要与短句不同的信息汇总方式<a class="headerlink" href="#imdb" title="Permanent link">&para;</a></h3>
 <p>IMDB 常包含比 STSB 更长的文本，需要汇总跨越多个 token 的情感信息。我们因此用它补充比较 Mean、FLaG 和融合方法是否有任务差异。</p>
 <h2 id="3">3. 后续实验实际观察到了什么？<a class="headerlink" href="#3" title="Permanent link">&para;</a></h2>
 <ul>
 <li>STSB 中直接 Mean 在部分匹配协议下优于原始 FLaG；<a href="../mean-compatible-flag/">Alignment-aware</a> 将 Mean 显式引入后改善了相似度结果。</li>
-<li>Sprint 中，原始直接 Mean + cosine 的 AP 较低；但 <a href="../dc-frequency/">仅保留 DC</a> 从头训练以及 <a href="../flag-gate-projection/">Mean + 可训练 Projection</a> 都说明可以从 Mean/DC 中读取更多任务信息。</li>
+<li>Sprint 中，原始直接 Mean + cosine 的 AP 较低；而 <a href="../dc-frequency/">只保留 DC</a> 训练的 FLaG 能获得更高的 AP，说明 DC 中的任务信息能否被利用与后续模型有关。</li>
 <li>IMDB 的五种子实验里，Mean、FLaG 和 Alignment-aware Accuracy 接近，分别约为 0.9525、0.9521、0.9526。</li>
 </ul>
 <p>这三种任务帮助我们区分：<strong>句向量本身包含什么信息</strong>，以及<strong>后续使用什么方式把这些信息变成预测</strong>，是两个不同问题。</p>
