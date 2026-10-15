@@ -37,7 +37,6 @@ $\mathrm{AP}=\sum_k(R_k-R_{k-1})P_k.$
 ## 各阶段怎样选模型？
 
 - **早期 S1/S2 和当时的推理机制分析**：根据 validation 上校准阈值后的 Accuracy 选择 checkpoint。S1/S2 报告 official test，S3–S5 报告 adaptation validation。
-- **最新 FLaG 与 Mean + Projection 的三seed对照**：两者都根据 validation **AP** 选择 checkpoint，最后报告 official test AP，并对同 seed 的模型差异配对统计。
 
 ## 配置说明
 
