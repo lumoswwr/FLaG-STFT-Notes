@@ -6,9 +6,9 @@
 
 ### 实验十八：六种经典排序目标在三种池化模型上的对照
 
-- **实验目的：** 在 STSB 句对语义相似度任务上，比较不同 Learning-to-Rank（LTR）训练目标下 Mean、FLaG-Zero 与原始 FLaG 的排序指标。
-- **实验思路：** 固定数据集划分与训练协议，比较 RankNet、Scaled RankNet、Pairwise Hinge、ListNet、ListMLE 和 LambdaRank-style 六种排序目标；每种模型与目标组合使用 5 个随机种子。
-- **实验结果：** 各组合的 Train、Validation 与 Test Spearman 汇总见下方表格。数值为 5 个随机种子的均值 ± 样本标准差。
+- **实验目的：** 在 STSB 任务上，比较不同 Learning-to-Rank（LTR）训练目标下 Mean、FLaG-Zero 与原始 FLaG 的排序指标。
+- **实验思路：** 固定数据集划分与训练协议，比较 RankNet、Scaled RankNet、Pairwise Hinge、ListNet、ListMLE 和 LambdaRank-style 六种排序目标，每种模型与目标组合使用 5 个随机种子。
+- **实验结果：** 表格如下。数值为 5 个随机种子的均值 ± 样本标准差。
 
 **[↓ 查看详细实验与数据](#exp-18-detail)**
 
@@ -26,7 +26,7 @@
 - **FLaG-Zero：** 使用 Mean 等价初始化的 FLaG_B2 控制模型。
 - **原始 FLaG：** 按原始实验协议实现的 FLaG。
 
-FLaG-Zero 的初始化检查比较池化向量与初始余弦相似度，允许浮点计算误差。本次模型从预训练 RoBERTa 出发进行端到端训练；FLaG-Zero 不是从已训练完成的 Mean checkpoint 起步。
+
 
 **排序目标**
 
@@ -37,7 +37,7 @@ FLaG-Zero 的初始化检查比较池化向量与初始余弦相似度，允许�
 5. **ListMLE：** 使用 Plackett–Luce 排列似然；每个 minibatch 按标签降序排列。
 6. **LambdaRank-style：** 使用由交换样本对所引起的 NDCG 变化幅度加权的 pairwise logistic loss。
 
-STSB 不提供天然的 query-document 分组，因此 ListNet、ListMLE 和 LambdaRank-style 将随机 minibatch 作为一个排序列表。所有 pairwise 目标均跳过标签完全相同的样本对；除历史 RankNet 使用原始余弦分数外，pairwise 目标使用可训练的仿射评分。
+
 
 ### 2. 训练与评估设置
 
@@ -94,7 +94,7 @@ STSB 不提供天然的 query-document 分组，因此 ListNet、ListMLE 和 Lam
 
 ### 6. 结果观察
 
-以下仅整理各指标的数值表现，便于横向查看；本节不对不同损失的优劣或泛化机制作进一步结论。
+宏观上看使用ltr后FLaG-Zero>Mean>FLaG
 
 **各模型在不同数据划分上的最高均值**
 
@@ -121,7 +121,5 @@ STSB 不提供天然的 query-document 分组，因此 ListNet、ListMLE 和 Lam
 - RankNet、Scaled RankNet、Pairwise Hinge 和 LambdaRank-style 下，FLaG-Zero 的 Test Spearman 均值高于 Mean。
 - ListNet 和 ListMLE 下，Mean 的 Test Spearman 均值高于 FLaG-Zero。
 - RankNet、Scaled RankNet、Pairwise Hinge、ListNet 和 ListMLE 下，原始 FLaG 的 Test Spearman 均值低于对应的 Mean；LambdaRank-style 下，原始 FLaG（0.7123）高于 Mean（0.7063）。
-
-以上为当前五个随机种子的汇总描述。各表中的粗体数值表示该模型在对应指标列上的最高均值；它们不是显著性检验结果。
 
 **[↑ 返回实验概览](#exp-18-summary)**
