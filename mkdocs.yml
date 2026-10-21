@@ -21,6 +21,9 @@ nav:
       - DC 与各频带的作用: dc-frequency.md
       - Mean 与 FLaG 的融合: mean-compatible-flag.md
 
+  - 第四阶段：经典 LTR 排序实验（STSB）:
+      - 六种排序目标与三种模型: ltr.md
+
 
 theme:
   name: material
