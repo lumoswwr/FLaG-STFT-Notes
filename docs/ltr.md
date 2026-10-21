@@ -64,9 +64,9 @@ STSB 不提供天然的 query-document 分组，因此 ListNet、ListMLE 和 Lam
 | 排序目标 | Train Spearman | Validation Spearman | Test Spearman |
 | --- | ---: | ---: | ---: |
 | RankNet | 0.8294 ± 0.0184 | 0.8129 ± 0.0033 | 0.7673 ± 0.0062 |
-| Scaled RankNet | 0.8622 ± 0.0147 | 0.8246 ± 0.0029 | 0.7840 ± 0.0062 |
-| Pairwise Hinge | 0.8659 ± 0.0033 | 0.8219 ± 0.0035 | 0.7821 ± 0.0071 |
-| ListNet | 0.8341 ± 0.0288 | 0.8281 ± 0.0050 | 0.7836 ± 0.0082 |
+| Scaled RankNet | 0.8622 ± 0.0147 | 0.8246 ± 0.0029 | **0.7840 ± 0.0062** |
+| Pairwise Hinge | **0.8659 ± 0.0033** | 0.8219 ± 0.0035 | 0.7821 ± 0.0071 |
+| ListNet | 0.8341 ± 0.0288 | **0.8281 ± 0.0050** | 0.7836 ± 0.0082 |
 | ListMLE | 0.8625 ± 0.0039 | 0.8200 ± 0.0050 | 0.7814 ± 0.0055 |
 | LambdaRank-style | 0.7334 ± 0.0082 | 0.7697 ± 0.0053 | 0.7063 ± 0.0067 |
 
@@ -75,8 +75,8 @@ STSB 不提供天然的 query-document 分组，因此 ListNet、ListMLE 和 Lam
 | 排序目标 | Train Spearman | Validation Spearman | Test Spearman |
 | --- | ---: | ---: | ---: |
 | RankNet | 0.8322 ± 0.0072 | 0.8136 ± 0.0058 | 0.7734 ± 0.0069 |
-| Scaled RankNet | 0.8572 ± 0.0201 | 0.8190 ± 0.0071 | 0.7863 ± 0.0085 |
-| Pairwise Hinge | 0.8996 ± 0.0023 | 0.8181 ± 0.0069 | 0.7916 ± 0.0046 |
+| Scaled RankNet | 0.8572 ± 0.0201 | **0.8190 ± 0.0071** | 0.7863 ± 0.0085 |
+| Pairwise Hinge | **0.8996 ± 0.0023** | 0.8181 ± 0.0069 | **0.7916 ± 0.0046** |
 | ListNet | 0.8429 ± 0.0209 | 0.8157 ± 0.0080 | 0.7807 ± 0.0096 |
 | ListMLE | 0.8626 ± 0.0157 | 0.8159 ± 0.0074 | 0.7809 ± 0.0139 |
 | LambdaRank-style | 0.7618 ± 0.0255 | 0.7679 ± 0.0225 | 0.7140 ± 0.0252 |
@@ -87,9 +87,41 @@ STSB 不提供天然的 query-document 分组，因此 ListNet、ListMLE 和 Lam
 | --- | ---: | ---: | ---: |
 | RankNet | 0.8162 ± 0.0294 | 0.7873 ± 0.0083 | 0.7366 ± 0.0199 |
 | Scaled RankNet | 0.8628 ± 0.0310 | 0.7955 ± 0.0071 | 0.7623 ± 0.0143 |
-| Pairwise Hinge | 0.8849 ± 0.0047 | 0.8094 ± 0.0041 | 0.7700 ± 0.0115 |
-| ListNet | 0.8409 ± 0.0138 | 0.8167 ± 0.0086 | 0.7759 ± 0.0072 |
+| Pairwise Hinge | **0.8849 ± 0.0047** | 0.8094 ± 0.0041 | 0.7700 ± 0.0115 |
+| ListNet | 0.8409 ± 0.0138 | **0.8167 ± 0.0086** | **0.7759 ± 0.0072** |
 | ListMLE | 0.8431 ± 0.0131 | 0.7991 ± 0.0096 | 0.7565 ± 0.0142 |
 | LambdaRank-style | 0.7755 ± 0.0027 | 0.7714 ± 0.0134 | 0.7123 ± 0.0076 |
+
+### 6. 结果观察
+
+以下仅整理各指标的数值表现，便于横向查看；本节不对不同损失的优劣或泛化机制作进一步结论。
+
+**各模型在不同数据划分上的最高均值**
+
+| 模型 | Train Spearman 最高 | Validation Spearman 最高 | Test Spearman 最高 |
+| --- | --- | --- | --- |
+| Mean | Pairwise Hinge：**0.8659 ± 0.0033** | ListNet：**0.8281 ± 0.0050** | Scaled RankNet：**0.7840 ± 0.0062** |
+| FLaG-Zero | Pairwise Hinge：**0.8996 ± 0.0023** | Scaled RankNet：**0.8190 ± 0.0071** | Pairwise Hinge：**0.7916 ± 0.0046** |
+| 原始 FLaG | Pairwise Hinge：**0.8849 ± 0.0047** | ListNet：**0.8167 ± 0.0086** | ListNet：**0.7759 ± 0.0072** |
+
+**三种模型合并比较时的最高均值**
+
+- **Train Spearman：** FLaG-Zero + Pairwise Hinge，0.8996 ± 0.0023。
+- **Validation Spearman：** Mean + ListNet，0.8281 ± 0.0050。
+- **Test Spearman：** FLaG-Zero + Pairwise Hinge，0.7916 ± 0.0046。
+
+**Test Spearman 按模型查看**
+
+- Mean：六种排序目标中，Scaled RankNet 的均值最高（0.7840）。
+- FLaG-Zero：Pairwise Hinge 的均值最高（0.7916）。
+- 原始 FLaG：ListNet 的均值最高（0.7759）。
+
+**同一种排序目标下的模型对比**
+
+- RankNet、Scaled RankNet、Pairwise Hinge 和 LambdaRank-style 下，FLaG-Zero 的 Test Spearman 均值高于 Mean。
+- ListNet 和 ListMLE 下，Mean 的 Test Spearman 均值高于 FLaG-Zero。
+- 六种排序目标下，原始 FLaG 的 Test Spearman 均值均低于对应的 Mean。
+
+以上为当前五个随机种子的汇总描述。各表中的粗体数值表示该模型在对应指标列上的最高均值；它们不是显著性检验结果。
 
 **[↑ 返回实验概览](#exp-18-summary)**
