@@ -120,7 +120,7 @@ STSB 不提供天然的 query-document 分组，因此 ListNet、ListMLE 和 Lam
 
 - RankNet、Scaled RankNet、Pairwise Hinge 和 LambdaRank-style 下，FLaG-Zero 的 Test Spearman 均值高于 Mean。
 - ListNet 和 ListMLE 下，Mean 的 Test Spearman 均值高于 FLaG-Zero。
-- 六种排序目标下，原始 FLaG 的 Test Spearman 均值均低于对应的 Mean。
+- RankNet、Scaled RankNet、Pairwise Hinge、ListNet 和 ListMLE 下，原始 FLaG 的 Test Spearman 均值低于对应的 Mean；LambdaRank-style 下，原始 FLaG（0.7123）高于 Mean（0.7063）。
 
 以上为当前五个随机种子的汇总描述。各表中的粗体数值表示该模型在对应指标列上的最高均值；它们不是显著性检验结果。
 
