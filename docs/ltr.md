@@ -94,7 +94,8 @@
 
 ### 6. 结果观察
 
-宏观上看使用ltr后FLaG-Zero>Mean>FLaG
+宏观上看使用LTR后FLaG-Zero>Mean>FLaG
+但使用LTR后模型整体表现低于MSE方法
 
 **各模型在不同数据划分上的最高均值**
 
