@@ -21,7 +21,7 @@
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
     
     
       
@@ -29,7 +29,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.57a0d79d.min.css">
       
       
 
@@ -829,10 +829,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#pairwise-listwise-flag" class="md-nav__link">
     <span class="md-ellipsis">
       
-        实验十八：六种经典排序目标在三种池化模型上的对照
+        实验十八：修正后的 Pairwise / Listwise 目标下，FLaG 的排序偏转是否有效？
       
     </span>
   </a>
@@ -845,7 +845,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         详细实验记录与数据
@@ -860,7 +860,7 @@
   <a href="#1_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 模型与排序目标
+        1. 研究问题、模型与排序目标
       
     </span>
   </a>
@@ -879,10 +879,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-mean" class="md-nav__link">
+  <a href="#3-meanflag-zero-flag" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Mean 结果
+        3. 修正后全部结果：Mean、FLaG-Zero 与 FLaG
       
     </span>
   </a>
@@ -890,10 +890,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-flag-zero" class="md-nav__link">
+  <a href="#4-ltr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. FLaG-Zero 结果
+        4. 同一种 LTR 下的架构差距
       
     </span>
   </a>
@@ -901,10 +901,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-flag" class="md-nav__link">
+  <a href="#5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. 原始 FLaG 结果
+        5. 训练集排序更好，却没有带来验证集优势
       
     </span>
   </a>
@@ -915,7 +915,29 @@
   <a href="#6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. 结果观察
+        6. 结果观察与机制含义
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-gate-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 下一步：回到 Gate / Projection 偏转机制
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 代码、原始记录与结果来源
       
     </span>
   </a>
@@ -982,10 +1004,10 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#_1" class="md-nav__link">
+  <a href="#pairwise-listwise-flag" class="md-nav__link">
     <span class="md-ellipsis">
       
-        实验十八：六种经典排序目标在三种池化模型上的对照
+        实验十八：修正后的 Pairwise / Listwise 目标下，FLaG 的排序偏转是否有效？
       
     </span>
   </a>
@@ -998,7 +1020,7 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
       
         详细实验记录与数据
@@ -1013,7 +1035,7 @@
   <a href="#1_1" class="md-nav__link">
     <span class="md-ellipsis">
       
-        1. 模型与排序目标
+        1. 研究问题、模型与排序目标
       
     </span>
   </a>
@@ -1032,10 +1054,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#3-mean" class="md-nav__link">
+  <a href="#3-meanflag-zero-flag" class="md-nav__link">
     <span class="md-ellipsis">
       
-        3. Mean 结果
+        3. 修正后全部结果：Mean、FLaG-Zero 与 FLaG
       
     </span>
   </a>
@@ -1043,10 +1065,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#4-flag-zero" class="md-nav__link">
+  <a href="#4-ltr" class="md-nav__link">
     <span class="md-ellipsis">
       
-        4. FLaG-Zero 结果
+        4. 同一种 LTR 下的架构差距
       
     </span>
   </a>
@@ -1054,10 +1076,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#5-flag" class="md-nav__link">
+  <a href="#5" class="md-nav__link">
     <span class="md-ellipsis">
       
-        5. 原始 FLaG 结果
+        5. 训练集排序更好，却没有带来验证集优势
       
     </span>
   </a>
@@ -1068,7 +1090,29 @@
   <a href="#6" class="md-nav__link">
     <span class="md-ellipsis">
       
-        6. 结果观察
+        6. 结果观察与机制含义
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7-gate-projection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        7. 下一步：回到 Gate / Projection 偏转机制
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#8" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        8. 代码、原始记录与结果来源
       
     </span>
   </a>
@@ -1100,44 +1144,53 @@
 <h1 id="stsb-ltr">第四阶段：STSB 上的经典 LTR 排序目标对照<a class="headerlink" href="#stsb-ltr" title="Permanent link">&para;</a></h1>
 <h2 id="1">本页实验概览（1 项）<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
 <p><a id="exp-18-summary"></a></p>
-<h3 id="_1">实验十八：六种经典排序目标在三种池化模型上的对照<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h3>
+<h3 id="pairwise-listwise-flag">实验十八：修正后的 Pairwise / Listwise 目标下，FLaG 的排序偏转是否有效？<a class="headerlink" href="#pairwise-listwise-flag" title="Permanent link">&para;</a></h3>
 <ul>
-<li><strong>实验目的：</strong> 在 STSB 任务上，比较不同 Learning-to-Rank（LTR）训练目标下 Mean、FLaG-Zero 与原始 FLaG 的排序指标。</li>
-<li><strong>实验思路：</strong> 固定数据集划分与训练协议，比较 RankNet、Scaled RankNet、Pairwise Hinge、ListNet、ListMLE 和 LambdaRank-style 六种排序目标，每种模型与目标组合使用 5 个随机种子。</li>
-<li><strong>实验结果：</strong> 表格如下。数值为 5 个随机种子的均值 ± 样本标准差。</li>
+<li><strong>实验目的：</strong> 回到最初的问题：FLaG 相对 Mean 引入了额外的表示变化和参数自由度，为何没有转化为更好的 STSB 排序？检验这种现象在不同 LTR 训练目标下是否仍然存在。</li>
+<li><strong>实验思路：</strong> 修正旧版 LTR 的评分尺度、Margin 和并列标签处理问题后，固定 RoBERTa-base、数据划分、训练预算与 checkpoint 选择规则。在 Mean、FLaG-Zero 和原始 FLaG 上测试 7 种纯排序目标，分别运行 5 个 seed，并以同协议 MSE 为基线。</li>
+<li><strong>实验结果：</strong> 共 <strong>3 模型 × 8 训练目标 × 5 seeds = 120 个条件</strong>（包含 MSE 和已完成的 Pure Soft Spearman）。在 <strong>7/7 种纯 LTR</strong> 下，验证集均为 <strong>Mean &gt; FLaG-Zero &gt; FLaG</strong>；FLaG 与 FLaG-Zero 在同一目标下对 Mean 的 <strong>5/5 个配对 seed 全部落后</strong>。</li>
+<li><strong>实验结论：</strong> 当前结果不支持“只要换成排序损失，FLaG 相对 Mean 的额外表示偏转就能改善排序”的解释。部分目标下 FLaG 的训练 Spearman 甚至更高，但验证 Spearman 更低。<strong>本页只证明性能现象，不直接证明 Gate、Projection 或转角本身是因果原因。</strong></li>
 </ul>
 <p><strong><a href="#exp-18-detail">↓ 查看详细实验与数据</a></strong></p>
 <hr />
-<h2 id="_2">详细实验记录与数据<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<h2 id="_1">详细实验记录与数据<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p><a id="exp-18-detail"></a></p>
-<h3 id="1_1">1. 模型与排序目标<a class="headerlink" href="#1_1" title="Permanent link">&para;</a></h3>
+<h3 id="1_1">1. 研究问题、模型与排序目标<a class="headerlink" href="#1_1" title="Permanent link">&para;</a></h3>
+<p>最初要解释的不是“LTR 能否优于 MSE”，而是：</p>
+<blockquote>
+<p><strong>FLaG 相比 Mean 学到的额外表示方向（转角／偏转）为什么没有起作用？如果训练目标直接要求正确排序，FLaG 能否利用这些额外自由度超过 Mean？</strong></p>
+</blockquote>
+<p>此前 LTR-v2 的训练设计存在分数尺度与排序目标实现上的不足，不能拿旧版 3-epoch / 未修正损失的结果与新实验直接比较。本页<strong>整体采用修正后的端到端协议</strong>，旧结果不再用于本页结论。</p>
 <p><strong>模型设置</strong></p>
 <ul>
 <li><strong>Mean：</strong> Masked Mean Pooling。</li>
-<li><strong>FLaG-Zero：</strong> 使用 Mean 等价初始化的 FLaG_B2 控制模型。</li>
-<li><strong>原始 FLaG：</strong> 按原始实验协议实现的 FLaG。</li>
+<li><strong>FLaG-Zero：</strong> <code>FLaG_B2</code>，Mean 等价初始化（频域 Gate 的初始残差为零、时域 Projection 初始为恒等、time pooling 为 mean、不使用 post-pool norm）；训练前检查初始 pooling / cosine 与 Mean 的差异，容差为 <code>1e-5</code>。</li>
+<li><strong>原始 FLaG：</strong> FFT latent attention + frequency gate + iFFT + max pooling + projection，使用原协议的 post-pool norm。</li>
 </ul>
-<p><strong>排序目标</strong></p>
+<p>三个模型均从 RoBERTa-base 预训练权重出发，<strong>Encoder 不冻结</strong>；这里的 FLaG-Zero 是“从与 Mean 函数等价的池化初始化开始训练”，<strong>并非从已训练的高性能 Mean checkpoint 做 warm-start</strong>。因此本实验属于模型架构与优化轨迹对照，而不是冻结 Encoder 条件下的 Gate 因果实验。</p>
+<p><strong>排序目标（全部为纯排序训练，不含 MSE 反向传播）</strong></p>
 <ol>
-<li><strong>RankNet：</strong> 对余弦相似度直接使用 pairwise logistic loss。</li>
-<li><strong>Scaled RankNet：</strong> 使用可学习仿射评分 <span class="arithmatex">\(s=\exp(\alpha)\,\mathrm{cosine}+b\)</span> 的 pairwise logistic loss。</li>
-<li><strong>Pairwise Hinge：</strong> 使用间隔式 pairwise 排序损失；相同标签的样本对不参与损失计算。</li>
-<li><strong>ListNet：</strong> 对标签和预测分数的 softmax 分布计算 top-one 概率交叉熵。</li>
-<li><strong>ListMLE：</strong> 使用 Plackett–Luce 排列似然；每个 minibatch 按标签降序排列。</li>
-<li><strong>LambdaRank-style：</strong> 使用由交换样本对所引起的 NDCG 变化幅度加权的 pairwise logistic loss。</li>
+<li><strong>RankNet（Pairwise）：</strong> 在非并列标签对上计算 logistic loss；固定评分温度，修正旧版未经缩放的 cosine 差值。</li>
+<li><strong>Hinge Fixed（Pairwise）：</strong> 评分 logits 的 margin 为 1，对应 raw cosine 的 margin 0.05，不再沿用旧版在 raw score 上取 margin 1 的设置。</li>
+<li><strong>Hinge Label-aware（Pairwise）：</strong> margin 随标签差距变化，范围为 logits 尺度上的 0.25–1。</li>
+<li><strong>LambdaRank-style（Pairwise / Listwise 加权）：</strong> 用随机 minibatch 内的 NDCG 变化对 pairwise logistic loss 加权；它是 <strong>batch-local 近似</strong>，不是标准 query-grouped LambdaRank。</li>
+<li><strong>ListNet KL（Listwise）：</strong> 对归一化标签分布和 cosine 分数的 softmax 分布计算 KL；并列标签自然得到相同的目标概率。</li>
+<li><strong>Grouped ListMLE（Listwise）：</strong> 先按标签值分组，再对有序 relevance 组计算 Plackett–Luce 式代理损失，避免为相同标签强行指定排列；并非精确枚举全部 tie-consistent 排列。</li>
+<li><strong>Pure Soft Spearman（Listwise 排序相关性代理）：</strong> 用可微 SoftRank 近似预测名次，以真实标签的平均名次处理 ties，最小化 <code>1 − rank correlation</code>。</li>
 </ol>
+<p>另外保留 <strong>MSE</strong> 作为非 LTR 参照，<strong>MSE + 0.05 Soft Spearman</strong> 是另一组混合目标实验，不计入本页的 7 种纯 LTR。</p>
 <h3 id="2">2. 训练与评估设置<a class="headerlink" href="#2" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
 <th>设置</th>
-<th>配置</th>
+<th>修正后的统一配置</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>数据集</td>
-<td>STS Benchmark（STSB）官方 train / validation / test 划分</td>
+<td>STS Benchmark（STSB）官方 train / validation</td>
 </tr>
 <tr>
 <td>模型</td>
@@ -1148,16 +1201,20 @@
 <td>0、1、2、3、4</td>
 </tr>
 <tr>
-<td>训练轮数</td>
-<td>3 epochs</td>
+<td>新增训练</td>
+<td>6 种经典 LTR × 3 模型 × 5 seeds = 90 次</td>
 </tr>
 <tr>
-<td>训练 batch size</td>
-<td>32</td>
+<td>合并对照</td>
+<td>已有 MSE 与 Pure Soft Spearman，共 120 个条件</td>
 </tr>
 <tr>
-<td>评估 batch size</td>
-<td>64</td>
+<td>Encoder</td>
+<td>RoBERTa-base，端到端训练（不冻结）</td>
+</tr>
+<tr>
+<td>训练 / 评估 batch size</td>
+<td>32 / 64</td>
 </tr>
 <tr>
 <td>最大序列长度</td>
@@ -1165,230 +1222,278 @@
 </tr>
 <tr>
 <td>优化器</td>
-<td>Adam</td>
+<td>Adam，weight decay = 0</td>
 </tr>
 <tr>
 <td>Encoder 学习率</td>
 <td><span class="arithmatex">\(1\times10^{-5}\)</span></td>
 </tr>
 <tr>
-<td>Pooling / head 学习率</td>
+<td>Pooling 学习率</td>
 <td><span class="arithmatex">\(1\times10^{-3}\)</span></td>
 </tr>
 <tr>
-<td>Weight decay</td>
-<td>0</td>
+<td>最大 / 最小训练轮数</td>
+<td>最多 20 epochs，至少 12 epochs</td>
+</tr>
+<tr>
+<td>Early stopping</td>
+<td>Patience = 5</td>
+</tr>
+<tr>
+<td>纯 LTR 评分</td>
+<td>Raw cosine；固定 score temperature = 0.05</td>
+</tr>
+<tr>
+<td>ListNet 标签温度</td>
+<td>0.20（标签先除以 5）</td>
+</tr>
+<tr>
+<td>Score affine head</td>
+<td>在纯 LTR 下固定 scale / bias，不参与训练</td>
 </tr>
 <tr>
 <td>Checkpoint 选择</td>
-<td>Validation Spearman</td>
+<td>只按官方 Validation Spearman 选择（包含 epoch 0）</td>
 </tr>
 <tr>
-<td>本页展示指标</td>
-<td>Train / Validation / Test Spearman</td>
+<td>本页主要指标</td>
+<td><strong>Validation Spearman</strong>，5-seed mean ± sample std</td>
+</tr>
+<tr>
+<td>Test</td>
+<td><strong>本轮没有读取或评估 Test</strong></td>
 </tr>
 </tbody>
 </table>
-<p>测试集指标在根据验证集 Spearman 选择 checkpoint 后计算。下表均为 5 个随机种子的 <strong>mean ± sample std</strong>。</p>
-<h3 id="3-mean">3. Mean 结果<a class="headerlink" href="#3-mean" title="Permanent link">&para;</a></h3>
+<p>STSB 是独立句对相似度评分任务，<strong>没有自然的 query/document 分组</strong>。这里的 Pairwise 和 Listwise 在随机 minibatch 内构造排序关系，不应与带 query ID 的搜索 LTR 协议混为一谈。</p>
+<h3 id="3-meanflag-zero-flag">3. 修正后全部结果：Mean、FLaG-Zero 与 FLaG<a class="headerlink" href="#3-meanflag-zero-flag" title="Permanent link">&para;</a></h3>
+<p>以下为 <strong>Validation Spearman（5 seeds mean ± sample std）</strong>。每一行加粗同一训练目标下的最佳模型，每一列的最佳纯 LTR 在表后单独说明。</p>
 <table>
 <thead>
 <tr>
-<th>排序目标</th>
-<th style="text-align: right;">Train Spearman</th>
-<th style="text-align: right;">Validation Spearman</th>
-<th style="text-align: right;">Test Spearman</th>
+<th>训练目标</th>
+<th style="text-align: right;">Mean</th>
+<th style="text-align: right;">FLaG-Zero</th>
+<th style="text-align: right;">原始 FLaG</th>
 </tr>
 </thead>
 <tbody>
 <tr>
+<td>MSE（基线）</td>
+<td style="text-align: right;"><strong>0.887813 ± 0.002137</strong></td>
+<td style="text-align: right;">0.880521 ± 0.002249</td>
+<td style="text-align: right;">0.874077 ± 0.002288</td>
+</tr>
+<tr>
+<td>Pure Soft Spearman</td>
+<td style="text-align: right;"><strong>0.890544 ± 0.001242</strong></td>
+<td style="text-align: right;">0.882284 ± 0.001639</td>
+<td style="text-align: right;">0.872682 ± 0.002478</td>
+</tr>
+<tr>
 <td>RankNet</td>
-<td style="text-align: right;">0.8294 ± 0.0184</td>
-<td style="text-align: right;">0.8129 ± 0.0033</td>
-<td style="text-align: right;">0.7673 ± 0.0062</td>
+<td style="text-align: right;"><strong>0.891177 ± 0.000950</strong></td>
+<td style="text-align: right;">0.881677 ± 0.001521</td>
+<td style="text-align: right;">0.871636 ± 0.000625</td>
 </tr>
 <tr>
-<td>Scaled RankNet</td>
-<td style="text-align: right;">0.8622 ± 0.0147</td>
-<td style="text-align: right;">0.8246 ± 0.0029</td>
-<td style="text-align: right;"><strong>0.7840 ± 0.0062</strong></td>
+<td>Hinge Fixed</td>
+<td style="text-align: right;"><strong>0.891492 ± 0.000930</strong></td>
+<td style="text-align: right;">0.881495 ± 0.001188</td>
+<td style="text-align: right;">0.873738 ± 0.001429</td>
 </tr>
 <tr>
-<td>Pairwise Hinge</td>
-<td style="text-align: right;"><strong>0.8659 ± 0.0033</strong></td>
-<td style="text-align: right;">0.8219 ± 0.0035</td>
-<td style="text-align: right;">0.7821 ± 0.0071</td>
-</tr>
-<tr>
-<td>ListNet</td>
-<td style="text-align: right;">0.8341 ± 0.0288</td>
-<td style="text-align: right;"><strong>0.8281 ± 0.0050</strong></td>
-<td style="text-align: right;">0.7836 ± 0.0082</td>
-</tr>
-<tr>
-<td>ListMLE</td>
-<td style="text-align: right;">0.8625 ± 0.0039</td>
-<td style="text-align: right;">0.8200 ± 0.0050</td>
-<td style="text-align: right;">0.7814 ± 0.0055</td>
+<td>Hinge Label-aware</td>
+<td style="text-align: right;"><strong>0.889612 ± 0.001938</strong></td>
+<td style="text-align: right;">0.882708 ± 0.000766</td>
+<td style="text-align: right;">0.877168 ± 0.003000</td>
 </tr>
 <tr>
 <td>LambdaRank-style</td>
-<td style="text-align: right;">0.7334 ± 0.0082</td>
-<td style="text-align: right;">0.7697 ± 0.0053</td>
-<td style="text-align: right;">0.7063 ± 0.0067</td>
+<td style="text-align: right;"><strong>0.878351 ± 0.001351</strong></td>
+<td style="text-align: right;">0.868304 ± 0.001971</td>
+<td style="text-align: right;">0.860642 ± 0.002489</td>
+</tr>
+<tr>
+<td>ListNet KL</td>
+<td style="text-align: right;"><strong>0.879715 ± 0.002021</strong></td>
+<td style="text-align: right;">0.871968 ± 0.003235</td>
+<td style="text-align: right;">0.867436 ± 0.001452</td>
+</tr>
+<tr>
+<td>Grouped ListMLE</td>
+<td style="text-align: right;"><strong>0.890560 ± 0.001272</strong></td>
+<td style="text-align: right;">0.874172 ± 0.002612</td>
+<td style="text-align: right;">0.866297 ± 0.003806</td>
 </tr>
 </tbody>
 </table>
-<h3 id="4-flag-zero">4. FLaG-Zero 结果<a class="headerlink" href="#4-flag-zero" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>排序目标</th>
-<th style="text-align: right;">Train Spearman</th>
-<th style="text-align: right;">Validation Spearman</th>
-<th style="text-align: right;">Test Spearman</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>RankNet</td>
-<td style="text-align: right;">0.8322 ± 0.0072</td>
-<td style="text-align: right;">0.8136 ± 0.0058</td>
-<td style="text-align: right;">0.7734 ± 0.0069</td>
-</tr>
-<tr>
-<td>Scaled RankNet</td>
-<td style="text-align: right;">0.8572 ± 0.0201</td>
-<td style="text-align: right;"><strong>0.8190 ± 0.0071</strong></td>
-<td style="text-align: right;">0.7863 ± 0.0085</td>
-</tr>
-<tr>
-<td>Pairwise Hinge</td>
-<td style="text-align: right;"><strong>0.8996 ± 0.0023</strong></td>
-<td style="text-align: right;">0.8181 ± 0.0069</td>
-<td style="text-align: right;"><strong>0.7916 ± 0.0046</strong></td>
-</tr>
-<tr>
-<td>ListNet</td>
-<td style="text-align: right;">0.8429 ± 0.0209</td>
-<td style="text-align: right;">0.8157 ± 0.0080</td>
-<td style="text-align: right;">0.7807 ± 0.0096</td>
-</tr>
-<tr>
-<td>ListMLE</td>
-<td style="text-align: right;">0.8626 ± 0.0157</td>
-<td style="text-align: right;">0.8159 ± 0.0074</td>
-<td style="text-align: right;">0.7809 ± 0.0139</td>
-</tr>
-<tr>
-<td>LambdaRank-style</td>
-<td style="text-align: right;">0.7618 ± 0.0255</td>
-<td style="text-align: right;">0.7679 ± 0.0225</td>
-<td style="text-align: right;">0.7140 ± 0.0252</td>
-</tr>
-</tbody>
-</table>
-<h3 id="5-flag">5. 原始 FLaG 结果<a class="headerlink" href="#5-flag" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>排序目标</th>
-<th style="text-align: right;">Train Spearman</th>
-<th style="text-align: right;">Validation Spearman</th>
-<th style="text-align: right;">Test Spearman</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>RankNet</td>
-<td style="text-align: right;">0.8162 ± 0.0294</td>
-<td style="text-align: right;">0.7873 ± 0.0083</td>
-<td style="text-align: right;">0.7366 ± 0.0199</td>
-</tr>
-<tr>
-<td>Scaled RankNet</td>
-<td style="text-align: right;">0.8628 ± 0.0310</td>
-<td style="text-align: right;">0.7955 ± 0.0071</td>
-<td style="text-align: right;">0.7623 ± 0.0143</td>
-</tr>
-<tr>
-<td>Pairwise Hinge</td>
-<td style="text-align: right;"><strong>0.8849 ± 0.0047</strong></td>
-<td style="text-align: right;">0.8094 ± 0.0041</td>
-<td style="text-align: right;">0.7700 ± 0.0115</td>
-</tr>
-<tr>
-<td>ListNet</td>
-<td style="text-align: right;">0.8409 ± 0.0138</td>
-<td style="text-align: right;"><strong>0.8167 ± 0.0086</strong></td>
-<td style="text-align: right;"><strong>0.7759 ± 0.0072</strong></td>
-</tr>
-<tr>
-<td>ListMLE</td>
-<td style="text-align: right;">0.8431 ± 0.0131</td>
-<td style="text-align: right;">0.7991 ± 0.0096</td>
-<td style="text-align: right;">0.7565 ± 0.0142</td>
-</tr>
-<tr>
-<td>LambdaRank-style</td>
-<td style="text-align: right;">0.7755 ± 0.0027</td>
-<td style="text-align: right;">0.7714 ± 0.0134</td>
-<td style="text-align: right;">0.7123 ± 0.0076</td>
-</tr>
-</tbody>
-</table>
-<h3 id="6">6. 结果观察<a class="headerlink" href="#6" title="Permanent link">&para;</a></h3>
-<p>宏观上看使用LTR后FLaG-Zero&gt;Mean&gt;FLaG
-但使用LTR后模型整体表现低于MSE方法:0.7916 ± 0.0046(LTR best model)&lt;0.852110 ± 0.002489(Mean mse)</p>
-<p><strong>各模型在不同数据划分上的最高均值</strong></p>
+<p><strong>各模型在纯 LTR 下的最佳验证结果</strong></p>
 <table>
 <thead>
 <tr>
 <th>模型</th>
-<th>Train Spearman 最高</th>
-<th>Validation Spearman 最高</th>
-<th>Test Spearman 最高</th>
+<th>最佳纯排序目标</th>
+<th style="text-align: right;">Validation Spearman</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Mean</td>
-<td>Pairwise Hinge：<strong>0.8659 ± 0.0033</strong></td>
-<td>ListNet：<strong>0.8281 ± 0.0050</strong></td>
-<td>Scaled RankNet：<strong>0.7840 ± 0.0062</strong></td>
+<td>Hinge Fixed</td>
+<td style="text-align: right;"><strong>0.891492 ± 0.000930</strong></td>
 </tr>
 <tr>
 <td>FLaG-Zero</td>
-<td>Pairwise Hinge：<strong>0.8996 ± 0.0023</strong></td>
-<td>Scaled RankNet：<strong>0.8190 ± 0.0071</strong></td>
-<td>Pairwise Hinge：<strong>0.7916 ± 0.0046</strong></td>
+<td>Hinge Label-aware</td>
+<td style="text-align: right;"><strong>0.882708 ± 0.000766</strong></td>
 </tr>
 <tr>
 <td>原始 FLaG</td>
-<td>Pairwise Hinge：<strong>0.8849 ± 0.0047</strong></td>
-<td>ListNet：<strong>0.8167 ± 0.0086</strong></td>
-<td>ListNet：<strong>0.7759 ± 0.0072</strong></td>
+<td>Hinge Label-aware</td>
+<td style="text-align: right;"><strong>0.877168 ± 0.003000</strong></td>
 </tr>
 </tbody>
 </table>
-<p><strong>三种模型合并比较时的最高均值</strong></p>
+<p>这里最重要的现象并非哪个 Loss 的绝对分数最高，而是：<strong>每一个修正后的纯排序目标都保持 Mean &gt; FLaG-Zero &gt; FLaG 的排序。</strong></p>
+<h3 id="4-ltr">4. 同一种 LTR 下的架构差距<a class="headerlink" href="#4-ltr" title="Permanent link">&para;</a></h3>
+<p>为了排除“对不同模型选择不同 Loss 导致的比较偏差”，下面<strong>固定同一个目标</strong>，计算配对 seed 的模型差：</p>
+<div class="arithmatex">\[
+\Delta_{\mathrm{Zero}}=\rho(\mathrm{FLaG\!-\!Zero})-\rho(\mathrm{Mean}),
+\qquad
+\Delta_{\mathrm{FLaG}}=\rho(\mathrm{FLaG})-\rho(\mathrm{Mean}).
+\]</div>
+<table>
+<thead>
+<tr>
+<th>训练目标</th>
+<th style="text-align: right;">FLaG-Zero − Mean</th>
+<th style="text-align: right;">FLaG − Mean</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MSE（参照）</td>
+<td style="text-align: right;">−0.007293</td>
+<td style="text-align: right;">−0.013736</td>
+</tr>
+<tr>
+<td>Pure Soft Spearman</td>
+<td style="text-align: right;">−0.008260</td>
+<td style="text-align: right;">−0.017863</td>
+</tr>
+<tr>
+<td>RankNet</td>
+<td style="text-align: right;">−0.009500</td>
+<td style="text-align: right;">−0.019541</td>
+</tr>
+<tr>
+<td>Hinge Fixed</td>
+<td style="text-align: right;">−0.009996</td>
+<td style="text-align: right;">−0.017754</td>
+</tr>
+<tr>
+<td>Hinge Label-aware</td>
+<td style="text-align: right;"><strong>−0.006905</strong></td>
+<td style="text-align: right;"><strong>−0.012445</strong></td>
+</tr>
+<tr>
+<td>LambdaRank-style</td>
+<td style="text-align: right;">−0.010048</td>
+<td style="text-align: right;">−0.017709</td>
+</tr>
+<tr>
+<td>ListNet KL</td>
+<td style="text-align: right;">−0.007747</td>
+<td style="text-align: right;">−0.012279</td>
+</tr>
+<tr>
+<td>Grouped ListMLE</td>
+<td style="text-align: right;">−0.016388</td>
+<td style="text-align: right;">−0.024263</td>
+</tr>
+</tbody>
+</table>
+<p>上表为五种子<strong>同 seed 配对差值的均值</strong>，不是三个模型分别挑选最佳 Loss 后计算的差。</p>
 <ul>
-<li><strong>Train Spearman：</strong> FLaG-Zero + Pairwise Hinge，0.8996 ± 0.0023。</li>
-<li><strong>Validation Spearman：</strong> Mean + ListNet，0.8281 ± 0.0050。</li>
-<li><strong>Test Spearman：</strong> FLaG-Zero + Pairwise Hinge，0.7916 ± 0.0046。</li>
+<li>对 <strong>7/7 种纯排序目标</strong>，FLaG-Zero 与 FLaG 的均值都低于相同 Loss 的 Mean。</li>
+<li>不仅是均值：两种 FLaG 变体在<strong>每个目标的 5/5 个配对 seed</strong> 上都没有超过 Mean。</li>
+<li>Hinge Label-aware 使两种 FLaG 的差距相对较小，但<strong>没有改变架构排序</strong>。</li>
 </ul>
-<p><strong>Test Spearman 按模型查看</strong></p>
+<p>因此现象具有一定的跨损失一致性：<strong>在当前训练协议下，只把 MSE 换成更直接的排序监督，不能使 FLaG 的额外参数自由度在 STSB 上超过 Mean。</strong></p>
+<h3 id="5">5. 训练集排序更好，却没有带来验证集优势<a class="headerlink" href="#5" title="Permanent link">&para;</a></h3>
+<p>Hinge Label-aware 是最值得用于连接原始机制问题的案例：FLaG 在该目标下有更高的<strong>完整训练集</strong> Spearman，但验证集 Spearman 更低。</p>
+<p>下表取各 seed <strong>由 Validation Spearman 选出的最佳 checkpoint</strong>，再评估完整训练集；数值均为 5 seeds 的均值。</p>
+<table>
+<thead>
+<tr>
+<th>模型</th>
+<th style="text-align: right;">Train Spearman</th>
+<th style="text-align: right;">Validation Spearman</th>
+<th style="text-align: right;">Train − Validation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Mean</td>
+<td style="text-align: right;">0.978632</td>
+<td style="text-align: right;"><strong>0.889612</strong></td>
+<td style="text-align: right;">0.089020</td>
+</tr>
+<tr>
+<td>FLaG-Zero</td>
+<td style="text-align: right;">0.980794</td>
+<td style="text-align: right;">0.882708</td>
+<td style="text-align: right;">0.098087</td>
+</tr>
+<tr>
+<td>原始 FLaG</td>
+<td style="text-align: right;"><strong>0.982147</strong></td>
+<td style="text-align: right;">0.877168</td>
+<td style="text-align: right;"><strong>0.104980</strong></td>
+</tr>
+</tbody>
+</table>
+<p>与 Mean 相比：</p>
 <ul>
-<li>Mean：六种排序目标中，Scaled RankNet 的均值最高（0.7840）。</li>
-<li>FLaG-Zero：Pairwise Hinge 的均值最高（0.7916）。</li>
-<li>原始 FLaG：ListNet 的均值最高（0.7759）。</li>
+<li>原始 FLaG 的 <strong>Train Spearman 高约 0.003515</strong>。</li>
+<li>但原始 FLaG 的 <strong>Validation Spearman 低约 0.012445</strong>。</li>
+<li>其训练—验证差距比 Mean 大约 <strong>0.015960</strong>。</li>
 </ul>
-<p><strong>同一种排序目标下的模型对比</strong></p>
+<p>这与最初的“<strong>FLaG 的额外能力改善训练拟合，却没有改善排序泛化</strong>”高度相似，现在该现象也出现在<strong>纯 LTR 目标</strong>下。</p>
+<p>不过不同 Loss 的训练 Spearman 并不都呈现相同排序。例如 RankNet 下，Mean 的完整训练集 Spearman 仍高于 FLaG。因而<strong>不能概括为 FLaG 在所有 LTR 下都更擅长拟合训练排序</strong>，只能说 Hinge Label-aware 提供了一个明确、可复现的切入点。</p>
+<h3 id="6">6. 结果观察与机制含义<a class="headerlink" href="#6" title="Permanent link">&para;</a></h3>
+<p><strong>（1）最初的问题仍然存在。</strong></p>
+<p>旧版 LTR 的负面结果有损失尺度、Margin 与并列标签处理上的设计问题。修正后，多种排序目标确实能在 Mean 上正常优化，并且验证 Spearman 达到较高水平。但是<strong>不管哪一种排序监督，同协议下 FLaG 仍落后于 Mean</strong>。</p>
+<p>因此不能再把 FLaG 的排序劣势简单归因于“原来使用 MSE，而不是 LTR”。</p>
+<p><strong>（2）FLaG-Zero 从 Mean 等价起点出发，也没有保住 Mean 的泛化水平。</strong></p>
+<p>FLaG-Zero 在初始化时能够近似复现 Mean，但随后 Gate / Projection 等可训练参数会使优化轨迹发生变化。最终排序较差，表明<strong>新增自由度没有在这一协议下自然转化为有用的排序增益</strong>。</p>
+<p>这<strong>并不意味着</strong>“Mean 等价初始化的数学性质有问题”，也<strong>不能单独证明</strong> Gate 或 Projection 是罪魁祸首。当前 Encoder 同样在更新，架构参数、随机优化轨迹与表示变化耦合在一起。</p>
+<p><strong>（3）“转角存在”与“转角有用”是两个不同问题。</strong></p>
+<p>我们真正想知道的是：相对 Mean，FLaG 的额外表示变化是否沿着有利于 STSB 排序的方向。</p>
+<p>本轮只测到了<strong>排名相关性的训练／验证结果</strong>，<strong>没有直接测量句向量转角、投影残差与排序增量的对应关系</strong>。因此当前能够支持的结论是：</p>
+<blockquote>
+<p><strong>在七种纯排序监督下，FLaG 相对 Mean 的额外表示和优化自由度没有转化为更好的验证集 Spearman；它们为何无效，仍需独立的几何和梯度诊断。</strong></p>
+</blockquote>
+<h3 id="7-gate-projection">7. 下一步：回到 Gate / Projection 偏转机制<a class="headerlink" href="#7-gate-projection" title="Permanent link">&para;</a></h3>
+<p>本阶段经典 LTR 对照可以收束，不再以“LTR 比 MSE 高多少”为主要研究问题。后续优先回到<strong>冻结 Encoder、从已训练高性能 Mean checkpoint 严格函数等价初始化的 FLaG-Zero</strong> 机制实验，避免把 Encoder 的联合更新与 Gate 的偏转效应混在一起。</p>
+<p>建议围绕以下可检验问题推进：</p>
+<ol>
+<li><strong>转角是否真的变大？</strong> 在固定样本和 checkpoint 上比较 Mean、FLaG-Zero、FLaG 的归一化表示方向，量化夹角与正交偏转的大小。</li>
+<li><strong>偏转是否具有排序效益？</strong> 将偏转带来的 cosine 分数变化，与标签顺序、pairwise inversion 的改善／恶化逐一对应，判断它是否只是改变表示而没有修正错排。</li>
+<li><strong>究竟谁在驱动偏转？</strong> 在严格 Mean 等价起点，分离 Gate、Projection 与 Encoder 的梯度和参数更新；使用 Gate-only、Projection-only 或冻结模块对照，区分有用更新与额外自由度造成的偏离。</li>
+</ol>
+<p>上述均为<strong>下一阶段待验证的机制假设</strong>，不是本页实验已经证明的结果。</p>
+<h3 id="8">8. 代码、原始记录与结果来源<a class="headerlink" href="#8" title="Permanent link">&para;</a></h3>
 <ul>
-<li>RankNet、Scaled RankNet、Pairwise Hinge 和 LambdaRank-style 下，FLaG-Zero 的 Test Spearman 均值高于 Mean。</li>
-<li>ListNet 和 ListMLE 下，Mean 的 Test Spearman 均值高于 FLaG-Zero。</li>
-<li>RankNet、Scaled RankNet、Pairwise Hinge、ListNet 和 ListMLE 下，原始 FLaG 的 Test Spearman 均值低于对应的 Mean；LambdaRank-style 下，原始 FLaG（0.7123）高于 Mean（0.7063）。</li>
+<li>修正版经典 Pairwise / Listwise 训练：<a href="https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/run_stsb_classic_ltr_suite.py"><code>run_stsb_classic_ltr_suite.py</code></a></li>
+<li>六种经典 Loss：<a href="https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/stsb_classic_ltr_losses.py"><code>stsb_classic_ltr_losses.py</code></a></li>
+<li>Pure Soft Spearman 训练：<a href="https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/run_stsb_pure_softspearman.py"><code>run_stsb_pure_softspearman.py</code></a></li>
+<li>正式实验协议：<a href="https://github.com/lumoswwr/AMPCliff/blob/FLaG-STFT-mechanism/text_repro/STSB_CLASSIC_LTR_SUITE_PROTOCOL.md"><code>STSB_CLASSIC_LTR_SUITE_PROTOCOL.md</code></a></li>
+<li>五种子逐轮日志及指标：<a href="https://github.com/lumoswwr/AMPCliff/tree/FLaG-STFT-mechanism/research_audit_exports/stsb_classic_ltr_final"><code>research_audit_exports/stsb_classic_ltr_final</code></a></li>
 </ul>
+<p><strong>数据口径：</strong> 本页所有正式结果均使用 STSB <strong>Validation Spearman</strong>；统一报告 5-seed mean ± sample std。同 seed 的架构差距采用配对差值。<strong>本轮经典 LTR 没有 Test 指标</strong>，不能将历史 LTR-v2 的 Test 结果填入修正后实验表格。</p>
 <p><strong><a href="#exp-18-summary">↑ 返回实验概览</a></strong></p>
 
 
@@ -1445,10 +1550,10 @@
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.sections", "navigation.top", "navigation.indexes", "toc.follow", "content.code.copy"], "search": "../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "\u5df2\u590d\u5236", "clipboard.copy": "\u590d\u5236", "search.result.more.one": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.more.other": "\u5728\u8be5\u9875\u4e0a\u8fd8\u6709 # \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.none": "\u6ca1\u6709\u627e\u5230\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.one": "\u627e\u5230 1 \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.other": "# \u4e2a\u7b26\u5408\u6761\u4ef6\u7684\u7ed3\u679c", "search.result.placeholder": "\u952e\u5165\u4ee5\u5f00\u59cb\u641c\u7d22", "search.result.term.missing": "\u7f3a\u5c11", "select.version": "\u9009\u62e9\u5f53\u524d\u7248\u672c"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../assets/javascripts/bundle.c21346df.min.js"></script>
       
         <script src="../javascripts/mathjax.js"></script>
       
