@@ -124,6 +124,8 @@
 
 ![FLaG Validation and Test Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag/flag_val_test_bar.png)
 
+![Mean、FLaG-Zero 与 FLaG 在不同排序目标下的训练 Loss 对比](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/combined/pooling_overlay_train_objective_curves.png)
+
 ### 6. 结果观察
 
 **各模型的最高均值**
