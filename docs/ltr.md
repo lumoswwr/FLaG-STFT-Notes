@@ -74,6 +74,14 @@
 | ListNet KL | 0.972930 ± 0.012976 | 0.879715 ± 0.002021 | 0.864924 ± 0.002385 |
 | Grouped ListMLE | 0.969734 ± 0.010516 | 0.890560 ± 0.001272 | 0.865785 ± 0.001285 |
 
+![Mean Training objective](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/mean/mean_train_objective_curves.png)
+
+![Mean Train Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/mean/mean_train_spearman_overlay.png)
+
+![Mean Validation Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/mean/mean_validation_spearman_overlay.png)
+
+![Mean Validation and Test Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/mean/mean_val_test_bar.png)
+
 ### 4. FLaG-Zero 结果
 
 | 排序目标 | Train Spearman | Validation Spearman | Test Spearman |
@@ -87,6 +95,14 @@
 | ListNet KL | 0.980037 ± 0.004266 | 0.871968 ± 0.003235 | 0.851010 ± 0.004716 |
 | Grouped ListMLE | 0.963735 ± 0.006698 | 0.874172 ± 0.002612 | 0.848842 ± 0.005220 |
 
+![FLaG-Zero Training objective](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag_zero/flag_zero_train_objective_curves.png)
+
+![FLaG-Zero Train Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag_zero/flag_zero_train_spearman_overlay.png)
+
+![FLaG-Zero Validation Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag_zero/flag_zero_validation_spearman_overlay.png)
+
+![FLaG-Zero Validation and Test Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag_zero/flag_zero_val_test_bar.png)
+
 ### 5. 原始 FLaG 结果
 
 | 排序目标 | Train Spearman | Validation Spearman | Test Spearman |
@@ -99,6 +115,14 @@
 | LambdaRank-style | 0.957079 ± 0.012692 | 0.860642 ± 0.002489 | 0.826439 ± 0.003789 |
 | ListNet KL | 0.975730 ± 0.006503 | 0.867436 ± 0.001452 | 0.842925 ± 0.007009 |
 | Grouped ListMLE | 0.951730 ± 0.011394 | 0.866297 ± 0.003806 | 0.831854 ± 0.009157 |
+
+![FLaG Training objective](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag/flag_train_objective_curves.png)
+
+![FLaG Train Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag/flag_train_spearman_overlay.png)
+
+![FLaG Validation Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag/flag_validation_spearman_overlay.png)
+
+![FLaG Validation and Test Spearman](https://raw.githubusercontent.com/lumoswwr/AMPCliff/FLaG-STFT-mechanism/outputs/text/stsb_all_models_ltr_plots_v1/flag/flag_val_test_bar.png)
 
 ### 6. 结果观察
 
