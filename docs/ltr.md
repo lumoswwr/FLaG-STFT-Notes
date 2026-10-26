@@ -7,8 +7,8 @@
 ### 实验十八：七种排序目标在三种池化模型上的对照
 
 - **实验目的：** 在 STSB 任务上，比较 Mean、FLaG-Zero 和原始 FLaG 使用不同 Learning-to-Rank（LTR）目标训练时的排序表现。
-- **实验思路：** 固定数据划分、模型训练设置和 checkpoint 选择方式，测试 RankNet、两种 Pairwise Hinge、LambdaRank-style、ListNet KL、Grouped ListMLE、Soft Spearman 七种排序目标，并以 MSE 作为基线；每个组合运行 5 个随机种子。
-- **实验结果：** 共 3 种模型 × 8 种训练目标 × 5 seeds = **120 组**。以下展示 Train、Validation 和 Test Spearman 的五种子均值 ± 样本标准差。
+- **实验思路：** 固定数据划分、模型训练设置和 checkpoint 选择方式，测试 RankNet、两种 Pairwise Hinge、LambdaRank-style、ListNet KL、Grouped ListMLE、Soft Spearman 七种排序目标，并以 MSE 作为对比，运行 5 个随机种子。
+- **实验结果：** 共 3 种模型 × 8 种训练目标 × 5 seeds = **120 组**。下面展示 Train、Validation 和 Test Spearman 的五种子均值 ± 样本标准差。
 
 **[↓ 查看详细实验与数据](#exp-18-detail)**
 
@@ -22,9 +22,9 @@
 
 **模型设置**
 
-- **Mean：** Masked Mean Pooling。
-- **FLaG-Zero：** 从与 Mean 等价的池化初始化出发，之后训练 FLaG-B2 的额外参数。
-- **原始 FLaG：** 使用频域 latent attention、frequency gate、iFFT、max pooling 和 projection 的 FLaG。
+- **Mean**
+- **FLaG-Zero：** 从与 Mean 等价的池化初始化出发。
+- **原始 FLaG**
 
 **排序目标**
 
